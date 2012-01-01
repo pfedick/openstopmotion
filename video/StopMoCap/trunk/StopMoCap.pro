@@ -12,9 +12,10 @@ else {
     unix:TARGET = release/StopMoCap
 }
 HEADERS += stopmocap.h \
-    stopmocap.h
+    capture.h
 SOURCES += main.cpp \
-    stopmocap.cpp
+    stopmocap.cpp \
+    capture.cpp
 FORMS += stopmocap.ui \
     stopmocap.ui
 RESOURCES += resources.qrc
@@ -33,7 +34,6 @@ CONFIG(debug, debug|release) {
         -lpcre \
         -liconv \
         -lmp3lame \
-        -lmad \
         -lz \
         -lbz2 \
         -lcurl \
@@ -45,6 +45,7 @@ CONFIG(debug, debug|release) {
         -ldnsapi \
         -lz \
         -lbz2 \
+        -lvfw32 \
         -lgdi32      
 }
 else { 
@@ -56,7 +57,6 @@ else {
         -lpcre \
         -liconv \
         -lmp3lame \
-        -lmad \
         -lz \
         -lbz2 \
         -lcurl \
@@ -68,6 +68,7 @@ else {
         -ldnsapi \
         -lz \
         -lbz2 \
+        -lvfw32 \
         -lgdi32
         
 }

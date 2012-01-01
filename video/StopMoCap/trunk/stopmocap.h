@@ -3,6 +3,7 @@
 
 #include <QtGui/QWidget>
 #include "ui_stopmocap.h"
+#include "capture.h"
 
 class StopMoCap : public QWidget
 {
@@ -14,6 +15,7 @@ public:
 
 private:
     Ui::StopMoCapClass ui;
+    Capture cap;
 };
 
 #endif // STOPMOCAP_H

@@ -12,7 +12,6 @@
 		</buildCommand>
 		<buildCommand>
 			<name>org.eclipse.cdt.make.core.makeBuilder</name>
-			<triggers>clean,full,incremental,</triggers>
 			<arguments>
 				<dictionary>
 					<key>org.eclipse.cdt.core.errorOutputParser</key>
@@ -31,6 +30,10 @@
 					<value>make</value>
 				</dictionary>
 				<dictionary>
+					<key>org.eclipse.cdt.make.core.build.location</key>
+					<value></value>
+				</dictionary>
+				<dictionary>
 					<key>org.eclipse.cdt.make.core.build.target.auto</key>
 					<value>debug</value>
 				</dictionary>
@@ -44,7 +47,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableAutoBuild</key>
-					<value>false</value>
+					<value>true</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.enableCleanBuild</key>
@@ -60,7 +63,7 @@
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.environment</key>
-					<value>PATH=C:\\Qt\\4.7.4\\bin;${env_var:PATH}|</value>
+					<value>QMAKESPEC=win32-g++|PATH=C:\\Qt\\4.7.4\\bin;${env_var:PATH};C:\\Qt\\4.6.7\\bin|QTDIR=C:\\Qt\\4.7.4|</value>
 				</dictionary>
 				<dictionary>
 					<key>org.eclipse.cdt.make.core.stopOnError</key>
