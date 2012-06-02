@@ -6,6 +6,7 @@
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
+	controlLayout=NULL;
 	ui.setupUi(this);
 
 	std::list<VideoDevice> devices;
@@ -61,9 +62,42 @@ void StopMoCap::on_formatComboBox_currentIndexChanged(int index)
 void StopMoCap::on_useDevice_clicked()
 {
 	cam.open(Devices[ui.deviceComboBox->currentIndex()]);
-	cam.setCaptureFormat(Formats[ui.formatComboBox->currentIndex()],
+	cam.startCapture(Formats[ui.formatComboBox->currentIndex()],
 			FrameSizes[ui.resolutionComboBox->currentIndex()]);
 
+	std::list<CameraControl> controls;
+	std::list<CameraControl>::const_iterator it;
+	cam.enumerateControls(controls);
+	if (ui.controlWidget->layout()) {
+		delete (ui.controlWidget->layout());
+	}
 
+	controlLayout=new QVBoxLayout;
+	for (it=controls.begin();it!=controls.end();it++) {
+		if (it->type==CameraControl::Integer) {
+			QLabel *label=new QLabel(it->Name);
+			controlLayout->addWidget(label);
+			MyQSlider *slider=new MyQSlider(Qt::Horizontal);
+			slider->setMinimum(it->min);
+			slider->setMaximum(it->max);
+			slider->setSingleStep(it->step);
+			slider->setPageStep(it->step);
+			slider->setSliderPosition(it->defaultValue);
+			slider->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
+			slider->setMaximumWidth(200);
+			slider->cont=*it;
+			controlLayout->addWidget(slider);
+		} else if (it->type==CameraControl::Boolean) {
+			MyQCheckBox *checkbox=new MyQCheckBox;
+			checkbox->setText(it->Name);
+			if (it->defaultValue>0) checkbox->setChecked(true);
+			checkbox->cont=*it;
+			controlLayout->addWidget(checkbox);
+		}
+	}
+	ui.controlWidget->setLayout(controlLayout);
+
+	ppl7::ByteArray ba;
+	cam.readFrame(ba);
 
 }

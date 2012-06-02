@@ -3,9 +3,30 @@
 
 #include <vector>
 #include <QtGui/QWidget>
+#include <QVBoxLayout>
+#include <QSlider>
+#include <QCheckBox>
 #include "ui_stopmocap.h"
 #define WITH_QT
 #include "device.h"
+
+
+class MyQSlider : public QSlider
+{
+	public:
+		MyQSlider( Qt::Orientation orientation, QWidget * parent = 0)
+		: QSlider(orientation,parent)
+		{
+
+		}
+		CameraControl cont;
+};
+
+class MyQCheckBox : public QCheckBox
+{
+	public:
+		CameraControl cont;
+};
 
 class StopMoCap : public QWidget
 {
@@ -21,6 +42,7 @@ private:
     std::vector<VideoDevice> Devices;
     std::vector<VideoFormat> Formats;
     std::vector<ppl7::grafix::Size> FrameSizes;
+    QVBoxLayout *controlLayout;
 
 
 public slots:

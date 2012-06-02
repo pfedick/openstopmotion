@@ -25,6 +25,8 @@ static int xioctl(int fh, int request, void *arg)
 Device::Device()
 {
 	myff=0;
+	buffers=NULL;
+	captureRunning=false;
 }
 
 Device::~Device()
@@ -74,6 +76,16 @@ void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDev
 		throw InvalidDevice();
 	}
 	d.Name.setf("%s",cap.card);
+
+	if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) {
+        printf ("is no video capture device\n");
+	}
+    if (!(cap.capabilities & V4L2_CAP_READWRITE)) {
+    	printf ("%s: Kein readwrite\n",(const char*)d.Name);
+    }
+    if (!(cap.capabilities & V4L2_CAP_STREAMING)) {
+    	printf ("%s: Kein Streaming\n",(const char*)d.Name);
+    }
 	::close(ff);
 }
 
@@ -127,15 +139,30 @@ void Device::open(const VideoDevice &dev)
 
 void Device::close()
 {
+	if (captureRunning) {
+		stopCapturing();
+	}
 	if (myff>0) {
 		::close(myff);
 		myff=0;
 	}
+	freeBuffers();
 }
 
-void Device::setCaptureFormat(const VideoFormat &fmt, int width, int height)
+void Device::freeBuffers()
+{
+	if (buffers) {
+        for (int i = 0; i < 4; ++i)
+                free(buffers[i].start);
+		free(buffers);
+		buffers=NULL;
+	}
+}
+
+void Device::startCapture(const VideoFormat &fmt, int width, int height)
 {
 	if (myff<1) throw DeviceNotOpen();
+	if (captureRunning) stopCapturing();
 	this->fmt=fmt;
 	struct v4l2_format f;
 	CLEAR(f);
@@ -147,11 +174,164 @@ void Device::setCaptureFormat(const VideoFormat &fmt, int width, int height)
 	if (-1 == xioctl(myff, VIDIOC_S_FMT, &f)) {
 		throw InvalidFormat();
 	}
+	if ((int)f.fmt.pix.pixelformat!=fmt.pixelformat) {
+		throw InvalidFormat();
+	}
+	initCapture(width*height*4);
 }
 
-void Device::setCaptureFormat(const VideoFormat &fmt, const ppl7::grafix::Size &size)
+void Device::startCapture(const VideoFormat &fmt, const ppl7::grafix::Size &size)
 {
-	setCaptureFormat(fmt,size.width,size.height);
+	startCapture(fmt,size.width,size.height);
+}
+
+void Device::enumerateControls(std::list<CameraControl> &list)
+{
+	struct v4l2_queryctrl qctrl;
+	struct v4l2_querymenu menu;
+
+	//qctrl.id = V4L2_CTRL_CLASS_CAMERA | V4L2_CTRL_FLAG_NEXT_CTRL;
+	qctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
+
+	while (0 == xioctl (myff, VIDIOC_QUERYCTRL, &qctrl)) {
+		qctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
+		//if (V4L2_CTRL_ID2CLASS (qctrl.id) != V4L2_CTRL_CLASS_CAMERA) break;
+		if (qctrl.flags&V4L2_CTRL_FLAG_DISABLED) continue;
+		CameraControl cc;
+		cc.id=qctrl.id;
+		switch (qctrl.type) {
+			case V4L2_CTRL_TYPE_INTEGER: cc.type=CameraControl::Integer; break;
+			case V4L2_CTRL_TYPE_BOOLEAN: cc.type=CameraControl::Boolean; break;
+			case V4L2_CTRL_TYPE_MENU: cc.type=CameraControl::Menu; break;
+			default:
+				cc.type=CameraControl::Unknown; break;
+		}
+		cc.Name.set((const char*)qctrl.name);
+		cc.min=qctrl.minimum;
+		cc.max=qctrl.maximum;
+		cc.step=qctrl.step;
+		cc.defaultValue=qctrl.default_value;
+		cc.flags=qctrl.flags;
+		/*
+		printf ("id: %i, type: %i, Name: %s, min: %i, max: %i, step: %i, default: %i, flags: %i\n",
+				cc.id,cc.type,(const char*)cc.Name,cc.min,cc.max,
+				cc.step, cc.defaultValue,cc.flags);
+		 */
+		if (qctrl.type==V4L2_CTRL_TYPE_MENU) {
+			CLEAR(menu);
+			menu.id=qctrl.id;
+			//printf ("Enumerating Menu...\n");
+			for (menu.index=(unsigned int)qctrl.minimum;menu.index<=(unsigned int)qctrl.maximum;menu.index++) {
+				if (0 == xioctl (myff, VIDIOC_QUERYMENU, &menu)) {
+					//printf ("Menue: %i, %s\n",menu.index,(const char*)menu.name);
+				} else {
+					//printf ("Error\n");
+				}
+			}
+		}
+		list.push_back(cc);
+
+	}
+
+}
+
+void Device::initCapture(size_t buffer_size)
+{
+	if (myff<1) throw DeviceNotOpen();
+	struct v4l2_requestbuffers req;
+	CLEAR(req);
+	req.count  = 4;
+	req.type   = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	req.memory = V4L2_MEMORY_USERPTR;
+
+	if (-1 == xioctl(myff, VIDIOC_REQBUFS, &req)) {
+		perror("ERROR");
+		if (EINVAL == errno) {
+			throw StreamingUnsupported();
+		} else {
+			throw StreamingUnsupported();
+		}
+	}
+	freeBuffers();
+	buffers = (struct buffer *)calloc(4, sizeof(*buffers));
+
+	if (!buffers) {
+		fprintf(stderr, "Out of memory\n");
+		exit(EXIT_FAILURE);
+	}
+
+	for (int n_buffers = 0; n_buffers < 4; ++n_buffers) {
+		buffers[n_buffers].length = buffer_size;
+		buffers[n_buffers].start = malloc(buffer_size);
+
+		if (!buffers[n_buffers].start) {
+			throw ppl7::OutOfMemoryException();
+		}
+	}
+}
+
+void Device::stopCapturing()
+{
+	enum v4l2_buf_type type;
+	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (-1 == xioctl(myff, VIDIOC_STREAMOFF, &type))
+		throw StreamOffError();
+}
+
+void Device::startCapturing()
+{
+	unsigned int i;
+	enum v4l2_buf_type type;
+	for (i = 0; i < 4; ++i) {
+		struct v4l2_buffer buf;
+
+		CLEAR(buf);
+		buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+		buf.memory = V4L2_MEMORY_USERPTR;
+		buf.index = i;
+		buf.m.userptr = (unsigned long)buffers[i].start;
+		buf.length = buffers[i].length;
+
+		if (-1 == xioctl(myff, VIDIOC_QBUF, &buf)) throw StreamBufferError();
+	}
+	type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+	if (-1 == xioctl(myff, VIDIOC_STREAMON, &type)) throw StreamOnError();
+}
+
+
+void Device::waitForNextFrame()
+{
+	for (;;) {
+		fd_set fds;
+		struct timeval tv;
+		int r;
+
+		FD_ZERO(&fds);
+		FD_SET(myff, &fds);
+
+		/* Timeout. */
+		tv.tv_sec = 2;
+		tv.tv_usec = 0;
+
+		r = select(myff + 1, &fds, NULL, NULL, &tv);
+
+		if (-1 == r) {
+			if (EINTR == errno)
+				continue;
+			throw SelectError();
+		}
+
+		if (0 == r) {
+			throw Timeout();
+		}
+		return;
+	}
+}
+
+void Device::readFrame(ppl7::ByteArray &ba)
+{
+	if (myff<1) throw DeviceNotOpen();
+	waitForNextFrame();
 }
 
 
