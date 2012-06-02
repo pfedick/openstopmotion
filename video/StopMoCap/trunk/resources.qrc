@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/translation"/>
-    <qresource prefix="/icons"/>
+    <qresource prefix="/icons">
+        <file>resources/icon48x48.png</file>
+    </qresource>
     <qresource prefix="/other"/>
 </RCC>

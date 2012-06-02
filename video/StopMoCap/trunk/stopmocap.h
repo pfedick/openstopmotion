@@ -1,9 +1,11 @@
 #ifndef STOPMOCAP_H
 #define STOPMOCAP_H
 
+#include <vector>
 #include <QtGui/QWidget>
 #include "ui_stopmocap.h"
-#include "capture.h"
+#define WITH_QT
+#include "device.h"
 
 class StopMoCap : public QWidget
 {
@@ -15,7 +17,16 @@ public:
 
 private:
     Ui::StopMoCapClass ui;
-    Capture cap;
+    Device cam;
+    std::vector<VideoDevice> Devices;
+    std::vector<VideoFormat> Formats;
+    std::vector<ppl7::grafix::Size> FrameSizes;
+
+
+public slots:
+    void on_deviceComboBox_currentIndexChanged(int index);
+    void on_formatComboBox_currentIndexChanged(int index);
+    void on_useDevice_clicked();
 };
 
 #endif // STOPMOCAP_H

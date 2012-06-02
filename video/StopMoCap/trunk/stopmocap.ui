@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
+    <width>748</width>
     <height>462</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>StopMoCap</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/icons/resources/icon48x48.png</normaloff>:/icons/resources/icon48x48.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -25,6 +29,16 @@
      </item>
      <item>
       <widget class="QComboBox" name="deviceComboBox"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Format:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="formatComboBox"/>
      </item>
      <item>
       <widget class="QLabel" name="label_2">
@@ -49,6 +63,13 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="useDevice">
+       <property name="text">
+        <string>use</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -67,6 +88,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

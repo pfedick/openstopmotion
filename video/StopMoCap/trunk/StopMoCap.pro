@@ -12,10 +12,10 @@ else {
     unix:TARGET = release/StopMoCap
 }
 HEADERS += stopmocap.h \
-    capture.h
+	device.h
 SOURCES += main.cpp \
     stopmocap.cpp \
-    capture.cpp
+    device.cpp
 FORMS += stopmocap.ui \
     stopmocap.ui
 RESOURCES += resources.qrc
@@ -24,7 +24,7 @@ INCLUDEPATH += include
 unix:INCLUDEPATH += /usr/local/include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib
-win32:QMAKESPEC = C:/Qt/4.7.4/mkspecs/win32-g++ 
+win32:QMAKESPEC = C:/Qt/4.7.4/mkspecs/win32-g++
 CONFIG(debug, debug|release) { 
     # Debug
     unix:LIBS += `ppl7-config \
@@ -46,7 +46,7 @@ CONFIG(debug, debug|release) {
         -lz \
         -lbz2 \
         -lvfw32 \
-        -lgdi32      
+        -lgdi32
 }
 else { 
     # Release
@@ -70,11 +70,8 @@ else {
         -lbz2 \
         -lvfw32 \
         -lgdi32
-        
 }
 CODECFORSRC = UTF-8
 CODECFORTR = UTF-8
 TRANSLATIONS = stopmocap_de.ts \
     stopmocap_en.ts
-
-
