@@ -11,26 +11,11 @@
 #include <QTimer>
 #include "ui_stopmocap.h"
 #include "device.h"
+#include "config.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
 
-class Config
-{
-	public:
-		Config();
-		~Config();
-		void load();
-		void save();
-
-
-		ppl7::String	CaptureDir;
-		ppl7::String	Scene;
-		int mergeFrames;
-		int skipFrames;
-		int	onionValue;
-
-};
 
 class MyQSlider : public QSlider
 {
@@ -41,12 +26,14 @@ class MyQSlider : public QSlider
 
 		}
 		CameraControl cont;
+		int lastValue;
 };
 
 class MyQCheckBox : public QCheckBox
 {
 	public:
 		CameraControl cont;
+		bool lastValue;
 };
 
 class StopMoCap : public QWidget
@@ -59,16 +46,21 @@ public:
 
 private:
     Ui::StopMoCapClass ui;
-    Device cam;
+    Config conf;
+    int lastFrameNum;
+    ppl7::grafix::Image lastFrame;
     std::vector<VideoDevice> Devices;
     std::vector<VideoFormat> Formats;
     std::vector<ppl7::grafix::Size> FrameSizes;
     QVBoxLayout *controlLayout;
 
     void grabFrame();
+    int highestSceneFrame();
+    bool eventFilter(QObject *target, QEvent *event);
+    bool consumeEvent(QObject *target, QEvent *event);
     QTimer *Timer;
+    Device cam;
 
-    Config conf;
 
 public slots:
     void on_deviceComboBox_currentIndexChanged(int index);
@@ -77,6 +69,9 @@ public slots:
     void on_timer_fired();
     void on_captureButton_clicked();
     void on_selectDir_clicked();
+    void on_sceneName_textChanged ( const QString & text );
+    void on_sceneName_editingFinished();
+    void on_createScene_clicked();
 };
 
 #endif // STOPMOCAP_H

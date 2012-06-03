@@ -25,6 +25,9 @@ void Config::load()
 	settings.beginGroup("common");
 	CaptureDir=settings.value("CaptureDir").toString();
 	Scene=settings.value("Scene").toString();
+	DeviceName=settings.value("DeviceName").toString();
+	ImageFormat=settings.value("ImageFormat").toString();
+	ImageSize=settings.value("ImageSize").toString();
 	mergeFrames=settings.value("mergeFrames",3).toInt();
 	skipFrames=settings.value("skipFrames",0).toInt();
 	onionValue=settings.value("onionValue",0).toInt();
@@ -37,6 +40,9 @@ void Config::save()
 	settings.beginGroup("common");
 	settings.setValue("CaptureDir",CaptureDir);
 	settings.setValue("Scene",Scene);
+	settings.setValue("DeviceName",DeviceName);
+	settings.setValue("ImageFormat",ImageFormat);
+	settings.setValue("ImageSize",ImageSize);
 	settings.setValue("mergeFrames",mergeFrames);
 	settings.setValue("skipFrames",skipFrames);
 	settings.setValue("onionValue",onionValue);

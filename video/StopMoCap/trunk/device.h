@@ -108,6 +108,8 @@ class Device
 		void stopCapture();
 
 		void enumerateControls(std::list<CameraControl> &list);
+		void setControlValue(const CameraControl &ctl, int value);
+		int getControlValue(const CameraControl &ctl);
 		int readFrame(ppl7::grafix::Image &img);
 
 		void close();
@@ -130,6 +132,8 @@ class Device
 		PPLNORMALEXCEPTION(MMapFailed);
 		PPLNORMALEXCEPTION(MUnmapFailed);
 		PPLNORMALEXCEPTION(BufferError);
+		PPLNORMALEXCEPTION(SetControlValueFailed);
+		PPLNORMALEXCEPTION(GetControlValueFailed);
 
 };
 

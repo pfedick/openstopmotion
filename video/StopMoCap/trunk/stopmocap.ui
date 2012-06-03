@@ -293,7 +293,10 @@
       <widget class="QLineEdit" name="sceneName"/>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="createScene">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>create</string>
        </property>
@@ -301,6 +304,9 @@
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
         <string>Clear</string>
        </property>
@@ -356,7 +362,7 @@
      <item>
       <widget class="QLabel" name="label_12">
        <property name="text">
-        <string>Merge Frames:</string>
+        <string>Skip Frames:</string>
        </property>
       </widget>
      </item>
@@ -438,6 +444,41 @@
      </item>
      <item>
       <widget class="QLabel" name="frameNum">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::StyledPanel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="midLineWidth">
+        <number>1</number>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>/</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="totalFrames">
        <property name="minimumSize">
         <size>
          <width>50</width>

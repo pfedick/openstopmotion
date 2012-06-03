@@ -6,6 +6,7 @@
 #include <QPixmap>
 #include <QTimer>
 #include <QFileDialog>
+#include <QEvent>
 
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
@@ -14,6 +15,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.setupUi(this);
 	Timer=new QTimer(this);
 	conf.load();
+	lastFrameNum=0;
 
 
 	std::list<VideoDevice> devices;
@@ -24,20 +26,33 @@ StopMoCap::StopMoCap(QWidget *parent)
 	for (it=devices.begin();it!=devices.end();it++) {
 		Devices.push_back(*it);
 		ui.deviceComboBox->addItem(it->Name,Devices.size()-1);
+		if (it->Name==conf.DeviceName) {
+			int index=ui.deviceComboBox->findText(conf.DeviceName);
+			if (index>=0) ui.deviceComboBox->setCurrentIndex(index);
+
+		}
 	}
 	ui.deviceComboBox->setCurrentIndex(0);
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 
 	ui.captureDir->setText(conf.CaptureDir);
 	ui.sceneName->setText(conf.Scene);
+	on_sceneName_editingFinished();
 	ui.mergeFrames->setValue(conf.mergeFrames);
 	ui.skipFrames->setValue(conf.skipFrames);
-	ui.mergeFrames->setValue(conf.onionValue);
+	ui.onionSkinning->setValue(conf.onionValue);
 }
 
 StopMoCap::~StopMoCap()
 {
 	Timer->stop();
+	conf.mergeFrames=ui.mergeFrames->value();
+	conf.skipFrames=ui.skipFrames->value();
+	conf.onionValue=ui.onionSkinning->value();
+	conf.DeviceName=ui.deviceComboBox->currentText();
+	conf.ImageFormat=ui.formatComboBox->currentText();
+	conf.ImageSize=ui.resolutionComboBox->currentText();
+
 	conf.save();
 	cam.close();
 	delete Timer;
@@ -55,6 +70,11 @@ void StopMoCap::on_deviceComboBox_currentIndexChanged(int index)
 	for (it=fmt.begin();it!=fmt.end();it++) {
 		Formats.push_back(*it);
 		ui.formatComboBox->addItem(it->Description,Formats.size()-1);
+		if (it->Description==conf.ImageFormat) {
+			int index=ui.formatComboBox->findText(conf.ImageFormat);
+			if (index>=0) ui.formatComboBox->setCurrentIndex(index);
+
+		}
 	}
 
 }
@@ -73,6 +93,11 @@ void StopMoCap::on_formatComboBox_currentIndexChanged(int index)
 		FrameSizes.push_back(*it);
 		Tmp.setf("%i x %i",it->width, it->height);
 		ui.resolutionComboBox->addItem(Tmp,FrameSizes.size()-1);
+		if (Tmp==conf.ImageSize) {
+			int index=ui.resolutionComboBox->findText(Tmp);
+			if (index>=0) ui.resolutionComboBox->setCurrentIndex(index);
+
+		}
 	}
 }
 
@@ -102,12 +127,18 @@ void StopMoCap::on_useDevice_clicked()
 			slider->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed));
 			slider->setMaximumWidth(200);
 			slider->cont=*it;
+			slider->setProperty("ctl_type",CameraControl::Integer);
+			slider->lastValue=it->defaultValue;
+			slider->installEventFilter(this);
 			controlLayout->addWidget(slider);
 		} else if (it->type==CameraControl::Boolean) {
 			MyQCheckBox *checkbox=new MyQCheckBox;
 			checkbox->setText(it->Name);
 			if (it->defaultValue>0) checkbox->setChecked(true);
 			checkbox->cont=*it;
+			checkbox->setProperty("ctl_type",CameraControl::Boolean);
+			checkbox->lastValue=it->defaultValue;
+			checkbox->installEventFilter(this);
 			controlLayout->addWidget(checkbox);
 		}
 	}
@@ -122,10 +153,44 @@ void StopMoCap::on_useDevice_clicked()
 	Timer->start(10);
 }
 
+bool StopMoCap::eventFilter(QObject *target, QEvent *event)
+{
+	if (consumeEvent(target,event)) return true;
+	return QWidget::eventFilter(target,event);
+}
+
+bool StopMoCap::consumeEvent(QObject *target, QEvent *event)
+{
+	int ctltype=target->property("ctl_type").toInt();
+	int type=event->type();
+	if (ctltype==CameraControl::Integer) {
+		MyQSlider *slider=(MyQSlider*)target;
+		//printf ("slider, type: %i\n",type);
+		if (slider->value()!=slider->lastValue) {
+			cam.setControlValue(slider->cont,slider->value());
+			slider->lastValue=slider->value();
+		}
+
+	} else if (ctltype==CameraControl::Boolean) {
+		MyQCheckBox *checkbox=(MyQCheckBox*)target;
+		if (checkbox->isChecked()!=checkbox->lastValue) {
+			printf ("checkbox, type: %i\n",type);
+			cam.setControlValue(checkbox->cont,checkbox->isChecked());
+			checkbox->lastValue=checkbox->isChecked();
+		}
+	}
+	return false;
+}
+
 void StopMoCap::grabFrame()
 {
 	ppl7::grafix::Image img;
 	cam.readFrame(img);
+	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
+	if (blendFactor>0.0f) {
+		img.blend(lastFrame,blendFactor);
+	}
+
 	//ppl7::grafix::ImageFilter_PNG png;
 	//png.saveFile("test.png",img);
 	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
@@ -143,6 +208,7 @@ void StopMoCap::on_timer_fired()
 
 void StopMoCap::on_selectDir_clicked()
 {
+	Timer->stop();
 	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
                                                  conf.CaptureDir,
                                                  QFileDialog::ShowDirsOnly
@@ -152,10 +218,14 @@ void StopMoCap::on_selectDir_clicked()
 		ui.captureDir->setText(dir);
 		conf.save();
 	}
+	Timer->start(10);
 }
 
 void StopMoCap::on_captureButton_clicked()
 {
+	ppl7::String Tmp;
+	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
+	if (ppl7::Dir::exists(CaptureDir)==false) return;
 	Timer->stop();
 	ui.viewer->setPixmap(QPixmap());
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -191,10 +261,74 @@ void StopMoCap::on_captureButton_clicked()
 		}
 	}
 
-
+	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
+	lastFrameNum++;
+	ppl7::String Filename=CaptureDir;
+	Filename.appendf("/frame_%06i.png",lastFrameNum);
 	ppl7::grafix::ImageFilter_PNG png;
-	png.saveFile("test.png",final);
+	png.saveFile(Filename,final);
+	lastFrame=final;
+	Tmp.setf("%i",lastFrameNum);
+	ui.totalFrames->setText(Tmp);
 	QApplication::restoreOverrideCursor();
 
 	Timer->start(10);
+}
+
+int StopMoCap::highestSceneFrame()
+{
+	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
+	int highest=0;
+	ppl7::Dir dir(CaptureDir);
+	ppl7::DirEntry e;
+	ppl7::Dir::Iterator it;
+	ppl7::Array matches;
+	dir.reset(it);
+	while (dir.getNextRegExp(e,it,"/^frame_[0-9]+\\..*$/")) {
+		//printf ("e.File=%s\n",(const char*)e.Filename);
+		if (e.Filename.pregMatch("/^frame_0*([1-9]+[0-9]*)\\..*$/",matches)) {
+			int id=matches[1].toInt();
+			//printf ("Match: %i (von: %s)\n",id, (const char*) matches[1]);
+			if (id>highest) highest=id;
+		}
+	}
+	return highest;
+}
+
+void StopMoCap::on_sceneName_textChanged (const QString & text)
+{
+	ppl7::String Tmp=text;
+	Tmp.trim();
+	if (Tmp!=conf.Scene && Tmp.notEmpty()==true) {
+		if (!ppl7::Dir::exists(conf.CaptureDir+"/"+Tmp)) ui.createScene->setEnabled(true);
+		else ui.createScene->setEnabled(false);
+		conf.Scene=Tmp;
+	}
+	lastFrameNum=0;
+}
+
+void StopMoCap::on_sceneName_editingFinished()
+{
+	on_createScene_clicked();
+	lastFrameNum=highestSceneFrame();
+	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
+	Filename.appendf("/frame_%06i.png",lastFrameNum);
+	try {
+		lastFrame.load(Filename);
+	} catch (...) {
+
+	}
+	ppl7::String Tmp;
+	Tmp.setf("%i",lastFrameNum);
+	ui.totalFrames->setText(Tmp);
+}
+
+void StopMoCap::on_createScene_clicked()
+{
+	ppl7::String Tmp=conf.CaptureDir+"/"+conf.Scene;
+	if (!ppl7::Dir::exists(Tmp)) {
+		ppl7::Dir::mkDir(Tmp,true);
+		ui.createScene->setEnabled(false);
+	}
+	lastFrameNum=0;
 }

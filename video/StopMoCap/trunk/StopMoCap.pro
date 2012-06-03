@@ -11,7 +11,8 @@ else {
     win32:TARGET = StopMoCap
     unix:TARGET = release/StopMoCap
 }
-HEADERS += stopmocap.h \
+HEADERS += config.h \
+    stopmocap.h \
     device.h
 SOURCES += config.cpp \
     main.cpp \

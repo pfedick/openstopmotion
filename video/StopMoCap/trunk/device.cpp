@@ -221,9 +221,11 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 	qctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
 
 	while (0 == xioctl (myff, VIDIOC_QUERYCTRL, &qctrl)) {
-		qctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
 		//if (V4L2_CTRL_ID2CLASS (qctrl.id) != V4L2_CTRL_CLASS_CAMERA) break;
-		if (qctrl.flags&V4L2_CTRL_FLAG_DISABLED) continue;
+		if (qctrl.flags&V4L2_CTRL_FLAG_DISABLED) {
+			qctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
+			continue;
+		}
 		CameraControl cc;
 		cc.id=qctrl.id;
 		switch (qctrl.type) {
@@ -239,11 +241,11 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 		cc.step=qctrl.step;
 		cc.defaultValue=qctrl.default_value;
 		cc.flags=qctrl.flags;
-		/*
-		printf ("id: %i, type: %i, Name: %s, min: %i, max: %i, step: %i, default: %i, flags: %i\n",
+
+		printf ("id: %x, type: %i, Name: %s, min: %i, max: %i, step: %i, default: %i, flags: %i\n",
 				cc.id,cc.type,(const char*)cc.Name,cc.min,cc.max,
 				cc.step, cc.defaultValue,cc.flags);
-		 */
+		printf ("  currentValue: %i\n",getControlValue(cc));
 		if (qctrl.type==V4L2_CTRL_TYPE_MENU) {
 			CLEAR(menu);
 			menu.id=qctrl.id;
@@ -257,7 +259,7 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 			}
 		}
 		list.push_back(cc);
-
+		qctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
 	}
 
 }
@@ -564,6 +566,37 @@ int Device::readFrame(ppl7::grafix::Image &img)
 	}
 
 	return 1;
+}
+
+
+void Device::setControlValue(const CameraControl &ctl, int value)
+{
+	if (myff<1) throw DeviceNotOpen();
+	struct v4l2_control c;
+	CLEAR(c);
+	printf ("Setting Control %x (%s) to %i\n",ctl.id,(const char*)ctl.Name,value);
+	c.id=ctl.id;
+	c.value=value;
+	if (-1 == xioctl(myff, VIDIOC_S_CTRL, &c)) {
+		perror("ERROR Device::setControlValue");
+		//throw SetControlValueFailed();
+	}
+}
+
+int Device::getControlValue(const CameraControl &ctl)
+{
+	if (myff<1) throw DeviceNotOpen();
+	struct v4l2_control c;
+	CLEAR(c);
+	//ctls.ctrl_class=V4L2_CTRL_CLASS_CAMERA;
+	c.id=ctl.id;
+	if (-1 == xioctl(myff, VIDIOC_G_CTRL, &c)) {
+		perror("ERROR Device::getControlValue");
+		//throw GetControlValueFailed();
+		return 0;
+	}
+	//ppl7::HexDump(&c,sizeof(c));
+	return c.value;
 }
 
 
