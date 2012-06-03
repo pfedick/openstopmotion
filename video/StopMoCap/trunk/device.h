@@ -26,9 +26,18 @@ class VideoFormat
 class VideoDevice
 {
 	public:
+		enum Capabilities {
+			CAP_VIDEO_CAPTURE			= 0x00000001,
+			CAP_READWRITE				= 0x00000002,
+			CAP_STREAMING				= 0x00000004,
+			CAP_VIDEO_OUTPUT_OVERLAY	= 0x00000008,
+			CAP_ASYNCIO					= 0x00000010,
+		};
+
 		ppl7::String DeviceName;
 		int index;
 		ppl7::String Name;
+		int caps;
 };
 
 class CameraControl
@@ -62,18 +71,31 @@ class Device
 		static void enumerateDevice(const ppl7::String &DeviceName, int index, VideoDevice &d);
 		void waitForNextFrame();
 		void initCapture(size_t buffer_size);
+		void initMMap();
+		void initUserp(size_t buffer_size);
+
 		void stopCapturing();
 		void startCapturing();
+		void initBuffers(int n, size_t buffer_size);
 		void freeBuffers();
+		void processImage(void *buffer, size_t size, ppl7::grafix::Image &img);
 
 		struct buffer          *buffers;
+		unsigned int n_buffers;
 		VideoDevice dev;
 		VideoFormat fmt;
 		ppl7::grafix::Size size;
 		int myff;
+		int iomethod;
 		bool captureRunning;
 
 	public:
+		enum io_method {
+		        IO_METHOD_READ,
+		        IO_METHOD_MMAP,
+		        IO_METHOD_USERPTR,
+		};
+
 		Device();
 		~Device();
 		static void enumerateDevices(std::list<VideoDevice> &list);
@@ -86,7 +108,7 @@ class Device
 		void stopCapture();
 
 		void enumerateControls(std::list<CameraControl> &list);
-		void readFrame(ppl7::ByteArray &ba);
+		int readFrame(ppl7::grafix::Image &img);
 
 		void close();
 
@@ -97,9 +119,17 @@ class Device
 		PPLNORMALEXCEPTION(Timeout);
 		PPLNORMALEXCEPTION(ReadError);
 		PPLNORMALEXCEPTION(StreamingUnsupported);
-		PPLNORMALEXCEPTION(StreamOffError);
-		PPLNORMALEXCEPTION(StreamOnError);
+		PPLNORMALEXCEPTION(StreamOffFailed);
+		PPLNORMALEXCEPTION(StreamOnFailed);
 		PPLNORMALEXCEPTION(StreamBufferError);
+		PPLNORMALEXCEPTION(DeviceDoesNotSupportCapture);
+		PPLNORMALEXCEPTION(MMapUnsupported);
+		PPLNORMALEXCEPTION(UserpUnsupported);
+		PPLNORMALEXCEPTION(InsufficientBufferMemory);
+		PPLNORMALEXCEPTION(QueryBufFailed);
+		PPLNORMALEXCEPTION(MMapFailed);
+		PPLNORMALEXCEPTION(MUnmapFailed);
+		PPLNORMALEXCEPTION(BufferError);
 
 };
 

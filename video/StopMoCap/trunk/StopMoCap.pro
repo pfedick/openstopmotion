@@ -12,8 +12,9 @@ else {
     unix:TARGET = release/StopMoCap
 }
 HEADERS += stopmocap.h \
-	device.h
-SOURCES += main.cpp \
+    device.h
+SOURCES += config.cpp \
+    main.cpp \
     stopmocap.cpp \
     device.cpp
 FORMS += stopmocap.ui \

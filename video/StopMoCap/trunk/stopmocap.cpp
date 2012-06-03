@@ -2,12 +2,19 @@
 #include <ppl7.h>
 #include "stopmocap.h"
 #include "device.h"
+#include <QImage>
+#include <QPixmap>
+#include <QTimer>
+#include <QFileDialog>
 
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
 	controlLayout=NULL;
 	ui.setupUi(this);
+	Timer=new QTimer(this);
+	conf.load();
+
 
 	std::list<VideoDevice> devices;
 	std::list<VideoDevice>::const_iterator it;
@@ -19,11 +26,21 @@ StopMoCap::StopMoCap(QWidget *parent)
 		ui.deviceComboBox->addItem(it->Name,Devices.size()-1);
 	}
 	ui.deviceComboBox->setCurrentIndex(0);
+	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 
+	ui.captureDir->setText(conf.CaptureDir);
+	ui.sceneName->setText(conf.Scene);
+	ui.mergeFrames->setValue(conf.mergeFrames);
+	ui.skipFrames->setValue(conf.skipFrames);
+	ui.mergeFrames->setValue(conf.onionValue);
 }
 
 StopMoCap::~StopMoCap()
 {
+	Timer->stop();
+	conf.save();
+	cam.close();
+	delete Timer;
 
 }
 
@@ -62,14 +79,13 @@ void StopMoCap::on_formatComboBox_currentIndexChanged(int index)
 void StopMoCap::on_useDevice_clicked()
 {
 	cam.open(Devices[ui.deviceComboBox->currentIndex()]);
-	cam.startCapture(Formats[ui.formatComboBox->currentIndex()],
-			FrameSizes[ui.resolutionComboBox->currentIndex()]);
 
 	std::list<CameraControl> controls;
 	std::list<CameraControl>::const_iterator it;
 	cam.enumerateControls(controls);
 	if (ui.controlWidget->layout()) {
 		delete (ui.controlWidget->layout());
+		ui.controlWidget->updateGeometry();
 	}
 
 	controlLayout=new QVBoxLayout;
@@ -96,8 +112,89 @@ void StopMoCap::on_useDevice_clicked()
 		}
 	}
 	ui.controlWidget->setLayout(controlLayout);
+	ui.controlWidget->updateGeometry();
 
-	ppl7::ByteArray ba;
-	cam.readFrame(ba);
+	cam.startCapture(Formats[ui.formatComboBox->currentIndex()],
+			FrameSizes[ui.resolutionComboBox->currentIndex()]);
 
+	ui.captureButton->setFocus();
+	//grabFrame();
+	Timer->start(10);
+}
+
+void StopMoCap::grabFrame()
+{
+	ppl7::grafix::Image img;
+	cam.readFrame(img);
+	//ppl7::grafix::ImageFilter_PNG png;
+	//png.saveFile("test.png",img);
+	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
+	QPixmap pm=QPixmap::fromImage(qi);
+	ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+}
+
+
+void StopMoCap::on_timer_fired()
+{
+	//printf ("Timer fired\n");
+	grabFrame();
+}
+
+
+void StopMoCap::on_selectDir_clicked()
+{
+	QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                 conf.CaptureDir,
+                                                 QFileDialog::ShowDirsOnly
+                                             | QFileDialog::DontResolveSymlinks);
+	if (!dir.isEmpty()) {
+		conf.CaptureDir=dir;
+		ui.captureDir->setText(dir);
+		conf.save();
+	}
+}
+
+void StopMoCap::on_captureButton_clicked()
+{
+	Timer->stop();
+	ui.viewer->setPixmap(QPixmap());
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	QCoreApplication::processEvents();
+
+	ppl7::grafix::Image final, img[100];
+	int mergeFrames=ui.mergeFrames->value();
+	int skipFrames=ui.skipFrames->value();
+	for (int i=0;i<mergeFrames;i++) {
+		//printf ("Capture %i\n",i);
+		cam.readFrame(img[i]);
+		for (int skip=0;skip<skipFrames;skip++) {
+			cam.readFrame(final);
+		}
+	}
+	int width=img[0].width();
+	int height=img[0].height();
+	int r,g,b;
+	ppl7::grafix::Color c;
+
+	final.create(width,height,ppl7::grafix::RGBFormat::X8R8G8B8);
+	for (int y=0;y<height;y++) {
+		for (int x=0;x<width;x++) {
+			r=g=b=0;
+			for (int layer=0;layer<mergeFrames;layer++) {
+				c=img[layer].getPixel(x,y);
+				r+=c.red();
+				g+=c.green();
+				b+=c.blue();
+			}
+			c.setColor(r/mergeFrames,g/mergeFrames,b/mergeFrames);
+			final.putPixel(x,y,c);
+		}
+	}
+
+
+	ppl7::grafix::ImageFilter_PNG png;
+	png.saveFile("test.png",final);
+	QApplication::restoreOverrideCursor();
+
+	Timer->start(10);
 }
