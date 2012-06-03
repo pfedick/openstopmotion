@@ -423,7 +423,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QSlider" name="horizontalSlider_3">
+      <widget class="QSlider" name="frameSlider">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -514,9 +514,9 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QToolButton" name="toolButton">
+        <widget class="QToolButton" name="playButton">
          <property name="text">
-          <string/>
+          <string>&gt;</string>
          </property>
          <property name="iconSize">
           <size>
@@ -527,9 +527,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButton_2">
+        <widget class="QToolButton" name="stopButton">
          <property name="text">
-          <string/>
+          <string>o</string>
          </property>
          <property name="iconSize">
           <size>
@@ -579,6 +579,26 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_13">
+       <property name="text">
+        <string>Framerate:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="frameRate">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>60</number>
+       </property>
+       <property name="value">
+        <number>30</number>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_4">

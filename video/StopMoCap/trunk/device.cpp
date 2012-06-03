@@ -252,7 +252,8 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 			//printf ("Enumerating Menu...\n");
 			for (menu.index=(unsigned int)qctrl.minimum;menu.index<=(unsigned int)qctrl.maximum;menu.index++) {
 				if (0 == xioctl (myff, VIDIOC_QUERYMENU, &menu)) {
-					//printf ("Menue: %i, %s\n",menu.index,(const char*)menu.name);
+					printf ("Menue: %i, %s\n",menu.index,(const char*)menu.name);
+					cc.MenuItems.push_back(CameraControl::MenuItem(menu.index,(const char*)menu.name));
 				} else {
 					//printf ("Error\n");
 				}
@@ -261,7 +262,6 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 		list.push_back(cc);
 		qctrl.id |= V4L2_CTRL_FLAG_NEXT_CTRL;
 	}
-
 }
 
 void Device::startCapture(const VideoFormat &fmt, int width, int height)

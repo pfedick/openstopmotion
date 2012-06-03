@@ -49,6 +49,17 @@ class CameraControl
 			Menu,
 			Unknown
 		};
+		class MenuItem
+		{
+			public:
+				MenuItem(int id, const ppl7::String &Name) {
+					this->id=id;
+					this->Name=Name;
+				}
+				int id;
+				ppl7::String Name;
+		};
+
 		int id;
 		ControlType type;
 		ppl7::String Name;
@@ -57,6 +68,7 @@ class CameraControl
 		int step;
 		int defaultValue;
 		int flags;
+		std::list <MenuItem> MenuItems;
 };
 
 struct buffer {
