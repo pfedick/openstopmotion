@@ -64,14 +64,16 @@ private:
     QVBoxLayout *controlLayout;
     bool inPlayback;
     int playbackFrame;
+    QTimer *Timer;
+    QTimer *PlaybackTimer;
+
+    Device cam;
 
     void grabFrame();
     int highestSceneFrame();
     bool eventFilter(QObject *target, QEvent *event);
     bool consumeEvent(QObject *target, QEvent *event);
-    QTimer *Timer;
-    QTimer *PlaybackTimer;
-    Device cam;
+    void capture(ppl7::grafix::Image &img);
 
 
 public slots:
@@ -91,6 +93,8 @@ public slots:
 
     void on_playButton_clicked();
     void on_stopButton_clicked();
+
+    void on_previewButton_toggled ( bool checked );
 
 };
 

@@ -51,6 +51,13 @@
       <widget class="QComboBox" name="resolutionComboBox"/>
      </item>
      <item>
+      <widget class="QPushButton" name="useDevice">
+       <property name="text">
+        <string>use</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -62,13 +69,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="useDevice">
-       <property name="text">
-        <string>use</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
@@ -376,6 +376,16 @@
        </property>
        <property name="value">
         <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="previewButton">
+       <property name="text">
+        <string>Preview</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

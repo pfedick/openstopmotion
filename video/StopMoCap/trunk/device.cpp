@@ -241,18 +241,19 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 		cc.step=qctrl.step;
 		cc.defaultValue=qctrl.default_value;
 		cc.flags=qctrl.flags;
-
+		/*
 		printf ("id: %x, type: %i, Name: %s, min: %i, max: %i, step: %i, default: %i, flags: %i\n",
 				cc.id,cc.type,(const char*)cc.Name,cc.min,cc.max,
 				cc.step, cc.defaultValue,cc.flags);
 		printf ("  currentValue: %i\n",getControlValue(cc));
+		*/
 		if (qctrl.type==V4L2_CTRL_TYPE_MENU) {
 			CLEAR(menu);
 			menu.id=qctrl.id;
 			//printf ("Enumerating Menu...\n");
 			for (menu.index=(unsigned int)qctrl.minimum;menu.index<=(unsigned int)qctrl.maximum;menu.index++) {
 				if (0 == xioctl (myff, VIDIOC_QUERYMENU, &menu)) {
-					printf ("Menue: %i, %s\n",menu.index,(const char*)menu.name);
+					//printf ("Menue: %i, %s\n",menu.index,(const char*)menu.name);
 					cc.MenuItems.push_back(CameraControl::MenuItem(menu.index,(const char*)menu.name));
 				} else {
 					//printf ("Error\n");
@@ -591,7 +592,7 @@ int Device::getControlValue(const CameraControl &ctl)
 	//ctls.ctrl_class=V4L2_CTRL_CLASS_CAMERA;
 	c.id=ctl.id;
 	if (-1 == xioctl(myff, VIDIOC_G_CTRL, &c)) {
-		perror("ERROR Device::getControlValue");
+		//perror("ERROR Device::getControlValue");
 		//throw GetControlValueFailed();
 		return 0;
 	}
