@@ -36,6 +36,8 @@
 		</buildTargets>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.pathentry">
+		<pathentry include="/usr/local/include" kind="inc" path="" system="true"/>
+		<pathentry include="/usr/local/include/qt4" kind="inc" path="" system="true"/>
 		<pathentry kind="src" path=""/>
 		<pathentry kind="out" path=""/>
 	</storageModule>
