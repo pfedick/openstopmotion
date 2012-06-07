@@ -76,10 +76,17 @@ struct buffer {
         size_t  length;
 };
 
-
 class Device
 {
 	private:
+#ifdef WIN32
+#else
+		enum io_method {
+		        IO_METHOD_READ,
+		        IO_METHOD_MMAP,
+		        IO_METHOD_USERPTR,
+		};
+
 		static void enumerateDevice(const ppl7::String &DeviceName, int index, VideoDevice &d);
 		void waitForNextFrame();
 		void initCapture(size_t buffer_size);
@@ -99,14 +106,11 @@ class Device
 		ppl7::grafix::Size size;
 		int myff;
 		int iomethod;
-		bool captureRunning;
+#endif
 
+		bool captureRunning;
 	public:
-		enum io_method {
-		        IO_METHOD_READ,
-		        IO_METHOD_MMAP,
-		        IO_METHOD_USERPTR,
-		};
+
 
 		Device();
 		~Device();
@@ -117,7 +121,7 @@ class Device
 		void open(const VideoDevice &dev);
 		void startCapture(const VideoFormat &fmt, int width, int height);
 		void startCapture(const VideoFormat &fmt, const ppl7::grafix::Size &size);
-		void stopCapture();
+		//void stopCapture();
 
 		void enumerateControls(std::list<CameraControl> &list);
 		void setControlValue(const CameraControl &ctl, int value);

@@ -1,3 +1,4 @@
+#ifndef WIN32
 #include "device.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -617,6 +618,6 @@ void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 	//ppl7::HexDump(buffer,256);
 }
 
-
+#endif	// #ifndef WIN32
 
 

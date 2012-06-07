@@ -11,13 +11,15 @@ else {
     win32:TARGET = StopMoCap
     unix:TARGET = release/StopMoCap
 }
+win32:DEFINES += "WIN32=1"
 HEADERS += config.h \
     stopmocap.h \
     device.h
-SOURCES += config.cpp \
+SOURCES += device_win32.cpp \
+    device_v4l2.cpp \
+    config.cpp \
     main.cpp \
-    stopmocap.cpp \
-    device.cpp
+    stopmocap.cpp
 FORMS += stopmocap.ui \
     stopmocap.ui
 RESOURCES += resources.qrc
@@ -36,7 +38,6 @@ CONFIG(debug, debug|release) {
         -lpcre \
         -liconv \
         -lmp3lame \
-        -lz \
         -lbz2 \
         -lcurl \
         -lidn \
@@ -45,7 +46,11 @@ CONFIG(debug, debug|release) {
         -lcrypto \
         -lws2_32 \
         -ldnsapi \
+        -lpng \
+        -ljpeg \
+        -lfreetype \
         -lz \
+        -lm \
         -lbz2 \
         -lvfw32 \
         -lgdi32
@@ -59,7 +64,6 @@ else {
         -lpcre \
         -liconv \
         -lmp3lame \
-        -lz \
         -lbz2 \
         -lcurl \
         -lidn \
@@ -68,7 +72,11 @@ else {
         -lcrypto \
         -lws2_32 \
         -ldnsapi \
+        -lpng \
+        -ljpeg \
+        -lfreetype \
         -lz \
+        -lm \
         -lbz2 \
         -lvfw32 \
         -lgdi32
