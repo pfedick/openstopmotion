@@ -6,6 +6,8 @@
 #include <windows.h>
 #endif
 
+#undef CATCH
+
 int main(int argc, char *argv[])
 {
 #ifdef WIN32
@@ -18,15 +20,25 @@ int main(int argc, char *argv[])
 		QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
 
 
-		StopMoCap w;
-		w.show();
-		int ret=a.exec();
-#ifdef WIN32
-		CoUninitialize();
+#ifdef CATCH
+		try {
 #endif
-		return ret;
-	}
-    /*
+			StopMoCap w;
+			w.show();
+			int ret=a.exec();
+#ifdef WIN32
+			CoUninitialize();
+#endif
+			return ret;
+#ifdef CATCH
+		} catch ( const ppl7::Exception &e) {
+			printf("ERROR: %s [%s]\n",e.what(),e.text());
+		} catch (...) {
+			printf ("Unknown Exception\n");
+		}
+#endif
+	return 1;
+	/*
     a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
     int ret=a.exec();
     return ret;

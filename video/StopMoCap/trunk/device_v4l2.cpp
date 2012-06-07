@@ -79,13 +79,15 @@ void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDev
 		::close(ff);
 		throw InvalidDevice();
 	}
-	d.Name.setf("%s",cap.card);
-
+	d.Name.set((const char*)cap.card);
+	if (d.Name.isEmpty()) d.Name.set((const char*)cap.driver);
+	//printf ("capabilities: %i, %x\n",cap.capabilities,cap.capabilities);
 	if ((cap.capabilities & V4L2_CAP_VIDEO_CAPTURE)) d.caps|=VideoDevice::CAP_VIDEO_CAPTURE;
     if ((cap.capabilities & V4L2_CAP_READWRITE)) d.caps|=VideoDevice::CAP_READWRITE;
     if ((cap.capabilities & V4L2_CAP_STREAMING)) d.caps|=VideoDevice::CAP_STREAMING;
     if ((cap.capabilities & V4L2_CAP_VIDEO_OUTPUT_OVERLAY)) d.caps|=VideoDevice::CAP_VIDEO_OUTPUT_OVERLAY;
     if ((cap.capabilities & V4L2_CAP_ASYNCIO)) d.caps|=VideoDevice::CAP_ASYNCIO;
+    //printf ("mycaps: %i, %x\n",d.caps,d.caps);
 	::close(ff);
 }
 
@@ -137,7 +139,7 @@ void Device::open(const VideoDevice &dev)
 	if (!(dev.caps&VideoDevice::CAP_VIDEO_CAPTURE)) throw DeviceDoesNotSupportCapture();
 	myff=::open((const char*)dev.DeviceName, O_RDWR /* required */ | O_NONBLOCK,0);
 	if (myff==-1) ppl7::File::throwErrno(errno,dev.DeviceName);
-
+	this->dev=dev;
 }
 
 void Device::close()
@@ -368,7 +370,9 @@ void Device::initCapture(size_t buffer_size)
 {
 	if (myff<1) throw DeviceNotOpen();
 	freeBuffers();
-	if (dev.caps&VideoDevice::CAP_STREAMING) {
+	printf ("Device::initCapture, caps=%i\n",dev.caps);
+	if ((dev.caps&VideoDevice::CAP_STREAMING)) {
+		printf ("Verwende Streaming\n");
 		try {
 			initMMap();
 			return;
@@ -382,7 +386,7 @@ void Device::initCapture(size_t buffer_size)
 			// Wir machen erstmal nichts, vielleicht geht ja Readwrite
 		}
 	}
-	if (dev.caps&VideoDevice::CAP_READWRITE) {
+	if ((dev.caps&VideoDevice::CAP_READWRITE)) {
 		initBuffers(1,buffer_size);
 		iomethod=IO_METHOD_READ;
 		return;

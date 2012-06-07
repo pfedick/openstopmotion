@@ -20,8 +20,7 @@ SOURCES += device_win32.cpp \
     config.cpp \
     main.cpp \
     stopmocap.cpp
-FORMS += stopmocap.ui \
-    stopmocap.ui
+FORMS += stopmocap.ui 
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += include

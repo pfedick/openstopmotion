@@ -39,7 +39,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.deviceComboBox->clear();
 	for (it=devices.begin();it!=devices.end();it++) {
 		Devices.push_back(*it);
-		ui.deviceComboBox->addItem(it->Name,Devices.size()-1);
+		ui.deviceComboBox->addItem(it->Name,(int)Devices.size()-1);
 		if (it->Name==conf.DeviceName) {
 			int index=ui.deviceComboBox->findText(conf.DeviceName);
 			if (index>=0) ui.deviceComboBox->setCurrentIndex(index);
@@ -76,7 +76,7 @@ void StopMoCap::on_deviceComboBox_currentIndexChanged(int index)
 	cam.enumerateImageFormats(fmt,Devices[index]);
 	for (it=fmt.begin();it!=fmt.end();it++) {
 		Formats.push_back(*it);
-		ui.formatComboBox->addItem(it->Description,Formats.size()-1);
+		ui.formatComboBox->addItem(it->Description,(int)(Formats.size()-1));
 		if (it->Description==conf.ImageFormat) {
 			int index=ui.formatComboBox->findText(conf.ImageFormat);
 			if (index>=0) ui.formatComboBox->setCurrentIndex(index);
@@ -99,7 +99,7 @@ void StopMoCap::on_formatComboBox_currentIndexChanged(int index)
 	for (it=sizes.begin();it!=sizes.end();it++) {
 		FrameSizes.push_back(*it);
 		Tmp.setf("%i x %i",it->width, it->height);
-		ui.resolutionComboBox->addItem(Tmp,FrameSizes.size()-1);
+		ui.resolutionComboBox->addItem(Tmp,(int)(FrameSizes.size()-1));
 		if (Tmp==conf.ImageSize) {
 			int index=ui.resolutionComboBox->findText(Tmp);
 			if (index>=0) ui.resolutionComboBox->setCurrentIndex(index);
