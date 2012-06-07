@@ -18,6 +18,7 @@
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
 
+//#define USERENDERTHREAD
 
 class MyQCheckBox : public QCheckBox
 {
@@ -35,12 +36,12 @@ class MyQComboBox : public QComboBox
 
 #ifdef USERENDERTHREAD
 
-class RenderThread : public ppl7::Thread
+class RenderThread : private ppl7::Thread
 {
 	private:
 		ppl7::Mutex mutex;
 		ppl7::Mutex signal;
-		QPixmap pix;
+		QImage pix;
 		ppl7::grafix::Image grab;
 		ppl7::grafix::Image lastFrame;
 		bool frameReady;
@@ -51,10 +52,12 @@ class RenderThread : public ppl7::Thread
 	public:
 		RenderThread();
 		~RenderThread();
+		void start();
+		void stop();
 		virtual void threadMain();
 		void grabNext(Device &cam);
 		bool ready() const;
-		const QPixmap& getFrame() const;
+		QPixmap getFrame() const;
 		void setBlendFactor(float f);
 		void setLastFrame(const ppl7::grafix::Image &img);
 		void setImageSize(int width, int height);
@@ -97,6 +100,8 @@ private:
     bool consumeEvent(QObject *target, QEvent *event);
     void capture(ppl7::grafix::Image &img);
 
+protected:
+    void resizeEvent ( QResizeEvent * event );
 
 public slots:
     void on_deviceComboBox_currentIndexChanged(int index);

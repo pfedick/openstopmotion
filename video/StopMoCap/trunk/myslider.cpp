@@ -62,7 +62,7 @@ int MySlider::value() const
 void MySlider::on_slider_valueChanged ( int value )
 {
 	if (noRecursion) return;
-	printf ("Slider Value changed: %i\n",value);
+	//printf ("Slider Value changed: %i\n",value);
 	noRecursion=true;
 	ui.spinBox->setValue(value);
 	noRecursion=false;
@@ -72,7 +72,7 @@ void MySlider::on_slider_valueChanged ( int value )
 void MySlider::on_spinBox_valueChanged ( int value )
 {
 	if (noRecursion) return;
-	printf ("spinBox Value changed: %i\n",value);
+	//printf ("spinBox Value changed: %i\n",value);
 	noRecursion=true;
 	ui.slider->setValue(value);
 	noRecursion=false;

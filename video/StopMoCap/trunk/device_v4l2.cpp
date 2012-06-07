@@ -370,9 +370,9 @@ void Device::initCapture(size_t buffer_size)
 {
 	if (myff<1) throw DeviceNotOpen();
 	freeBuffers();
-	printf ("Device::initCapture, caps=%i\n",dev.caps);
+	//printf ("Device::initCapture, caps=%i\n",dev.caps);
 	if ((dev.caps&VideoDevice::CAP_STREAMING)) {
-		printf ("Verwende Streaming\n");
+		//printf ("Verwende Streaming\n");
 		try {
 			initMMap();
 			return;
@@ -580,7 +580,7 @@ void Device::setControlValue(const CameraControl &ctl, int value)
 	if (myff<1) throw DeviceNotOpen();
 	struct v4l2_control c;
 	CLEAR(c);
-	printf ("Setting Control %x (%s) to %i\n",ctl.id,(const char*)ctl.Name,value);
+	//printf ("Setting Control %x (%s) to %i\n",ctl.id,(const char*)ctl.Name,value);
 	c.id=ctl.id;
 	c.value=value;
 	if (-1 == xioctl(myff, VIDIOC_S_CTRL, &c)) {

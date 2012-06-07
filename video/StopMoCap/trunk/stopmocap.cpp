@@ -53,6 +53,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 StopMoCap::~StopMoCap()
 {
+#ifdef USERENDERTHREAD
+	rthread.stop();
+#endif
 	PlaybackTimer->stop();
 	Timer->stop();
 	conf.mergeFrames=ui.mergeFrames->value();
@@ -112,6 +115,9 @@ void StopMoCap::on_formatComboBox_currentIndexChanged(int index)
 
 void StopMoCap::on_useDevice_clicked()
 {
+#ifdef USERENDERTHREAD
+	rthread.stop();
+#endif
 	cam.open(Devices[ui.deviceComboBox->currentIndex()]);
 
 	std::list<CameraControl> controls;
@@ -180,6 +186,10 @@ void StopMoCap::on_useDevice_clicked()
 	ui.captureButton->setFocus();
 	//grabFrame();
 	Timer->start(10);
+#ifdef USERENDERTHREAD
+	rthread.setImageSize(ui.viewer->width(),ui.viewer->height());
+	rthread.start();
+#endif
 }
 
 bool StopMoCap::eventFilter(QObject *target, QEvent *event)
@@ -188,10 +198,10 @@ bool StopMoCap::eventFilter(QObject *target, QEvent *event)
 	return QWidget::eventFilter(target,event);
 }
 
-bool StopMoCap::consumeEvent(QObject *target, QEvent *event)
+bool StopMoCap::consumeEvent(QObject *target, QEvent *)
 {
 	int ctltype=target->property("ctl_type").toInt();
-	int type=event->type();
+	//int type=event->type();
 	if (ctltype==CameraControl::Integer) {
 		MySlider *slider=(MySlider*)target;
 		//printf ("slider, type: %i\n",type);
@@ -218,6 +228,14 @@ bool StopMoCap::consumeEvent(QObject *target, QEvent *event)
 
 	}
 	return false;
+}
+
+void StopMoCap::resizeEvent ( QResizeEvent * event )
+{
+#ifdef USERENDERTHREAD
+	rthread.setImageSize(ui.viewer->width(),ui.viewer->height());
+#endif
+	QWidget::resizeEvent(event);
 }
 
 void StopMoCap::grabFrame()
@@ -251,7 +269,18 @@ void StopMoCap::on_timer_fired()
 		ui.captureFPS->setText(Tmp);
 		fpsCounter=0;
 	}
+#ifdef USERENDERTHREAD
+	rthread.grabNext(cam);
+	printf ("StopMoCap::on_timer_fired: rthread.ready?\n");
+	if (rthread.ready()) {
+		printf ("yes\n");
+		ui.viewer->setPixmap(rthread.getFrame());
+	} else {
+		printf ("no\n");
+	}
+#else
 	grabFrame();
+#endif
 }
 
 

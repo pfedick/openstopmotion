@@ -34,10 +34,13 @@ RenderThread::~RenderThread()
 
 void RenderThread::threadMain()
 {
+	printf ("RenderThread::start\n");
 	frameReady=false;
 	newFrame=false;
 	while(!threadShouldStop()) {
-		signal.wait(1000);
+		printf ("RenderThread: Waiting for new image\n");
+		signal.wait(5000);
+		printf ("RenderThread: Signal received\n");
 		if (threadShouldStop()) return;
 		mutex.lock();
 		if (newFrame) {
@@ -45,12 +48,13 @@ void RenderThread::threadMain()
 				grab.blend(lastFrame,blendFactor);
 			}
 			QImage qi((uchar*)grab.adr(),grab.width(),grab.height(), grab.pitch(), QImage::Format_RGB32);
-			pix=QPixmap::fromImage(qi).scaled(w,h,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+			pix=qi.scaled(w,h,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 			newFrame=false;
 			frameReady=true;
 		}
 		mutex.unlock();
 	}
+	printf ("RenderThread::end\n");
 }
 
 void RenderThread::setImageSize(int width, int height)
@@ -63,11 +67,14 @@ void RenderThread::setImageSize(int width, int height)
 
 void RenderThread::grabNext(Device &cam)
 {
+	printf ("RenderThread::grabNext\n");
 	mutex.lock();
+	printf ("cam.readFrame\n");
 	cam.readFrame(grab);
 	newFrame=true;
-	signal.signal();
+	printf ("ok, signalisiere Renderthread\n");
 	mutex.unlock();
+	signal.signal();
 }
 
 bool RenderThread::ready() const
@@ -75,9 +82,10 @@ bool RenderThread::ready() const
 	return frameReady;
 }
 
-const QPixmap& RenderThread::getFrame() const
+QPixmap RenderThread::getFrame() const
 {
-	return pix;
+	printf ("RenderThread::getFrame\n");
+	return QPixmap::fromImage(pix);
 }
 
 void RenderThread::setBlendFactor(float f)
@@ -87,22 +95,24 @@ void RenderThread::setBlendFactor(float f)
 	mutex.unlock();
 }
 
-void StopMoCap::grabFrame()
+void RenderThread::setLastFrame(const ppl7::grafix::Image &img)
 {
-	ppl7::grafix::Image img;
-	cam.readFrame(img);
-	//img.create(1280,720);
-	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
-	if (blendFactor>0.0f) {
-		img.blend(lastFrame,blendFactor);
-	}
-	//ppl7::grafix::ImageFilter_PNG png;
-	//png.saveFile("test.png",img);
-	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-	QPixmap pm=QPixmap::fromImage(qi);
-	ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
-	return;
+	mutex.lock();
+	lastFrame=img;
+	mutex.unlock();
 }
+
+void RenderThread::start()
+{
+	printf("RenderThread::start\n");
+	threadStart();
+}
+
+void RenderThread::stop()
+{
+	threadStop();
+}
+
 
 #endif
 
