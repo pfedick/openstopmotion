@@ -11,22 +11,22 @@ else {
     win32:TARGET = StopMoCap
     unix:TARGET = release/StopMoCap
 }
-win32:DEFINES += "WIN32=1"
-HEADERS += config.h \
+HEADERS += myslider.h \
+    config.h \
     stopmocap.h \
     device.h
-SOURCES += device_win32.cpp \
+SOURCES += myslider.cpp \
+    device_win32.cpp \
     device_v4l2.cpp \
     config.cpp \
     main.cpp \
     stopmocap.cpp
-FORMS += stopmocap.ui 
+FORMS += myslider.ui \
+    stopmocap.ui
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += include
 unix:INCLUDEPATH += /usr/local/include
-#win32:INCLUDEPATH += C:/sdk/Windows/v7.1/Include
-#win32:INCLUDEPATH += C:/sdk/Windows/v7.1/Include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib
 win32:QMAKESPEC = C:/Qt/4.7.4/mkspecs/win32-g++
@@ -39,6 +39,7 @@ CONFIG(debug, debug|release) {
         -lpcre \
         -liconv \
         -lmp3lame \
+        -lz \
         -lbz2 \
         -lcurl \
         -lidn \
@@ -47,13 +48,8 @@ CONFIG(debug, debug|release) {
         -lcrypto \
         -lws2_32 \
         -ldnsapi \
-        -lpng \
-        -ljpeg \
-        -lfreetype \
         -lz \
-        -lm \
         -lbz2 \
-        -lole32 \
         -lvfw32 \
         -lgdi32
 }
@@ -66,6 +62,7 @@ else {
         -lpcre \
         -liconv \
         -lmp3lame \
+        -lz \
         -lbz2 \
         -lcurl \
         -lidn \
@@ -74,13 +71,8 @@ else {
         -lcrypto \
         -lws2_32 \
         -ldnsapi \
-        -lpng \
-        -ljpeg \
-        -lfreetype \
         -lz \
-        -lm \
         -lbz2 \
-        -lole32 \
         -lvfw32 \
         -lgdi32
 }

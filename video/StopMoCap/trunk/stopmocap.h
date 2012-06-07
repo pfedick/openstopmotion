@@ -13,6 +13,7 @@
 #include "ui_stopmocap.h"
 #include "device.h"
 #include "config.h"
+#include "myslider.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
