@@ -19,18 +19,6 @@
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
 
 
-class MyQSlider : public QSlider
-{
-	public:
-		MyQSlider( Qt::Orientation orientation, QWidget * parent = 0)
-		: QSlider(orientation,parent)
-		{
-
-		}
-		CameraControl cont;
-		int lastValue;
-};
-
 class MyQCheckBox : public QCheckBox
 {
 	public:
@@ -44,6 +32,34 @@ class MyQComboBox : public QComboBox
 		CameraControl cont;
 		int lastValue;
 };
+
+#ifdef USERENDERTHREAD
+
+class RenderThread : public ppl7::Thread
+{
+	private:
+		ppl7::Mutex mutex;
+		ppl7::Mutex signal;
+		QPixmap pix;
+		ppl7::grafix::Image grab;
+		ppl7::grafix::Image lastFrame;
+		bool frameReady;
+		bool newFrame;
+		float blendFactor;
+		int w,h;
+
+	public:
+		RenderThread();
+		~RenderThread();
+		virtual void threadMain();
+		void grabNext(Device &cam);
+		bool ready() const;
+		const QPixmap& getFrame() const;
+		void setBlendFactor(float f);
+		void setLastFrame(const ppl7::grafix::Image &img);
+		void setImageSize(int width, int height);
+};
+#endif
 
 
 class StopMoCap : public QWidget
@@ -62,6 +78,9 @@ private:
     std::vector<VideoDevice> Devices;
     std::vector<VideoFormat> Formats;
     std::vector<ppl7::grafix::Size> FrameSizes;
+#ifdef USERENDERTHREAD
+    RenderThread rthread;
+#endif
     QVBoxLayout *controlLayout;
     bool inPlayback;
     int playbackFrame;
@@ -69,6 +88,8 @@ private:
     QTimer *PlaybackTimer;
 
     Device cam;
+    ppluint64 fpsTimer;
+    int fpsCounter;
 
     void grabFrame();
     int highestSceneFrame();

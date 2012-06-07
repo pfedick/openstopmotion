@@ -19,6 +19,7 @@ SOURCES += myslider.cpp \
     device_win32.cpp \
     device_v4l2.cpp \
     config.cpp \
+    renderthread.cpp \
     main.cpp \
     stopmocap.cpp
 FORMS += myslider.ui \

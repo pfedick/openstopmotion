@@ -12,6 +12,8 @@ StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
 	controlLayout=NULL;
+	fpsTimer=0;
+	fpsCounter=0;
 	ui.setupUi(this);
 	Timer=new QTimer(this);
 	PlaybackTimer=new QTimer(this);
@@ -126,7 +128,7 @@ void StopMoCap::on_useDevice_clicked()
 		if (it->type==CameraControl::Integer) {
 			QLabel *label=new QLabel(it->Name);
 			controlLayout->addWidget(label);
-			MyQSlider *slider=new MyQSlider(Qt::Horizontal);
+			MySlider *slider=new MySlider(Qt::Horizontal);
 			slider->setMinimum(it->min);
 			slider->setMaximum(it->max);
 			slider->setSingleStep(it->step);
@@ -191,7 +193,7 @@ bool StopMoCap::consumeEvent(QObject *target, QEvent *event)
 	int ctltype=target->property("ctl_type").toInt();
 	int type=event->type();
 	if (ctltype==CameraControl::Integer) {
-		MyQSlider *slider=(MyQSlider*)target;
+		MySlider *slider=(MySlider*)target;
 		//printf ("slider, type: %i\n",type);
 		if (slider->value()!=slider->lastValue) {
 			cam.setControlValue(slider->cont,slider->value());
@@ -222,16 +224,17 @@ void StopMoCap::grabFrame()
 {
 	ppl7::grafix::Image img;
 	cam.readFrame(img);
+	//img.create(1280,720);
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
 	if (blendFactor>0.0f) {
 		img.blend(lastFrame,blendFactor);
 	}
-
 	//ppl7::grafix::ImageFilter_PNG png;
 	//png.saveFile("test.png",img);
 	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
 	QPixmap pm=QPixmap::fromImage(qi);
 	ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+	return;
 }
 
 
@@ -239,6 +242,15 @@ void StopMoCap::on_timer_fired()
 {
 	//printf ("Timer fired\n");
 	if (inPlayback) return;
+	fpsCounter++;
+	ppluint64 now=ppl7::GetTime();
+	if (now!=fpsTimer) {
+		ppl7::String Tmp;
+		Tmp.setf("%i",fpsCounter);
+		fpsTimer=now;
+		ui.captureFPS->setText(Tmp);
+		fpsCounter=0;
+	}
 	grabFrame();
 }
 
@@ -315,6 +327,9 @@ void StopMoCap::on_captureButton_clicked()
 	ppl7::grafix::ImageFilter_PNG png;
 	png.saveFile(Filename,img);
 	lastFrame=img;
+#ifdef USERENDERTHREAD
+	rthread.setLastFrame(img);
+#endif
 	Tmp.setf("%i",lastFrameNum);
 	ui.totalFrames->setText(Tmp);
 	ui.frameSlider->setMaximum(lastFrameNum);
@@ -365,6 +380,9 @@ void StopMoCap::on_sceneName_editingFinished()
 	Filename.appendf("/frame_%06i.png",lastFrameNum);
 	try {
 		lastFrame.load(Filename);
+#ifdef USERENDERTHREAD
+		rthread.setLastFrame(lastFrame);
+#endif
 	} catch (...) {
 
 	}
