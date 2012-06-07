@@ -3,8 +3,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <string.h>
-
-
+#include <windows.h>
+#include <Vfw.h>
+//#include <dshow.h>
 
 
 Device::Device()
@@ -21,6 +22,29 @@ void Device::enumerateDevices(std::list<VideoDevice> &list)
 {
 	ppl7::String DeviceName;
 	list.clear();
+	wchar_t szDeviceName[80];
+	wchar_t szDeviceVersion[80];
+
+	for (int wIndex = 0; wIndex < 64; wIndex++)
+	{
+	    if (capGetDriverDescription(
+	            wIndex,
+	            szDeviceName,
+	            sizeof (szDeviceName),
+	            szDeviceVersion,
+	            sizeof (szDeviceVersion)
+	        ))
+	    {
+	    	VideoDevice d;
+	    	d.index=wIndex;
+	    	d.DeviceName.setf("%i",wIndex);
+	    	d.Name.set(szDeviceName);
+	    	list.push_back(d);
+
+	        // Append name to list of installed capture drivers
+	        // and then let the user select a driver to use.
+	    }
+	}
 	/*
 	for (int d=0;d<64;d++) {
 		DeviceName.setf("/dev/video%i",d);

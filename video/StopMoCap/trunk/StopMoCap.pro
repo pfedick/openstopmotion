@@ -26,6 +26,8 @@ RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += include
 unix:INCLUDEPATH += /usr/local/include
+#win32:INCLUDEPATH += C:/sdk/Windows/v7.1/Include
+#win32:INCLUDEPATH += C:/sdk/Windows/v7.1/Include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib
 win32:QMAKESPEC = C:/Qt/4.7.4/mkspecs/win32-g++
@@ -52,6 +54,7 @@ CONFIG(debug, debug|release) {
         -lz \
         -lm \
         -lbz2 \
+        -lole32 \
         -lvfw32 \
         -lgdi32
 }
@@ -78,6 +81,7 @@ else {
         -lz \
         -lm \
         -lbz2 \
+        -lole32 \
         -lvfw32 \
         -lgdi32
 }
