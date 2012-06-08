@@ -65,6 +65,7 @@ void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDev
 	int ff=::open((const char*)DeviceName, O_RDONLY);
 	if (ff==-1) ppl7::File::throwErrno(errno,DeviceName);
 	struct v4l2_input argp;
+	CLEAR(argp);
 	argp.index=index;
 	if (xioctl( ff, VIDIOC_ENUMINPUT, &argp)) {
 		::close(ff);
@@ -75,6 +76,7 @@ void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDev
 	d.caps=0;
 
 	struct v4l2_capability cap;
+	CLEAR(cap);
 	if (-1==ioctl(ff,VIDIOC_QUERYCAP,&cap)) {
 		::close(ff);
 		throw InvalidDevice();
@@ -219,6 +221,8 @@ void Device::enumerateControls(std::list<CameraControl> &list)
 {
 	struct v4l2_queryctrl qctrl;
 	struct v4l2_querymenu menu;
+	CLEAR(qctrl);
+	CLEAR(menu);
 
 	//qctrl.id = V4L2_CTRL_CLASS_CAMERA | V4L2_CTRL_FLAG_NEXT_CTRL;
 	qctrl.id = V4L2_CTRL_FLAG_NEXT_CTRL;
