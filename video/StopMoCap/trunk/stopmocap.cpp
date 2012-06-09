@@ -244,14 +244,13 @@ void StopMoCap::grabFrame()
 	cam.readFrame(img);
 	//img.create(1280,720);
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
-	if (blendFactor>0.0f) {
-		img.blend(lastFrame,blendFactor);
-	}
+	img.bltBlend(lastFrame,blendFactor);
 	//ppl7::grafix::ImageFilter_PNG png;
 	//png.saveFile("test.png",img);
 	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-	QPixmap pm=QPixmap::fromImage(qi);
-	ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+	//QPixmap pm=QPixmap::fromImage(qi);
+	//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+	ui.viewer->setPixmap(QPixmap::fromImage(qi));
 	return;
 }
 

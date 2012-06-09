@@ -53,7 +53,7 @@ void Device::enumerateDevices(std::list<VideoDevice> &list)
 			} catch (const Device::InvalidDevice &e) {
 
 			} catch (...) {
-				throw;
+				//throw;
 			}
 		}
 
