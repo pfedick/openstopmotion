@@ -10,7 +10,7 @@
 #include <QImage>
 
 PPL7ImageViewer::PPL7ImageViewer(QWidget *parent)
-	:QWidget(parent)
+	:QGLWidget(parent)
 {
 	img=NULL;
 	smode=None;

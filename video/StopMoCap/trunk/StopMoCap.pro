@@ -1,7 +1,8 @@
 TEMPLATE = app
 TARGET = StopMoCap
 QT += core \
-    gui
+    gui \
+    opengl
 CONFIG += debug_and_release
 CONFIG(debug, debug|release) { 
     win32:TARGET = StopMoCap

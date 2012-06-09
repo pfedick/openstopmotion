@@ -9,10 +9,11 @@
 #define PPL7IMAGEVIEWER_H_
 
 #include <QWidget>
+#include <QtOpenGL/QGLWidget>
 #include <ppl7.h>
 #include <ppl7-grafix.h>
 
-class PPL7ImageViewer : public QWidget
+class PPL7ImageViewer : public QGLWidget
 {
 		Q_OBJECT
 	public:
