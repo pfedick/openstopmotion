@@ -249,7 +249,7 @@ void StopMoCap::grabFrame()
 	ui.viewer->setPixmap(QPixmap::fromImage(qi).scaled
 			(ui.viewer->width(),
 			ui.viewer->height(),
-			Qt::KeepAspectRatio,Qt::SmoothTransformation)
+			Qt::KeepAspectRatio,Qt::FastTransformation)
 			);
 	return;
 }
