@@ -14,6 +14,7 @@ else {
 HEADERS += myslider.h \
     config.h \
     stopmocap.h \
+    ppl7imageviewer.h \
     device.h
 SOURCES += myslider.cpp \
     device_win32.cpp \
@@ -21,6 +22,7 @@ SOURCES += myslider.cpp \
     config.cpp \
     renderthread.cpp \
     main.cpp \
+    ppl7imageviewer.cpp \
     stopmocap.cpp
 FORMS += myslider.ui \
     stopmocap.ui

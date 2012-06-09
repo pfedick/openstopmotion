@@ -48,6 +48,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 		}
 	}
+	ui.viewer->setDrawable(&grabImg);
 
 }
 
@@ -241,27 +242,19 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 void StopMoCap::grabFrame()
 {
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
-	if (ui.zoom11->isChecked()) {
+	if (ui.zoom11->isChecked()==true || ui.zoomSmooth->isChecked()==true) {
 		cam.readFrame(grabImg);
 		grabImg.bltBlend(lastFrame,blendFactor);
-		QImage qi((uchar*)grabImg.adr(),grabImg.width(),grabImg.height(), grabImg.pitch(), QImage::Format_RGB32);
-		ui.viewer->setPixmap(QPixmap::fromImage(qi));
 	} else {
 		ppl7::grafix::Image img;
 		cam.readFrame(img);
 		img.bltBlend(lastFrame,blendFactor);
-		if (ui.zoomFast->isChecked()) {
-			img.scale(grabImg,ui.viewer->width(),ui.viewer->height(),true,false);
-			QImage qi((uchar*)grabImg.adr(),grabImg.width(),grabImg.height(), grabImg.pitch(), QImage::Format_RGB32);
-			ui.viewer->setPixmap(QPixmap::fromImage(qi));
-		} else {
-			QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-			ui.viewer->setPixmap(QPixmap::fromImage(qi).scaled
-						(ui.viewer->width(),
-						ui.viewer->height(),
-						Qt::KeepAspectRatio,Qt::SmoothTransformation));
-		}
+		img.scale(grabImg,ui.viewer->width(),ui.viewer->height(),true,false);
 	}
+	if (ui.zoom11->isChecked()) ui.viewer->setScaling(PPL7ImageViewer::None);
+	else if (ui.zoomSmooth->isChecked()) ui.viewer->setScaling(PPL7ImageViewer::Smooth);
+	else ui.viewer->setScaling(PPL7ImageViewer::Fast);
+	ui.viewer->update();
 }
 
 
@@ -471,7 +464,7 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 	}
 	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
 	QPixmap pm=QPixmap::fromImage(qi);
-	ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+	//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
 
 }
 
@@ -503,7 +496,7 @@ void StopMoCap::on_previewButton_toggled ( bool checked )
 		capture(img);
 		QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
 		QPixmap pm=QPixmap::fromImage(qi);
-		ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+		//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
 
 	} else {
 		inPlayback=false;

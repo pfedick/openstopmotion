@@ -14,6 +14,7 @@
 #include "device.h"
 #include "config.h"
 #include "myslider.h"
+#include "ppl7imageviewer.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
@@ -33,6 +34,7 @@ class MyQComboBox : public QComboBox
 		CameraControl cont;
 		int lastValue;
 };
+
 
 #ifdef USERENDERTHREAD
 
