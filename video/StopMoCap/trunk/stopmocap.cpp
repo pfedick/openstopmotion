@@ -242,6 +242,9 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 void StopMoCap::grabFrame()
 {
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
+	cam.readFrame(grabImg);
+	grabImg.bltBlend(lastFrame,blendFactor);
+	/*
 	if (ui.zoom11->isChecked()==true || ui.zoomSmooth->isChecked()==true) {
 		cam.readFrame(grabImg);
 		grabImg.bltBlend(lastFrame,blendFactor);
@@ -251,6 +254,7 @@ void StopMoCap::grabFrame()
 		img.bltBlend(lastFrame,blendFactor);
 		img.scale(grabImg,ui.viewer->width(),ui.viewer->height(),true,false);
 	}
+	*/
 	if (ui.zoom11->isChecked()) ui.viewer->setScaling(PPL7ImageViewer::None);
 	else if (ui.zoomSmooth->isChecked()) ui.viewer->setScaling(PPL7ImageViewer::Smooth);
 	else ui.viewer->setScaling(PPL7ImageViewer::Fast);

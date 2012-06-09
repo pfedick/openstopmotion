@@ -41,9 +41,22 @@ void PPL7ImageViewer::paintEvent(QPaintEvent *)
 		}
 		case Fast:
 		{
-			img->scale(myImg,width(),height(),true,false);
-			QImage qi((uchar*)myImg.adr(),myImg.width(),myImg.height(), myImg.pitch(), QImage::Format_RGB32);
-			painter.drawImage(p,qi);
+			int nw,nh;
+			float ratio=(float)img->width()/(float)img->height();
+			if (height()*ratio>width()) {
+				nw=width();
+				nh=(int)((float)nw/ratio);
+			} else {
+				nh=height();
+				nw=(int)((float)nh*ratio);
+			}
+			p.setX((width()-nw)/2);
+			p.setY((height()-nh)/2);
+
+
+			QImage qi((uchar*)img->adr(),img->width(),img->height(), img->pitch(), QImage::Format_RGB32);
+			QImage sc=qi.scaled(width(),height(),Qt::KeepAspectRatio,Qt::FastTransformation);
+			painter.drawImage(p,sc);
 			break;
 		}
 		case Smooth:
