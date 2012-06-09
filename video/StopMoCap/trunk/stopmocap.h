@@ -89,6 +89,7 @@ private:
     int playbackFrame;
     QTimer *Timer;
     QTimer *PlaybackTimer;
+    ppl7::grafix::Image grabImg;
 
     Device cam;
     ppluint64 fpsTimer;

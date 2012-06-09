@@ -240,14 +240,13 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 
 void StopMoCap::grabFrame()
 {
-	ppl7::grafix::Image img;
-	cam.readFrame(img);
+	cam.readFrame(grabImg);
 	//img.create(1280,720);
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
-	img.bltBlend(lastFrame,blendFactor);
+	grabImg.bltBlend(lastFrame,blendFactor);
 	//ppl7::grafix::ImageFilter_PNG png;
 	//png.saveFile("test.png",img);
-	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
+	QImage qi((uchar*)grabImg.adr(),grabImg.width(),grabImg.height(), grabImg.pitch(), QImage::Format_RGB32);
 	//QPixmap pm=QPixmap::fromImage(qi);
 	//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
 	ui.viewer->setPixmap(QPixmap::fromImage(qi));
