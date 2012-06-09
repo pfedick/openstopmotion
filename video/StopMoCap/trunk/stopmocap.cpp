@@ -240,18 +240,28 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 
 void StopMoCap::grabFrame()
 {
-	cam.readFrame(grabImg);
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
-	grabImg.bltBlend(lastFrame,blendFactor);
-	QImage qi((uchar*)grabImg.adr(),grabImg.width(),grabImg.height(), grabImg.pitch(), QImage::Format_RGB32);
-	//QPixmap pm=QPixmap::fromImage(qi);
-	//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
-	ui.viewer->setPixmap(QPixmap::fromImage(qi).scaled
-			(ui.viewer->width(),
-			ui.viewer->height(),
-			Qt::KeepAspectRatio,Qt::FastTransformation)
-			);
-	return;
+	if (ui.zoom11->isChecked()) {
+		cam.readFrame(grabImg);
+		grabImg.bltBlend(lastFrame,blendFactor);
+		QImage qi((uchar*)grabImg.adr(),grabImg.width(),grabImg.height(), grabImg.pitch(), QImage::Format_RGB32);
+		ui.viewer->setPixmap(QPixmap::fromImage(qi));
+	} else {
+		ppl7::grafix::Image img;
+		cam.readFrame(img);
+		img.bltBlend(lastFrame,blendFactor);
+		if (ui.zoomFast->isChecked()) {
+			img.scale(grabImg,ui.viewer->width(),ui.viewer->height(),true,false);
+			QImage qi((uchar*)grabImg.adr(),grabImg.width(),grabImg.height(), grabImg.pitch(), QImage::Format_RGB32);
+			ui.viewer->setPixmap(QPixmap::fromImage(qi));
+		} else {
+			QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
+			ui.viewer->setPixmap(QPixmap::fromImage(qi).scaled
+						(ui.viewer->width(),
+						ui.viewer->height(),
+						Qt::KeepAspectRatio,Qt::SmoothTransformation));
+		}
+	}
 }
 
 
