@@ -458,17 +458,14 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 	Tmp.setf("%i",value);
 	ui.frameNum->setText(Tmp);
 	if (!inPlayback) return;
-	ppl7::grafix::Image img;
 	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
 	Filename.appendf("/frame_%06i.png",value);
 	try {
-		img.load(Filename);
+		grabImg.load(Filename);
 	} catch (...) {
 		return;
 	}
-	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-	QPixmap pm=QPixmap::fromImage(qi);
-	//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
+	ui.viewer->update();
 
 }
 
@@ -496,12 +493,7 @@ void StopMoCap::on_previewButton_toggled ( bool checked )
 {
 	if (checked) {
 		inPlayback=true;
-		ppl7::grafix::Image img;
-		capture(img);
-		QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-		QPixmap pm=QPixmap::fromImage(qi);
-		//ui.viewer->setPixmap(pm.scaled(ui.viewer->width(),ui.viewer->height(),Qt::KeepAspectRatio,Qt::SmoothTransformation));
-
+		capture(grabImg);
 	} else {
 		inPlayback=false;
 	}
