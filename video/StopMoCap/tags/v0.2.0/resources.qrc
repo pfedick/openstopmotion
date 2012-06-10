@@ -1,0 +1,21 @@
+<RCC>
+  <qresource prefix="/translation"/>
+  <qresource prefix="/icons">
+    <file>resources/ok.png</file>
+    <file>resources/camera-photo.png</file>
+    <file>resources/filenew.png</file>
+    <file>resources/icon48x48.png</file>
+    <file>resources/folder-open-20.png</file>
+    <file>resources/filenew.png</file>
+    <file>resources/media-playback-pause.png</file>
+    <file>resources/media-playback-start.png</file>
+    <file>resources/media-playback-stop.png</file>
+    <file>resources/media-record.png</file>
+    <file>resources/media-seek-backward.png</file>
+    <file>resources/media-seek-forward.png</file>
+    <file>resources/media-skip-backward.png</file>
+    <file>resources/media-skip-forward.png</file>
+    <file>resources/trash-16.png</file>
+  </qresource>
+  <qresource prefix="/other"/>
+</RCC>
