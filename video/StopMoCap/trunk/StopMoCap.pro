@@ -12,12 +12,14 @@ else {
     win32:TARGET = StopMoCap
     unix:TARGET = release/StopMoCap
 }
-HEADERS += myslider.h \
+HEADERS += selectscene.h \
+    myslider.h \
     config.h \
     stopmocap.h \
     ppl7imageviewer.h \
     device.h
-SOURCES += myslider.cpp \
+SOURCES += selectscene.cpp \
+    myslider.cpp \
     device_win32.cpp \
     device_v4l2.cpp \
     config.cpp \
@@ -25,7 +27,8 @@ SOURCES += myslider.cpp \
     main.cpp \
     ppl7imageviewer.cpp \
     stopmocap.cpp
-FORMS += myslider.ui \
+FORMS += selectscene.ui \
+    myslider.ui \
     stopmocap.ui
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
