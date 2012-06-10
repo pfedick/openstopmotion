@@ -1,19 +1,88 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>SelectSceneClass</class>
- <widget class="QDialog" name="SelectSceneClass" >
-  <property name="geometry" >
+ <widget class="QDialog" name="SelectSceneClass">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>716</width>
+    <height>408</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>SelectScene</string>
   </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTreeWidget" name="sceneTable">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>100</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="rootIsDecorated">
+      <bool>false</bool>
+     </property>
+     <property name="uniformRowHeights">
+      <bool>true</bool>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <column>
+      <property name="text">
+       <string>scene name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>frames</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>first frame</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>last frame</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="cancelButton">
+       <property name="text">
+        <string>cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <resources/>
  <connections/>
 </ui>

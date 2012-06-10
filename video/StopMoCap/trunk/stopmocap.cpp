@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QEvent>
 #include <QMessageBox>
+#include "selectscene.h"
 
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
@@ -594,6 +595,15 @@ void StopMoCap::on_deleteScene_clicked()
 
 void StopMoCap::on_selectScene_clicked()
 {
+	SelectScene sel(this);
+	try {
+		sel.scanDir(conf.CaptureDir);
+		if (sel.exec()!=1) return;
+		ui.sceneName->setText(sel.selectedScene());
+		on_sceneName_editingFinished();
+	} catch (const ppl7::Exception &e) {
+		DisplayException(e,this);
+	}
 
 }
 
