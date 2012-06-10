@@ -19,6 +19,8 @@
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
 #define STOPMOCAP_APPNAME		"StopMotion Capture"
+#define STOPMOCAP_COPYRIGHT		"(c) 2012 by Patrick Fedick"
+#define STOPMOCAP_VERSION		"0.2"
 
 void DisplayException(const ppl7::Exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());
 void DisplayException(const std::exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());

@@ -12,10 +12,14 @@
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
+	ppl7::String Tmp;
+	ui.setupUi(this);
+
+	Tmp.setf("%s - Version %s",STOPMOCAP_APPNAME,STOPMOCAP_VERSION);
+	this->setWindowTitle(Tmp);
 	controlLayout=NULL;
 	fpsTimer=0;
 	fpsCounter=0;
-	ui.setupUi(this);
 	Timer=new QTimer(this);
 	PlaybackTimer=new QTimer(this);
 	conf.load();

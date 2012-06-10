@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StopMoCap</string>
+   <string>StopMotion Capture</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resources.qrc">
