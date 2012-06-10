@@ -156,6 +156,12 @@ void Device::close()
 	freeBuffers();
 }
 
+bool Device::isOpen() const
+{
+	if (myff>0) return true;
+	return false;
+}
+
 void Device::initBuffers(int n, size_t buffer_size)
 {
 	if (n<1) throw ppl7::IllegalArgumentException();

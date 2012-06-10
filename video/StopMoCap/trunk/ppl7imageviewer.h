@@ -26,6 +26,7 @@ class PPL7ImageViewer : public QGLWidget
 		PPL7ImageViewer(QWidget *parent = 0);
 		void setDrawable(ppl7::grafix::Drawable *draw);
 		void setScaling(ScalingMode mode);
+		ScalingMode scalingMode() const;
 
 	private:
 		ppl7::grafix::Drawable *img;

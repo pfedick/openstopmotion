@@ -18,6 +18,12 @@
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
+#define STOPMOCAP_APPNAME		"StopMotion Capture"
+
+void DisplayException(const ppl7::Exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());
+void DisplayException(const std::exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());
+
+
 
 //#define USERENDERTHREAD
 
@@ -88,6 +94,7 @@ private:
 #endif
     QVBoxLayout *controlLayout;
     bool inPlayback;
+    bool inPreviewMode;
     int playbackFrame;
     QTimer *Timer;
     QTimer *PlaybackTimer;
@@ -123,8 +130,15 @@ public slots:
 
     void on_playButton_clicked();
     void on_stopButton_clicked();
+    void on_undoButton_clicked();
 
     void on_previewButton_toggled ( bool checked );
+    void on_zoom11_clicked ( bool checked );
+    void on_zoomFast_clicked ( bool checked );
+    void on_zoomSmooth_clicked ( bool checked );
+
+    void on_deleteScene_clicked();
+    void on_selectScene_clicked();
 
 };
 

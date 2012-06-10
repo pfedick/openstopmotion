@@ -32,7 +32,10 @@ int main(int argc, char *argv[])
 			return ret;
 #ifdef CATCH
 		} catch ( const ppl7::Exception &e) {
-			printf("ERROR: %s [%s]\n",e.what(),e.text());
+			DisplayException(e)
+			//printf("ERROR: %s [%s]\n",e.what(),e.text());
+		} catch ( const std::exception &e) {
+			DisplayException(e)
 		} catch (...) {
 			printf ("Unknown Exception\n");
 		}
@@ -43,4 +46,48 @@ int main(int argc, char *argv[])
     int ret=a.exec();
     return ret;
 	*/
+}
+
+
+void DisplayException(const ppl7::Exception &e, QWidget *object, const ppl7::String &msg)
+{
+	ppl7::String a=QObject::tr("Error");
+	ppl7::String title=STOPMOCAP_APPNAME;
+	title+=": "+a;
+	ppl7::String name=e.what();
+	ppl7::String descr=ppl7::EscapeHTMLTags(e.text());
+
+	ppl7::String m="<html><body><b>";
+	if (msg.isEmpty()) {
+		m+=QObject::tr("An error occured:");
+	} else {
+		m+=msg;
+	}
+	m+="</b><br>\n";
+	m+=QObject::tr("Exception name")+": <b style=\"color: red;\">";
+	m+=name+"</b><br>\n";
+	m+=QObject::tr("Description")+": <b style=\"color: red;\">";
+	m+=descr+"</b><br>\n";
+
+	m+="</body></html>";
+	QMessageBox::critical(object, title, m, QMessageBox::Ok);
+}
+
+void DisplayException(const std::exception &e, QWidget *object, const ppl7::String &msg)
+{
+	ppl7::String a=QObject::tr("Error");
+	ppl7::String title=STOPMOCAP_APPNAME;
+	title+=": "+a;
+	ppl7::String name=e.what();
+	ppl7::String m="<html><body><b>";
+	if (msg.isEmpty()) {
+		m+=QObject::tr("An error occured:");
+	} else {
+		m+=msg;
+	}
+	m+="</b><br>\n";
+	m+=QObject::tr("Exception name")+": <b style=\"color: red;\">";
+	m+=name+"</b><br>\n";
+	m+="</body></html>";
+	QMessageBox::critical(object, title, m, QMessageBox::Ok);
 }

@@ -127,6 +127,7 @@ class Device
 		void setControlValue(const CameraControl &ctl, int value);
 		int getControlValue(const CameraControl &ctl);
 		int readFrame(ppl7::grafix::Image &img);
+		bool isOpen() const;
 
 		void close();
 

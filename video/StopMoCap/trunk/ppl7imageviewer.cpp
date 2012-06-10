@@ -26,6 +26,11 @@ void PPL7ImageViewer::setScaling(ScalingMode mode)
 	smode=mode;
 }
 
+PPL7ImageViewer::ScalingMode PPL7ImageViewer::scalingMode() const
+{
+	return smode;
+}
+
 
 void PPL7ImageViewer::paintEvent(QPaintEvent *)
 {

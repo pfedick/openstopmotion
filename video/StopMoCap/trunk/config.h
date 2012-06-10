@@ -27,6 +27,7 @@ class Config
 		int mergeFrames;
 		int skipFrames;
 		int	onionValue;
+		int scalingMode;
 
 };
 

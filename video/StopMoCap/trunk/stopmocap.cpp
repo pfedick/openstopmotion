@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QFileDialog>
 #include <QEvent>
+#include <QMessageBox>
 
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
@@ -20,6 +21,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	conf.load();
 	lastFrameNum=0;
 	inPlayback=false;
+	inPreviewMode=false;
 	playbackFrame=0;
 
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
@@ -27,10 +29,22 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 	ui.captureDir->setText(conf.CaptureDir);
 	ui.sceneName->setText(conf.Scene);
-	on_sceneName_editingFinished();
+	on_sceneName_textChanged(conf.Scene);
 	ui.mergeFrames->setValue(conf.mergeFrames);
 	ui.skipFrames->setValue(conf.skipFrames);
 	ui.onionSkinning->setValue(conf.onionValue);
+	ui.viewer->setScaling((PPL7ImageViewer::ScalingMode)conf.scalingMode);
+	switch (conf.scalingMode) {
+		case PPL7ImageViewer::None:
+			ui.zoom11->setChecked(true);
+			break;
+		case PPL7ImageViewer::Fast:
+			ui.zoomFast->setChecked(true);
+			break;
+		case PPL7ImageViewer::Smooth:
+			ui.zoomSmooth->setChecked(true);
+			break;
+	}
 
 
 
@@ -65,7 +79,7 @@ StopMoCap::~StopMoCap()
 	conf.DeviceName=ui.deviceComboBox->currentText();
 	conf.ImageFormat=ui.formatComboBox->currentText();
 	conf.ImageSize=ui.resolutionComboBox->currentText();
-
+	conf.scalingMode=ui.viewer->scalingMode();
 	conf.save();
 	cam.close();
 	delete Timer;
@@ -124,9 +138,14 @@ void StopMoCap::on_useDevice_clicked()
 	std::list<CameraControl> controls;
 	std::list<CameraControl>::const_iterator it;
 	cam.enumerateControls(controls);
+
 	if (ui.controlWidget->layout()) {
-		delete (ui.controlWidget->layout());
-		ui.controlWidget->updateGeometry();
+		QLayoutItem* item;
+		while ( ( item = ui.controlWidget->layout()->takeAt( 0 ) ) != NULL ) {
+			item->widget()->deleteLater();
+	        delete item;
+	    }
+	    delete ui.controlWidget->layout();
 	}
 
 	controlLayout=new QVBoxLayout;
@@ -181,8 +200,8 @@ void StopMoCap::on_useDevice_clicked()
 	ui.controlWidget->setLayout(controlLayout);
 	ui.controlWidget->updateGeometry();
 
-	cam.startCapture(Formats[ui.formatComboBox->currentIndex()],
-			FrameSizes[ui.resolutionComboBox->currentIndex()]);
+	cam.startCapture(Formats[(int)ui.formatComboBox->currentIndex()],
+			FrameSizes[(int)ui.resolutionComboBox->currentIndex()]);
 
 	ui.captureButton->setFocus();
 	//grabFrame();
@@ -199,32 +218,39 @@ bool StopMoCap::eventFilter(QObject *target, QEvent *event)
 	return QWidget::eventFilter(target,event);
 }
 
-bool StopMoCap::consumeEvent(QObject *target, QEvent *)
+bool StopMoCap::consumeEvent(QObject *target, QEvent *event)
 {
 	int ctltype=target->property("ctl_type").toInt();
-	//int type=event->type();
-	if (ctltype==CameraControl::Integer) {
-		MySlider *slider=(MySlider*)target;
-		//printf ("slider, type: %i\n",type);
-		if (slider->value()!=slider->lastValue) {
-			cam.setControlValue(slider->cont,slider->value());
-			slider->lastValue=slider->value();
-		}
+	int type=event->type();
+	//printf ("Event: %i \n",type);
+	if (type==QEvent::KeyRelease
+			|| type==QEvent::Paint
+	) {
 
-	} else if (ctltype==CameraControl::Boolean) {
-		MyQCheckBox *checkbox=(MyQCheckBox*)target;
-		if (checkbox->isChecked()!=checkbox->lastValue) {
-			//printf ("checkbox, type: %i\n",type);
-			cam.setControlValue(checkbox->cont,checkbox->isChecked());
-			checkbox->lastValue=checkbox->isChecked();
-		}
-	} else if (ctltype==CameraControl::Menu) {
-		MyQComboBox *combo=(MyQComboBox*)target;
-		int index=combo->currentIndex();
-		int data=combo->itemData(index).toInt();
-		if (data!=combo->lastValue) {
-			cam.setControlValue(combo->cont,data);
-			combo->lastValue=data;
+		if (ctltype==CameraControl::Integer) {
+			MySlider *slider=(MySlider*)target;
+			//printf ("slider, type: %i\n",type);
+			if (slider->value()!=slider->lastValue) {
+				cam.setControlValue(slider->cont,slider->value());
+				slider->lastValue=slider->value();
+			}
+
+		} else if (ctltype==CameraControl::Boolean) {
+			MyQCheckBox *checkbox=(MyQCheckBox*)target;
+			if (checkbox->isChecked()!=checkbox->lastValue) {
+				//printf ("checkbox, type: %i\n",type);
+				cam.setControlValue(checkbox->cont,(int)checkbox->isChecked());
+				checkbox->lastValue=checkbox->isChecked();
+			}
+		} else if (ctltype==CameraControl::Menu) {
+			MyQComboBox *combo=(MyQComboBox*)target;
+			int index=combo->currentIndex();
+			int data=combo->itemData(index).toInt();
+			if (data!=combo->lastValue) {
+				cam.setControlValue(combo->cont,data);
+				combo->lastValue=data;
+			}
+
 		}
 
 	}
@@ -242,22 +268,16 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 void StopMoCap::grabFrame()
 {
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
-	cam.readFrame(grabImg);
-	grabImg.bltBlend(lastFrame,blendFactor);
-	/*
-	if (ui.zoom11->isChecked()==true || ui.zoomSmooth->isChecked()==true) {
-		cam.readFrame(grabImg);
+	try {
+		if (inPreviewMode) {
+			capture(grabImg);
+		} else {
+			cam.readFrame(grabImg);
+		}
 		grabImg.bltBlend(lastFrame,blendFactor);
-	} else {
-		ppl7::grafix::Image img;
-		cam.readFrame(img);
-		img.bltBlend(lastFrame,blendFactor);
-		img.scale(grabImg,ui.viewer->width(),ui.viewer->height(),true,false);
+	} catch (...) {
+
 	}
-	*/
-	if (ui.zoom11->isChecked()) ui.viewer->setScaling(PPL7ImageViewer::None);
-	else if (ui.zoomSmooth->isChecked()) ui.viewer->setScaling(PPL7ImageViewer::Smooth);
-	else ui.viewer->setScaling(PPL7ImageViewer::Fast);
 	ui.viewer->update();
 }
 
@@ -307,6 +327,7 @@ void StopMoCap::on_selectDir_clicked()
 
 void StopMoCap::capture(ppl7::grafix::Image &img)
 {
+	if (cam.isOpen()==false) return;
 	Timer->stop();
 	//ui.viewer->setPixmap(QPixmap());
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -349,25 +370,30 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 
 void StopMoCap::on_captureButton_clicked()
 {
+	if (cam.isOpen()==false) return;
 	ppl7::String Tmp;
 	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
 	if (ppl7::Dir::exists(CaptureDir)==false) return;
 	ppl7::grafix::Image img;
-	capture(img);
+	try {
+		capture(img);
 
-	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
-	lastFrameNum++;
-	ppl7::String Filename=CaptureDir;
-	Filename.appendf("/frame_%06i.png",lastFrameNum);
-	ppl7::grafix::ImageFilter_PNG png;
-	png.saveFile(Filename,img);
-	lastFrame=img;
+		if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
+		lastFrameNum++;
+		ppl7::String Filename=CaptureDir;
+		Filename.appendf("/frame_%06i.png",lastFrameNum);
+		ppl7::grafix::ImageFilter_PNG png;
+		png.saveFile(Filename,img);
+		lastFrame=img;
 #ifdef USERENDERTHREAD
-	rthread.setLastFrame(img);
+		rthread.setLastFrame(img);
 #endif
-	Tmp.setf("%i",lastFrameNum);
-	ui.totalFrames->setText(Tmp);
-	ui.frameSlider->setMaximum(lastFrameNum);
+		Tmp.setf("%i",lastFrameNum);
+		ui.totalFrames->setText(Tmp);
+		ui.frameSlider->setMaximum(lastFrameNum);
+	} catch (const ppl7::Exception &e) {
+		DisplayException(e,this);
+	}
 }
 
 int StopMoCap::highestSceneFrame()
@@ -395,21 +421,53 @@ int StopMoCap::highestSceneFrame()
 	return 0;
 }
 
+void StopMoCap::on_undoButton_clicked()
+{
+	ppl7::String Tmp;
+	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
+	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
+	Filename.appendf("/frame_%06i.png",lastFrameNum);
+	try {
+		ppl7::File::unlink(Filename);
+	} catch (const ppl7::Exception &e) {
+		DisplayException(e,this);
+		return;
+	}
+	lastFrameNum=highestSceneFrame();
+	Tmp.setf("%i",lastFrameNum);
+	ui.totalFrames->setText(Tmp);
+	ui.frameSlider->setMaximum(lastFrameNum);
+	Filename=conf.CaptureDir+"/"+conf.Scene;
+	Filename.appendf("/frame_%06i.png",lastFrameNum);
+	try {
+		lastFrame.load(Filename);
+	} catch (...) {
+		lastFrame.clear();
+	}
+}
+
 void StopMoCap::on_sceneName_textChanged (const QString & text)
 {
 	ppl7::String Tmp=text;
 	Tmp.trim();
-	if (Tmp!=conf.Scene && Tmp.notEmpty()==true) {
-		if (!ppl7::Dir::exists(conf.CaptureDir+"/"+Tmp)) ui.createScene->setEnabled(true);
-		else ui.createScene->setEnabled(false);
-		conf.Scene=Tmp;
+	if (Tmp.notEmpty()==true) {
+		if (!ppl7::Dir::exists(conf.CaptureDir+"/"+Tmp)) {
+			ui.createScene->setEnabled(true);
+			ui.deleteScene->setEnabled(false);
+		} else {
+			ui.createScene->setEnabled(false);
+			ui.deleteScene->setEnabled(true);
+		}
+		if (conf.Scene!=Tmp) conf.Scene=Tmp;
 	}
 	lastFrameNum=0;
 }
 
 void StopMoCap::on_sceneName_editingFinished()
 {
-	on_createScene_clicked();
+	//on_createScene_clicked();
+	on_sceneName_textChanged(ui.sceneName->text());
+
 	lastFrameNum=highestSceneFrame();
 	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
 	Filename.appendf("/frame_%06i.png",lastFrameNum);
@@ -442,7 +500,7 @@ void StopMoCap::on_frameSlider_sliderPressed()
 	if (lastFrameNum<1) return;
 	playbackFrame=0;
 	inPlayback=true;
-	on_frameSlider_valueChanged(ui.frameSlider->value());
+	on_frameSlider_valueChanged((int)ui.frameSlider->value());
 }
 
 void StopMoCap::on_frameSlider_sliderReleased()
@@ -492,12 +550,46 @@ void StopMoCap::on_playbackTimer_fired()
 void StopMoCap::on_previewButton_toggled ( bool checked )
 {
 	if (checked) {
-		inPlayback=true;
-		capture(grabImg);
+		inPreviewMode=true;
 	} else {
-		inPlayback=false;
+		inPreviewMode=false;
 	}
 }
 
+void StopMoCap::on_zoom11_clicked ( bool checked )
+{
+	if (checked) ui.viewer->setScaling(PPL7ImageViewer::None);
+}
 
+void StopMoCap::on_zoomFast_clicked ( bool checked )
+{
+	if (checked) ui.viewer->setScaling(PPL7ImageViewer::Fast);
+}
+
+void StopMoCap::on_zoomSmooth_clicked ( bool checked )
+{
+	if (checked) ui.viewer->setScaling(PPL7ImageViewer::Smooth);
+}
+
+void StopMoCap::on_deleteScene_clicked()
+{
+	 int ret = QMessageBox::question(this, STOPMOCAP_APPNAME,
+	                                tr("Are you sure you want to delete this scene?"),
+	                                QMessageBox::Yes | QMessageBox::No
+	                                ,
+	                                QMessageBox::No);
+	 if (ret!=QMessageBox::Yes) return;
+	 ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
+	 try {
+		 ppl7::File::unlink(Filename);
+	 } catch ( const ppl7::Exception &e) {
+		 DisplayException(e,this);
+	 }
+	 on_sceneName_textChanged(ui.sceneName->text());
+}
+
+void StopMoCap::on_selectScene_clicked()
+{
+
+}
 
