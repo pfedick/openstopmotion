@@ -337,7 +337,7 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 	//ui.viewer->setPixmap(QPixmap());
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	QCoreApplication::processEvents();
-
+	//ppl7::PrintDebugTime("Start capture\n");
 	ppl7::grafix::Image tmp[100];
 	int mergeFrames=ui.mergeFrames->value();
 	int skipFrames=ui.skipFrames->value();
@@ -348,11 +348,12 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 			cam.readFrame(img);
 		}
 	}
+	//ppl7::PrintDebugTime("End capture\n");
 	int width=tmp[0].width();
 	int height=tmp[0].height();
 	int r,g,b;
 	ppl7::grafix::Color c;
-
+	//ppl7::PrintDebugTime("Start merge\n");
 	img.create(width,height,ppl7::grafix::RGBFormat::X8R8G8B8);
 	for (int y=0;y<height;y++) {
 		for (int x=0;x<width;x++) {
@@ -367,6 +368,7 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 			img.putPixel(x,y,c);
 		}
 	}
+	//ppl7::PrintDebugTime("End merge\n");
 	QApplication::restoreOverrideCursor();
 
 	Timer->start(10);
@@ -382,13 +384,16 @@ void StopMoCap::on_captureButton_clicked()
 	ppl7::grafix::Image img;
 	try {
 		capture(img);
+		QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 		if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 		lastFrameNum++;
 		ppl7::String Filename=CaptureDir;
 		Filename.appendf("/frame_%06i.png",lastFrameNum);
 		ppl7::grafix::ImageFilter_PNG png;
+		//ppl7::PrintDebugTime("Start Save PNG\n");
 		png.saveFile(Filename,img);
+		//ppl7::PrintDebugTime("End Save PNG\n");
 		lastFrame=img;
 #ifdef USERENDERTHREAD
 		rthread.setLastFrame(img);
@@ -396,7 +401,9 @@ void StopMoCap::on_captureButton_clicked()
 		Tmp.setf("%i",lastFrameNum);
 		ui.totalFrames->setText(Tmp);
 		ui.frameSlider->setMaximum(lastFrameNum);
+		QApplication::restoreOverrideCursor();
 	} catch (const ppl7::Exception &e) {
+		QApplication::restoreOverrideCursor();
 		DisplayException(e,this);
 	}
 }
