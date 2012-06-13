@@ -8,44 +8,57 @@ SaveThread::SaveThread()
 
 SaveThread::~SaveThread()
 {
-
+	signal.signal();
 }
 
 void SaveThread::run()
 {
 	running=true;
+	ppl7::PrintDebugTime("SaveThread läuft\n");
 	timeout=ppl7::GetTime()+60;
 	while (1) {
-		signal.wait(2000);
 		mutex.lock();
-		SaveJob *job=jobs.front();
-		if (job) {
+		if (!jobs.empty()) {
+			SaveJob *job=jobs.front();
+			ppl7::PrintDebugTime("Verarbeite Job\n");
 			jobs.pop();
 			timeout=ppl7::GetTime()+60;
 			mutex.unlock();
 			executeJob(*job);
 			delete job;
+			ppl7::PrintDebugTime("Job beendet\n");
 		} else {
 			if (threadShouldStop()==true || ppl7::GetTime()>timeout) {
 				running=false;
 				mutex.unlock();
+				ppl7::PrintDebugTime("SaveThread wird wartet auf signal\n");
+				signal.wait(5000);
 				break;
 			}
 		}
 	}
+	ppl7::PrintDebugTime("SaveThread wird beendet\n");
 }
 
 void SaveThread::stop()
 {
+	threadShouldStop();
+	signal.signal();
 	threadStop();
 }
 
 void SaveThread::addJob(SaveJob *job)
 {
+	ppl7::PrintDebugTime("Füge SaveJob hinzu\n");
 	mutex.lock();
 	jobs.push(job);
-	if (!running) threadStart();
-	signal.signal();
+	if (!running) {
+		ppl7::PrintDebugTime("SaveThread wird gestartet\n");
+		threadStart();
+	} else {
+		ppl7::PrintDebugTime("Signalisiere SaveThread\n");
+		signal.signal();
+	}
 	mutex.unlock();
 }
 
