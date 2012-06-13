@@ -28,6 +28,8 @@ class Config
 		int skipFrames;
 		int	onionValue;
 		int scalingMode;
+		int jpegQuality;
+		int pictureFormat;
 
 };
 

@@ -51,6 +51,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 			break;
 	}
 
+	ui.jpegQualitySlider->setValue(conf.jpegQuality);
+	ui.imageFormat->setCurrentIndex(conf.pictureFormat);
+
 
 
 	std::list<VideoDevice> devices;
@@ -73,6 +76,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 StopMoCap::~StopMoCap()
 {
+	savethread.stop();
 #ifdef USERENDERTHREAD
 	rthread.stop();
 #endif
@@ -85,6 +89,8 @@ StopMoCap::~StopMoCap()
 	conf.ImageFormat=ui.formatComboBox->currentText();
 	conf.ImageSize=ui.resolutionComboBox->currentText();
 	conf.scalingMode=ui.viewer->scalingMode();
+	conf.jpegQuality=ui.jpegQualitySlider->value();
+	conf.pictureFormat=ui.imageFormat->currentIndex();
 	conf.save();
 	cam.close();
 	delete Timer;
@@ -381,28 +387,35 @@ void StopMoCap::on_captureButton_clicked()
 	ppl7::String Tmp;
 	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
 	if (ppl7::Dir::exists(CaptureDir)==false) return;
-	ppl7::grafix::Image img;
+	SaveJob *job=new SaveJob;
+	if (!job) throw ppl7::OutOfMemoryException();
 	try {
-		capture(img);
-		QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+		capture(job->img);
 
 		if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 		lastFrameNum++;
-		ppl7::String Filename=CaptureDir;
-		Filename.appendf("/frame_%06i.png",lastFrameNum);
-		ppl7::grafix::ImageFilter_PNG png;
-		//ppl7::PrintDebugTime("Start Save PNG\n");
-		png.saveFile(Filename,img);
-		//ppl7::PrintDebugTime("End Save PNG\n");
-		lastFrame=img;
-#ifdef USERENDERTHREAD
-		rthread.setLastFrame(img);
-#endif
+
+		job->Filename=CaptureDir;
+		job->Filename.appendf("/frame_%06i",lastFrameNum);
+		lastFrame=job->img;
+		if (ui.imageFormat->currentIndex()==0) {
+			job->format=PictureFormat::png;
+			job->Filename+=".png";
+		} else if (ui.imageFormat->currentIndex()==1) {
+			job->format=PictureFormat::bmp;
+			job->Filename+=".bmp";
+		} else if (ui.imageFormat->currentIndex()==2) {
+			job->format=PictureFormat::jpeg;
+			job->quality=ui.jpegQualitySlider->value();
+			job->Filename+=".jpg";
+		}
+		savethread.addJob(job);
+
 		Tmp.setf("%i",lastFrameNum);
 		ui.totalFrames->setText(Tmp);
 		ui.frameSlider->setMaximum(lastFrameNum);
-		QApplication::restoreOverrideCursor();
 	} catch (const ppl7::Exception &e) {
+		delete job;
 		QApplication::restoreOverrideCursor();
 		DisplayException(e,this);
 	}
@@ -614,3 +627,21 @@ void StopMoCap::on_selectScene_clicked()
 
 }
 
+void StopMoCap::on_imageFormat_currentIndexChanged(int index)
+{
+	if (index==2) {
+		ui.jpegQuality->setEnabled(true);
+	} else {
+		ui.jpegQuality->setEnabled(false);
+	}
+}
+
+void StopMoCap::on_jpegQualitySlider_valueChanged (int value)
+{
+	ui.jpegQualitySpinBox->setValue(value);
+}
+
+void StopMoCap::on_jpegQualitySpinBox_valueChanged ( int value )
+{
+	ui.jpegQualitySlider->setValue(value);
+}

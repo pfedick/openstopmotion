@@ -32,6 +32,9 @@ void Config::load()
 	mergeFrames=settings.value("mergeFrames",3).toInt();
 	skipFrames=settings.value("skipFrames",0).toInt();
 	onionValue=settings.value("onionValue",0).toInt();
+	jpegQuality=settings.value("jpegQuality",90).toInt();
+	pictureFormat=settings.value("pictureFormat",0).toInt();
+
 	scalingMode=settings.value("scalingMode",PPL7ImageViewer::Smooth).toInt();
 	settings.endGroup();
 }
@@ -49,5 +52,7 @@ void Config::save()
 	settings.setValue("skipFrames",skipFrames);
 	settings.setValue("onionValue",onionValue);
 	settings.setValue("scalingMode",scalingMode);
+	settings.setValue("jpegQuality",jpegQuality);
+	settings.setValue("pictureFormat",pictureFormat);
 	settings.endGroup();
 }

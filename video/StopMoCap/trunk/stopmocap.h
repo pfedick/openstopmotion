@@ -15,6 +15,7 @@
 #include "config.h"
 #include "myslider.h"
 #include "ppl7imageviewer.h"
+#include "savethread.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
@@ -91,6 +92,7 @@ private:
     std::vector<VideoDevice> Devices;
     std::vector<VideoFormat> Formats;
     std::vector<ppl7::grafix::Size> FrameSizes;
+    SaveThread savethread;
 #ifdef USERENDERTHREAD
     RenderThread rthread;
 #endif
@@ -141,6 +143,10 @@ public slots:
 
     void on_deleteScene_clicked();
     void on_selectScene_clicked();
+
+    void on_imageFormat_currentIndexChanged(int index);
+    void on_jpegQualitySlider_valueChanged ( int value );
+    void on_jpegQualitySpinBox_valueChanged ( int value );
 
 };
 
