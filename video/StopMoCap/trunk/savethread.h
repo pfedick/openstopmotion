@@ -40,7 +40,6 @@ class SaveThread : ppl7::Thread
 		ppluint64 timeout;
 		bool running;
 
-		void executeJob(const SaveJob &job);
 
 	public:
 		SaveThread();
@@ -49,7 +48,7 @@ class SaveThread : ppl7::Thread
 		void addJob(SaveJob *job);
 		void run();
 		void stop();
-
+		void executeJob(const SaveJob &job) const;
 };
 
 
