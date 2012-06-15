@@ -1,5 +1,16 @@
 #include "scenemanager.h"
 
+SceneManager::Frame::Frame()
+{
+	img=NULL;
+}
+
+SceneManager::Frame::~Frame()
+{
+	if (img) delete img;
+}
+
+
 SceneManager::SceneManager()
 {
 	highest=0;
@@ -14,6 +25,7 @@ void SceneManager::clear()
 {
 	frames.clear();
 	highest=0;
+	path.clear();
 }
 
 void SceneManager::loadScene(const ppl7::String &path)
@@ -32,10 +44,36 @@ void SceneManager::loadScene(const ppl7::String &path)
 				if (id>highest) highest=id;
 				Frame f;
 				f.Filename=e.File;
-				frames.insert(id,f);
+				frames.insert (std::pair<size_t,Frame>(id,f));
 			}
 		}
 	} catch (...) {
 
 	}
 }
+
+void SceneManager::setFilename(size_t nr, const ppl7::String Filename)
+{
+	Frame f;
+	f.Filename=Filename;
+	frames.insert (std::pair<size_t,Frame>(nr,f));
+	if (nr>highest) highest=nr;
+
+}
+
+void SceneManager::setImage(size_t nr, const ppl7::grafix::Image &img)
+{
+	std::map<size_t,Frame>::iterator it;
+	it=frames.find(nr);
+	if (it==frames.end()) return;
+
+	Frame &frame=it->second;
+	if (!frame.img) {
+		frame.img=new ppl7::ByteArray;
+	}
+	ppl7::grafix::ImageFilter_JPEG jpeg;
+
+
+
+}
+

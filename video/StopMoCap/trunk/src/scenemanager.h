@@ -11,21 +11,23 @@
 #define WITH_QT
 #include <ppl7.h>
 #include <ppl7-grafix.h>
-#include <vector>
-
-class Frame
-{
-	public:
-		ppl7::String Filename;
-		ppl7::ByteArray img;
-};
+#include <map>
 
 class SceneManager
 {
 	private:
+		class Frame
+		{
+			public:
+				Frame();
+				~Frame();
+				ppl7::String Filename;
+				ppl7::ByteArray *img;
+		};
+
 		ppl7::Mutex mutex;
 		ppl7::String path;
-		std::vector<Frame> frames;
+		std::map<size_t,Frame> frames;
 		size_t highest;
 
 	public:
