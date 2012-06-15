@@ -26,6 +26,7 @@ class SceneManager
 		ppl7::Mutex mutex;
 		ppl7::String path;
 		std::vector<Frame> frames;
+		size_t highest;
 
 	public:
 		SceneManager();
