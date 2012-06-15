@@ -12,29 +12,31 @@ else {
     win32:TARGET = StopMoCap
     unix:TARGET = release/StopMoCap
 }
-HEADERS += savethread.h \
-    selectscene.h \
-    myslider.h \
-    config.h \
-    stopmocap.h \
-    ppl7imageviewer.h \
-    device.h
-SOURCES += savethread.cpp \
-    selectscene.cpp \
-    myslider.cpp \
-    device_win32.cpp \
-    device_v4l2.cpp \
-    config.cpp \
-    renderthread.cpp \
-    main.cpp \
-    ppl7imageviewer.cpp \
-    stopmocap.cpp
-FORMS += selectscene.ui \
-    myslider.ui \
-    stopmocap.ui
+HEADERS += gui/stopmocap.h \
+    gui/selectscene.h \
+    src/savethread.h \
+    gui/myslider.h \
+    gui/ppl7imageviewer.h \
+    src/device.h \
+    src/config.h \
+    src/scenemanager.h
+SOURCES += gui/stopmocap.cpp \
+    gui/selectscene.cpp \
+    src/savethread.cpp \
+    gui/myslider.cpp \
+    gui/ppl7imageviewer.cpp \
+    src/device_v4l2.cpp \
+    src/device_win32.cpp \
+    src/main.cpp \
+    src/config.cpp \
+    src/scenemanager.cpp
+FORMS += gui/stopmocap.ui \
+    gui/selectscene.ui \
+    gui/myslider.ui
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
-INCLUDEPATH += include
+INCLUDEPATH += gui
+INCLUDEPATH += src
 unix:INCLUDEPATH += /usr/local/include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib
