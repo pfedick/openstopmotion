@@ -19,10 +19,8 @@ class SceneManager
 		class Frame
 		{
 			public:
-				Frame();
-				~Frame();
 				ppl7::String Filename;
-				ppl7::ByteArray *img;
+				ppl7::MemFile file;
 		};
 
 		ppl7::Mutex mutex;
