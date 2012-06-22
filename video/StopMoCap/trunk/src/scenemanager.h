@@ -23,7 +23,18 @@ class SceneManager
 				ppl7::MemFile file;
 		};
 
+		class LoaderThread : public ppl7::Thread
+		{
+			public:
+				SceneManager *manager;
+
+				void run();
+
+		};
+
+
 		ppl7::Mutex mutex;
+		LoaderThread lthread;
 		ppl7::String path;
 		std::map<size_t,Frame> frames;
 		size_t highest;
@@ -37,9 +48,9 @@ class SceneManager
 		void setFilename(size_t nr, const ppl7::String Filename);
 		void setImage(size_t nr, const ppl7::grafix::Image &img);
 		void deleteFrame(size_t nr);
-		const ppl7::String &getFilename(size_t nr) const;
-		void getImage(size_t nr, ppl7::grafix::Image &img) const;
-		size_t getHighestFrameNum() const;
+		ppl7::String getFilename(size_t nr);
+		void getImage(size_t nr, ppl7::grafix::Image &img);
+		size_t getHighestFrameNum();
 
 };
 

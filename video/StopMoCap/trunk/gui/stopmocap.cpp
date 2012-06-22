@@ -34,7 +34,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 	ui.captureDir->setText(conf.CaptureDir);
 	ui.sceneName->setText(conf.Scene);
-	on_sceneName_textChanged(conf.Scene);
+	on_sceneName_editingFinished();
 	ui.mergeFrames->setValue(conf.mergeFrames);
 	ui.skipFrames->setValue(conf.skipFrames);
 	ui.onionSkinning->setValue(conf.onionValue);
@@ -409,6 +409,10 @@ void StopMoCap::on_captureButton_clicked()
 			job->quality=ui.jpegQualitySlider->value();
 			job->Filename+=".jpg";
 		}
+#ifdef USE_SCENEMANAGER
+		scm.setFilename(lastFrameNum,job->Filename);
+		scm.setImage(lastFrameNum,job->img);
+#endif
 		savethread.addJob(job);
 
 		Tmp.setf("%i",lastFrameNum);
@@ -458,6 +462,9 @@ void StopMoCap::on_undoButton_clicked()
 		DisplayException(e,this);
 		return;
 	}
+#ifdef USE_SCENEMANAGER
+	scm.deleteFrame(lastFrameNum);
+#endif
 	lastFrameNum=highestSceneFrame();
 	Tmp.setf("%i",lastFrameNum);
 	ui.totalFrames->setText(Tmp);
@@ -498,9 +505,6 @@ void StopMoCap::on_sceneName_editingFinished()
 	Filename.appendf("/frame_%06i.png",lastFrameNum);
 	try {
 		lastFrame.load(Filename);
-#ifdef USERENDERTHREAD
-		rthread.setLastFrame(lastFrame);
-#endif
 	} catch (...) {
 
 	}
@@ -508,6 +512,10 @@ void StopMoCap::on_sceneName_editingFinished()
 	Tmp.setf("%i",lastFrameNum);
 	ui.totalFrames->setText(Tmp);
 	ui.frameSlider->setMaximum(lastFrameNum);
+#ifdef USE_SCENEMANAGER
+	scm.clear();
+	scm.loadScene(conf.CaptureDir+"/"+conf.Scene);
+#endif
 }
 
 void StopMoCap::on_createScene_clicked()
@@ -541,13 +549,27 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 	Tmp.setf("%i",value);
 	ui.frameNum->setText(Tmp);
 	if (!inPlayback) return;
-	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
-	Filename.appendf("/frame_%06i.png",value);
+#ifdef USE_SCENEMANAGER
 	try {
-		grabImg.load(Filename);
+		scm.getImage(value,grabImg);
 	} catch (...) {
-		return;
+		grabImg.clear();
 	}
+	if (grabImg.isEmpty()) {
+#endif
+		ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
+		Filename.appendf("/frame_%06i.png",value);
+		try {
+			grabImg.load(Filename);
+#ifdef USE_SCENEMANAGER
+			scm.setImage(value,grabImg);
+#endif
+		} catch (...) {
+			return;
+		}
+#ifdef USE_SCENEMANAGER
+	}
+#endif
 	ui.viewer->update();
 
 }
