@@ -15,6 +15,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 {
 	ppl7::String Tmp;
 	ui.setupUi(this);
+	ui.controlTab->setCurrentIndex(0);
 
 	Tmp.setf("%s - Version %s",STOPMOCAP_APPNAME,STOPMOCAP_VERSION);
 	this->setWindowTitle(Tmp);
@@ -71,7 +72,12 @@ StopMoCap::StopMoCap(QWidget *parent)
 		}
 	}
 	ui.viewer->setDrawable(&grabImg);
+	bluebox.loadBackground("/raid/video/Brickfilms/Decker/Akt 3/Backgrounds/see.png");
 
+	ui.tolNearSlider->setValue(bluebox.nearTolerance());
+	ui.tolFarSlider->setValue(bluebox.farTolerance());
+	Tmp.setf("r=%i, g=%i, b=%i",bluebox.colorKey().red(),bluebox.colorKey().green(),bluebox.colorKey().blue());
+	ui.keyColor->setText(Tmp);
 }
 
 StopMoCap::~StopMoCap()
@@ -285,6 +291,7 @@ void StopMoCap::grabFrame()
 		} else {
 			cam.readFrame(grabImg);
 		}
+		if (ui.blueBoxCheckBox->isChecked()) bluebox.process(grabImg);
 		grabImg.bltBlend(lastFrame,blendFactor);
 	} catch (...) {
 
@@ -667,3 +674,23 @@ void StopMoCap::on_jpegQualitySpinBox_valueChanged ( int value )
 {
 	ui.jpegQualitySlider->setValue(value);
 }
+
+void StopMoCap::on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c)
+{
+	ppl7::String Tmp;
+	bluebox.setColorKey(c);
+	Tmp.setf("r=%i, g=%i, b=%i",c.red(),c.green(),c.blue());
+	ui.keyColor->setText(Tmp);
+
+}
+
+void StopMoCap::on_tolNearSlider_valueChanged ( int value )
+{
+	bluebox.setNearTolerance(value);
+}
+
+void StopMoCap::on_tolFarSlider_valueChanged ( int value )
+{
+	bluebox.setFarTolerance(value);
+}
+

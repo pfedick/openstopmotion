@@ -17,6 +17,7 @@
 #include "ppl7imageviewer.h"
 #include "savethread.h"
 #include "scenemanager.h"
+#include "bluebox.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
@@ -65,6 +66,7 @@ private:
     std::vector<VideoFormat> Formats;
     std::vector<ppl7::grafix::Size> FrameSizes;
     SaveThread savethread;
+    BlueBox bluebox;
 #ifdef USE_SCENEMANAGER
     SceneManager scm;
 #endif
@@ -119,6 +121,10 @@ public slots:
     void on_imageFormat_currentIndexChanged(int index);
     void on_jpegQualitySlider_valueChanged ( int value );
     void on_jpegQualitySpinBox_valueChanged ( int value );
+
+    void on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c);
+    void on_tolNearSlider_valueChanged ( int value );
+    void on_tolFarSlider_valueChanged ( int value );
 
 };
 

@@ -63,14 +63,20 @@ void SaveThread::stop()
 
 void SaveThread::addJob(SaveJob *job)
 {
+#ifdef DEBUGOUT
 	ppl7::PrintDebugTime("Füge SaveJob hinzu\n");
+#endif
 	mutex.lock();
 	jobs.push(job);
 	if (!running) {
+#ifdef DEBUGOUT
 		ppl7::PrintDebugTime("SaveThread wird gestartet\n");
+#endif
 		threadStart();
 	} else {
+#ifdef DEBUGOUT
 		ppl7::PrintDebugTime("Signalisiere SaveThread\n");
+#endif
 		signal.signal();
 	}
 	mutex.unlock();

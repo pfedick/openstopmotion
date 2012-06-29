@@ -8,6 +8,7 @@
 #include "ppl7imageviewer.h"
 #include <QPainter>
 #include <QImage>
+#include <QMouseEvent>
 
 PPL7ImageViewer::PPL7ImageViewer(QWidget *parent)
 	:QGLWidget(parent)
@@ -88,5 +89,22 @@ void PPL7ImageViewer::paintEvent(QPaintEvent *)
 	}
 
 
+}
+
+void PPL7ImageViewer::mousePressEvent(QMouseEvent *event)
+{
+	if (!img) return;
+	ppl7::grafix::Color c;
+	QPoint p;
+	p=event->pos();
+	int x,y;
+	x=p.x()*img->width()/width();
+	y=p.y()*img->height()/height();
+	c=img->getPixel(x,y);
+
+	emit mouseClicked(x,y,c);
+
+	//printf ("Event: %i/%i => %i/%i, Color: %i, %i, %i\n",p.x(),p.y(),x,y,c.red(),c.green(),c.blue());
+	QWidget::mousePressEvent(event);
 }
 

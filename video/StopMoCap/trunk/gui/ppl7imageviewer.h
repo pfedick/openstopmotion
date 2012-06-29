@@ -36,6 +36,11 @@ class PPL7ImageViewer : public QGLWidget
 
 	protected:
 		void paintEvent(QPaintEvent *event);
+		void mousePressEvent(QMouseEvent *event);
+
+
+	signals:
+	     void mouseClicked(int x, int y, ppl7::grafix::Color c);
 };
 
 

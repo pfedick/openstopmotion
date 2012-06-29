@@ -19,6 +19,7 @@ HEADERS += gui/stopmocap.h \
     gui/ppl7imageviewer.h \
     src/device.h \
     src/config.h \
+    src/bluebox.h \
     src/scenemanager.h
 SOURCES += gui/stopmocap.cpp \
     gui/selectscene.cpp \
@@ -29,6 +30,7 @@ SOURCES += gui/stopmocap.cpp \
     src/device_win32.cpp \
     src/main.cpp \
     src/config.cpp \
+    src/bluebox.cpp \
     src/scenemanager.cpp
 FORMS += gui/stopmocap.ui \
     gui/selectscene.ui \
