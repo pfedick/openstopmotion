@@ -21,7 +21,7 @@ class BlueBox
 		int tola;
 		int tolb;
 
-		double colorclose(int Cb_p,int Cr_p,int Cb_key,int Cr_key);
+		//double colorclose(int Cb_p,int Cr_p,int Cb_key,int Cr_key);
 
 	public:
 		BlueBox();
@@ -37,7 +37,6 @@ class BlueBox
 		ppl7::grafix::Color colorKey() const;
 
 		void process(ppl7::grafix::Image &img);
-		void chromaInfo(ppl7::String &out, const ppl7::grafix::Color &c);
 };
 
 

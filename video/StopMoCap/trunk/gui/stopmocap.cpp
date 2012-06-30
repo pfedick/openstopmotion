@@ -76,8 +76,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 	ui.tolNearSlider->setValue(bluebox.nearTolerance());
 	ui.tolFarSlider->setValue(bluebox.farTolerance());
-	Tmp.setf("r=%i, g=%i, b=%i",bluebox.colorKey().red(),bluebox.colorKey().green(),bluebox.colorKey().blue());
-	ui.keyColor->setText(Tmp);
+	UpdateColorKey(bluebox.colorKey());
 }
 
 StopMoCap::~StopMoCap()
@@ -675,13 +674,24 @@ void StopMoCap::on_jpegQualitySpinBox_valueChanged ( int value )
 	ui.jpegQualitySlider->setValue(value);
 }
 
-void StopMoCap::on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c)
+void StopMoCap::on_viewer_mouseClicked(int , int , ppl7::grafix::Color c)
 {
-	ppl7::String Tmp;
+	if (ui.pickChromaKey->isChecked()) {
+		UpdateColorKey(c);
+		//ui.pickChromaKey->setChecked(false);
+	}
+}
+
+void StopMoCap::UpdateColorKey(ppl7::grafix::Color c)
+{
 	bluebox.setColorKey(c);
+	ppl7::String Tmp;
 	Tmp.setf("r=%i, g=%i, b=%i",c.red(),c.green(),c.blue());
 	ui.keyColor->setText(Tmp);
-
+	Tmp.setf("background-color: rgb(%i, %i, %i);\n",c.red(),c.green(),c.blue());
+	ppl7::grafix::Color n=c.negativ();
+	Tmp.appendf("color: rgb(%i, %i, %i);",n.red(),n.green(),n.blue());
+	ui.keyColor->setStyleSheet(Tmp);
 }
 
 void StopMoCap::on_tolNearSlider_valueChanged ( int value )

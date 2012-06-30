@@ -98,8 +98,32 @@ void PPL7ImageViewer::mousePressEvent(QMouseEvent *event)
 	QPoint p;
 	p=event->pos();
 	int x,y;
-	x=p.x()*img->width()/width();
-	y=p.y()*img->height()/height();
+	switch (smode) {
+		case None:
+			x=p.x();
+			y=p.y();
+			break;
+		case Fast:
+		case Smooth:
+			QPoint p2(0,0);
+			int nw,nh;
+			float ratio=(float)img->width()/(float)img->height();
+			if (height()*ratio>width()) {
+				nw=width();
+				nh=(int)((float)nw/ratio);
+			} else {
+				nh=height();
+				nw=(int)((float)nh*ratio);
+			}
+			p2.setX((width()-nw)/2);
+			p2.setY((height()-nh)/2);
+			//printf ("nw=%i, nh=%i\n",nw,nh);
+			x=(p.x()-p2.x())*img->width()/nw;
+			y=(p.y()-p2.y())*img->height()/nh;
+
+			break;
+	}
+
 	c=img->getPixel(x,y);
 
 	emit mouseClicked(x,y,c);

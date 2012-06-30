@@ -87,6 +87,7 @@ private:
     bool eventFilter(QObject *target, QEvent *event);
     bool consumeEvent(QObject *target, QEvent *event);
     void capture(ppl7::grafix::Image &img);
+    void UpdateColorKey(ppl7::grafix::Color c);
 
 protected:
     void resizeEvent ( QResizeEvent * event );
