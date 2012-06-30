@@ -37,12 +37,12 @@ static inline double colorclose(int Cb_p,int Cr_p,int Cb_key,int Cr_key,int tola
 
 static inline int getYCb(int r, int g, int b)
 {
-	return (int) round(128 + -0.168736*r - 0.331264*g + 0.5*b);
+	return (int) (128 + -0.168736*r - 0.331264*g + 0.5*b);
 }
 
 static inline int getYCr(int r, int g, int b)
 {
-	return (int) round(128 + 0.5*r - 0.418688*g - 0.081312*b);
+	return (int) (128 + 0.5*r - 0.418688*g - 0.081312*b);
 }
 
 
@@ -172,7 +172,7 @@ void BlueBox::process(ppl7::grafix::Image &img)
 				t.r=max(c.r-mask*r_key,0)+mask*bg.r;
 				t.g=max(c.g-mask*g_key,0)+mask*bg.g;
 				t.b=max(c.b-mask*b_key,0)+mask*bg.b;
-				sadr[x]=bg.c;
+				sadr[x]=t.c;
 			}
 		}
 		sadr+=spitch;
