@@ -168,7 +168,7 @@
             </attribute>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
-              <widget class="QCheckBox" name="blueBoxCheckBox">
+              <widget class="QCheckBox" name="chromaKeyingEnabled">
                <property name="text">
                 <string>enable Chroma Keying</string>
                </property>

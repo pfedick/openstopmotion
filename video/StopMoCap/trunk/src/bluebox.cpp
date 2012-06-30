@@ -51,6 +51,8 @@ BlueBox::BlueBox()
 	Key.set(0,0,255);
 	tola=50;
 	tolb=70;
+	spill=0;
+	mode=0;
 }
 
 void BlueBox::setColorKey(const ppl7::grafix::Color &key)
@@ -58,6 +60,16 @@ void BlueBox::setColorKey(const ppl7::grafix::Color &key)
 	Key=key;
 }
 
+void BlueBox::setReplaceColor(const ppl7::grafix::Color &color)
+{
+	Replace=color;
+}
+
+void BlueBox::setReplaceMode(int mode)
+{
+	if (mode==1) this->mode=1;
+	else this->mode=0;
+}
 
 void BlueBox::loadBackground(const ppl7::String &file)
 {
@@ -72,6 +84,11 @@ void BlueBox::setBackground(const ppl7::grafix::Drawable &img)
 void BlueBox::setForeground(const ppl7::grafix::Drawable &img)
 {
 	fgImage.copy(img);
+}
+
+void BlueBox::setSpillRemoval(int value)
+{
+	spill=value;
 }
 
 void BlueBox::setNearTolerance(int value)
@@ -92,6 +109,16 @@ int BlueBox::nearTolerance() const
 int BlueBox::farTolerance() const
 {
 	return tolb;
+}
+
+int BlueBox::spillRemoval() const
+{
+	return spill;
+}
+
+const ppl7::grafix::Image & BlueBox::getBGImage() const
+{
+	return bgImage;
 }
 
 ppl7::grafix::Color BlueBox::colorKey() const
@@ -149,6 +176,11 @@ void BlueBox::process(ppl7::grafix::Image &img)
 
 	PIXEL c,bg,t;
 
+	bg.r=Replace.red();
+	bg.g=Replace.green();
+	bg.b=Replace.blue();
+
+
 	ppluint32 *sadr=(ppluint32*)img.adr();
 	ppluint32 spitch=img.pitch()/4;
 
@@ -161,7 +193,7 @@ void BlueBox::process(ppl7::grafix::Image &img)
 			c.c=sadr[x];
 			cb=getYCb(c.r,c.g,c.b);
 			cr=getYCr(c.r,c.g,c.b);
-			bg.c=bgadr[x];
+			if (mode==0) bg.c=bgadr[x];
 
 			mask = 1-colorclose(cb, cr, cb_key, cr_key,tola,tolb);
 			if (mask==0.0) {

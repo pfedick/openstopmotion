@@ -1,6 +1,7 @@
 #define WITH_QT
 
 #include <ppl7.h>
+#include <ppl7-grafix.h>
 #include <QSettings>
 #include <QDesktopServices>
 #include "stopmocap.h"
@@ -37,6 +38,16 @@ void Config::load()
 
 	scalingMode=settings.value("scalingMode",PPL7ImageViewer::Smooth).toInt();
 	settings.endGroup();
+
+	settings.beginGroup("chromaKeying");
+	chromaKeyEnabled=settings.value("chromaKeyEnabled",false).toBool();
+	chromaBGImage=settings.value("chromaBGImage","").toString();
+	chromaToleranceFar=settings.value("chromaToleranceFar",0).toInt();
+	chromaToleranceNear=settings.value("chromaToleranceNear",0).toInt();
+	chromaKey.setColor((ppluint32)settings.value("chromaKey",0x00ff0000).toInt());
+	chromaReplaceColor=settings.value("chromaReplaceColor",0).toInt();
+	chromaCaptureMode=settings.value("chromaCaptureMode",0).toInt();
+	settings.endGroup();
 }
 
 void Config::save()
@@ -54,5 +65,16 @@ void Config::save()
 	settings.setValue("scalingMode",scalingMode);
 	settings.setValue("jpegQuality",jpegQuality);
 	settings.setValue("pictureFormat",pictureFormat);
+	settings.endGroup();
+
+	settings.beginGroup("chromaKeying");
+	settings.setValue("chromaKeyEnabled",chromaKeyEnabled);
+	settings.setValue("chromaBGImage",chromaBGImage);
+	settings.setValue("chromaToleranceFar",chromaToleranceFar);
+	settings.setValue("chromaToleranceNear",chromaToleranceNear);
+	settings.setValue("chromaSpillRemove",chromaSpillRemove);
+	settings.setValue("chromaKey",chromaKey.rgb());
+	settings.setValue("chromaReplaceColor",chromaReplaceColor);
+	settings.setValue("chromaCaptureMode",chromaCaptureMode);
 	settings.endGroup();
 }

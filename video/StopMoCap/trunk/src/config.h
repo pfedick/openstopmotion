@@ -31,6 +31,16 @@ class Config
 		int jpegQuality;
 		int pictureFormat;
 
+		// Chroma-Keying
+		bool 			chromaKeyEnabled;
+		ppl7::String	chromaBGImage;
+		int				chromaToleranceFar;
+		int				chromaToleranceNear;
+		int				chromaSpillRemove;
+		ppl7::grafix::Color	chromaKey;
+		int				chromaReplaceColor;
+		int				chromaCaptureMode;
+
 };
 
 #endif /* CONFIG_H_ */

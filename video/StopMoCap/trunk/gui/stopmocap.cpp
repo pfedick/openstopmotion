@@ -72,10 +72,48 @@ StopMoCap::StopMoCap(QWidget *parent)
 		}
 	}
 	ui.viewer->setDrawable(&grabImg);
-	bluebox.loadBackground("/raid/video/Brickfilms/Decker/Akt 3/Backgrounds/see.png");
+
+	// ChromaKeying
+	try {
+		bluebox.loadBackground(conf.chromaBGImage);
+		const ppl7::grafix::Image &bg=bluebox.getBGImage();
+		QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
+		ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
+				(ui.chromaBackground->width(),
+						ui.chromaBackground->height(),
+						Qt::KeepAspectRatio,Qt::SmoothTransformation)
+		);
+	} catch (...) {
+
+	}
+	ui.chromaKeyingEnabled->setChecked(conf.chromaKeyEnabled);
+	bluebox.setColorKey(conf.chromaKey);
+	bluebox.setNearTolerance(conf.chromaToleranceFar);
+	bluebox.setFarTolerance(conf.chromaToleranceNear);
+	bluebox.setSpillRemoval(conf.chromaSpillRemove);
+	if (conf.chromaReplaceColor==1) {
+		ui.chromaCaptureGreen->setChecked(true);
+		bluebox.setReplaceColor(ppl7::grafix::Color(0,255,0));
+	}
+	else if (conf.chromaReplaceColor==2) {
+		ui.chromaCaptureRed->setChecked(true);
+		bluebox.setReplaceColor(ppl7::grafix::Color(255,0,0));
+	} else {
+		ui.chromaCaptureBlue->setChecked(true);
+		bluebox.setReplaceColor(ppl7::grafix::Color(0,0,255));
+	}
+
+	bluebox.setReplaceMode(0);
+	if (conf.chromaCaptureMode==0) ui.chromaCaptureOff->setChecked(true);
+	else if (conf.chromaCaptureMode==1) ui.chromaCaptureBg->setChecked(true);
+	else {
+		bluebox.setReplaceMode(1);
+		ui.chromaCaptureColor->setChecked(true);
+	}
 
 	ui.tolNearSlider->setValue(bluebox.nearTolerance());
 	ui.tolFarSlider->setValue(bluebox.farTolerance());
+	ui.spillSlider->setValue(bluebox.spillRemoval());
 	UpdateColorKey(bluebox.colorKey());
 }
 
@@ -96,6 +134,10 @@ StopMoCap::~StopMoCap()
 	conf.scalingMode=ui.viewer->scalingMode();
 	conf.jpegQuality=ui.jpegQualitySlider->value();
 	conf.pictureFormat=ui.imageFormat->currentIndex();
+	conf.chromaKeyEnabled=ui.chromaKeyingEnabled->isChecked();
+	if (ui.chromaCaptureColor->isChecked()) conf.chromaCaptureMode=2;
+	else if (ui.chromaCaptureBg->isChecked()) conf.chromaCaptureMode=1;
+	else conf.chromaCaptureMode=0;
 	conf.save();
 	cam.close();
 	delete Timer;
@@ -290,7 +332,7 @@ void StopMoCap::grabFrame()
 		} else {
 			cam.readFrame(grabImg);
 		}
-		if (ui.blueBoxCheckBox->isChecked()) bluebox.process(grabImg);
+		if (ui.chromaKeyingEnabled->isChecked()) bluebox.process(grabImg);
 		grabImg.bltBlend(lastFrame,blendFactor);
 	} catch (...) {
 
@@ -573,6 +615,7 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 		} catch (...) {
 			return;
 		}
+		if (ui.chromaKeyingEnabled->isChecked()) bluebox.process(grabImg);
 #ifdef USE_SCENEMANAGER
 	}
 #endif
@@ -685,6 +728,7 @@ void StopMoCap::on_viewer_mouseClicked(int , int , ppl7::grafix::Color c)
 void StopMoCap::UpdateColorKey(ppl7::grafix::Color c)
 {
 	bluebox.setColorKey(c);
+	conf.chromaKey=c;
 	ppl7::String Tmp;
 	Tmp.setf("r=%i, g=%i, b=%i",c.red(),c.green(),c.blue());
 	ui.keyColor->setText(Tmp);
@@ -697,10 +741,94 @@ void StopMoCap::UpdateColorKey(ppl7::grafix::Color c)
 void StopMoCap::on_tolNearSlider_valueChanged ( int value )
 {
 	bluebox.setNearTolerance(value);
+	conf.chromaToleranceNear=value;
 }
 
 void StopMoCap::on_tolFarSlider_valueChanged ( int value )
 {
 	bluebox.setFarTolerance(value);
+	conf.chromaToleranceFar=value;
 }
+
+void StopMoCap::on_spillSlider_valueChanged ( int value )
+{
+	bluebox.setSpillRemoval(value);
+	conf.chromaSpillRemove=value;
+}
+
+void StopMoCap::on_chromaCaptureRed_toggled(bool checked)
+{
+	if (checked) {
+		bluebox.setReplaceColor(ppl7::grafix::Color(255,0,0));
+		conf.chromaReplaceColor=2;
+		ui.chromaCaptureGreen->setChecked(false);
+		ui.chromaCaptureBlue->setChecked(false);
+	}
+}
+
+void StopMoCap::on_chromaCaptureGreen_toggled(bool checked)
+{
+	if (checked) {
+		bluebox.setReplaceColor(ppl7::grafix::Color(0,255,0));
+		conf.chromaReplaceColor=1;
+		ui.chromaCaptureRed->setChecked(false);
+		ui.chromaCaptureBlue->setChecked(false);
+	}
+}
+
+void StopMoCap::on_chromaCaptureBlue_toggled(bool checked)
+{
+	if (checked) {
+		bluebox.setReplaceColor(ppl7::grafix::Color(0,0,255));
+		conf.chromaReplaceColor=0;
+		ui.chromaCaptureRed->setChecked(false);
+		ui.chromaCaptureGreen->setChecked(false);
+	}
+}
+
+void StopMoCap::on_chromaBackgroundSelect_clicked()
+{
+	Timer->stop();
+	ppl7::String Dir=ppl7::File::getPath(conf.chromaBGImage);
+	if (Dir.isEmpty()) {
+		Dir=ppl7::Dir::homePath();
+	}
+
+	QString newfile = QFileDialog::getOpenFileName(this, tr("Select background image"),
+			Dir,
+			tr("Images (*.png *.bmp *.jpg)"));
+	if (!newfile.isNull()) {
+		try {
+			bluebox.loadBackground(newfile);
+			conf.chromaBGImage=newfile;
+			const ppl7::grafix::Image &bg=bluebox.getBGImage();
+			QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
+			ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
+					(ui.chromaBackground->width(),
+							ui.chromaBackground->height(),
+							Qt::KeepAspectRatio,Qt::SmoothTransformation)
+			);
+		} catch (...) {
+
+		}
+	}
+	Timer->start(10);
+}
+
+
+void StopMoCap::on_chromaCaptureColor_toggled(bool checked)
+{
+	bluebox.setReplaceMode(1);
+}
+
+void StopMoCap::on_chromaCaptureBg_toggled(bool checked)
+{
+	bluebox.setReplaceMode(0);
+}
+
+void StopMoCap::on_chromaCaptureOff_toggled(bool checked)
+{
+	bluebox.setReplaceMode(0);
+}
+
 

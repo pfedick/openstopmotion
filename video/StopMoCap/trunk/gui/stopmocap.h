@@ -126,6 +126,16 @@ public slots:
     void on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c);
     void on_tolNearSlider_valueChanged ( int value );
     void on_tolFarSlider_valueChanged ( int value );
+    void on_spillSlider_valueChanged ( int value );
+
+    void on_chromaCaptureRed_toggled(bool checked);
+    void on_chromaCaptureGreen_toggled(bool checked);
+    void on_chromaCaptureBlue_toggled(bool checked);
+    void on_chromaBackgroundSelect_clicked();
+
+    void on_chromaCaptureColor_toggled(bool checked);
+    void on_chromaCaptureBg_toggled(bool checked);
+    void on_chromaCaptureOff_toggled(bool checked);
 
 };
 
