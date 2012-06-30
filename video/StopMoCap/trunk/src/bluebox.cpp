@@ -18,6 +18,9 @@ double BlueBox::colorclose(int Cb_p,int Cr_p,int Cb_key,int Cr_key)
 {
    /*decides if a color is close to the specified hue*/
    double temp = sqrt((Cb_key-Cb_p)*(Cb_key-Cb_p)+(Cr_key-Cr_p)*(Cr_key-Cr_p));
+   // SSE: sqrtss für float, SSE2: sqrtsd für double
+   // Man könnte Cb und Cr in ein MME-Register packen, die Subtraktionen und Multiplikationen
+   // parallel berechnen, das Ergebnis addieren und dann die Wurzel ziehen
    if (temp < tola) {return (0.0);}
    if (temp < tolb) {return ((temp-tola)/(tolb-tola));}
    return (1.0);
