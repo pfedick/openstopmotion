@@ -23,7 +23,7 @@
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
 #define STOPMOCAP_APPNAME		"StopMotion Capture"
 #define STOPMOCAP_COPYRIGHT		"(c) 2012 by Patrick Fedick"
-#define STOPMOCAP_VERSION		"0.2"
+#define STOPMOCAP_VERSION		"0.3"
 
 
 //#define USE_SCENEMANAGER
@@ -91,6 +91,7 @@ private:
 
 protected:
     void resizeEvent ( QResizeEvent * event );
+    void showEvent (  QShowEvent * event );
 
 public slots:
     void on_deviceComboBox_currentIndexChanged(int index);

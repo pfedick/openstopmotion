@@ -79,9 +79,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 		const ppl7::grafix::Image &bg=bluebox.getBGImage();
 		QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 		ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
-				(ui.chromaBackground->width(),
-						ui.chromaBackground->height(),
-						Qt::KeepAspectRatio,Qt::SmoothTransformation)
+				(220,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 		);
 	} catch (...) {
 
@@ -321,6 +319,13 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 	rthread.setImageSize(ui.viewer->width(),ui.viewer->height());
 #endif
 	QWidget::resizeEvent(event);
+}
+
+void StopMoCap::showEvent (  QShowEvent * event )
+{
+	const ppl7::grafix::Image &bg=bluebox.getBGImage();
+
+	QWidget::showEvent(event);
 }
 
 void StopMoCap::grabFrame()
@@ -804,9 +809,7 @@ void StopMoCap::on_chromaBackgroundSelect_clicked()
 			const ppl7::grafix::Image &bg=bluebox.getBGImage();
 			QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 			ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
-					(ui.chromaBackground->width(),
-							ui.chromaBackground->height(),
-							Qt::KeepAspectRatio,Qt::SmoothTransformation)
+					(220,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 			);
 		} catch (...) {
 

@@ -306,8 +306,14 @@
               <widget class="QLabel" name="chromaBackground">
                <property name="minimumSize">
                 <size>
-                 <width>200</width>
-                 <height>200</height>
+                 <width>220</width>
+                 <height>160</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>220</width>
+                 <height>160</height>
                 </size>
                </property>
                <property name="frameShape">
