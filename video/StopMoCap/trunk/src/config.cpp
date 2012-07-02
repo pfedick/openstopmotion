@@ -14,6 +14,8 @@ Config::Config()
 	skipFrames=0;
 	onionValue=0;
 	scalingMode=PPL7ImageViewer::Smooth;
+	saveCamShot=true;
+	saveComposited=false;
 }
 
 Config::~Config()
@@ -36,6 +38,12 @@ void Config::load()
 	jpegQuality=settings.value("jpegQuality",90).toInt();
 	pictureFormat=settings.value("pictureFormat",0).toInt();
 
+	jpegQualityComp=settings.value("jpegQualityComp",90).toInt();
+	pictureFormatComp=settings.value("pictureFormatComp",0).toInt();
+
+	saveCamShot=settings.value("saveCamShot",true).toBool();
+	saveComposited=settings.value("saveComposited",false).toBool();
+
 	scalingMode=settings.value("scalingMode",PPL7ImageViewer::Smooth).toInt();
 	settings.endGroup();
 
@@ -45,8 +53,15 @@ void Config::load()
 	chromaToleranceFar=settings.value("chromaToleranceFar",0).toInt();
 	chromaToleranceNear=settings.value("chromaToleranceNear",0).toInt();
 	chromaKey.setColor((ppluint32)settings.value("chromaKey",0x00ff0000).toInt());
-	chromaReplaceColor=settings.value("chromaReplaceColor",0).toInt();
-	chromaCaptureMode=settings.value("chromaCaptureMode",0).toInt();
+	replaceColor.setColor((ppluint32)settings.value("replaceColor",0x00ff0000).toInt());
+	chromaReplaceMode=settings.value("chromaReplaceMode",0).toInt();
+
+	foregroundEnabled=settings.value("foregroundEnabled",false).toBool();
+	chromaFGImage=settings.value("chromaFGImage","").toString();
+	chromaToleranceFarFG=settings.value("chromaToleranceFarFG",0).toInt();
+	chromaToleranceNearFG=settings.value("chromaToleranceNearFG",0).toInt();
+	chromaKeyFG.setColor((ppluint32)settings.value("chromaKeyFG",0x00ff0000).toInt());
+
 	settings.endGroup();
 }
 
@@ -65,6 +80,10 @@ void Config::save()
 	settings.setValue("scalingMode",scalingMode);
 	settings.setValue("jpegQuality",jpegQuality);
 	settings.setValue("pictureFormat",pictureFormat);
+	settings.setValue("jpegQualityComp",jpegQualityComp);
+	settings.setValue("pictureFormatComp",pictureFormatComp);
+	settings.setValue("saveCamShot",saveCamShot);
+	settings.setValue("saveComposited",saveComposited);
 	settings.endGroup();
 
 	settings.beginGroup("chromaKeying");
@@ -74,7 +93,15 @@ void Config::save()
 	settings.setValue("chromaToleranceNear",chromaToleranceNear);
 	settings.setValue("chromaSpillRemove",chromaSpillRemove);
 	settings.setValue("chromaKey",chromaKey.rgb());
-	settings.setValue("chromaReplaceColor",chromaReplaceColor);
-	settings.setValue("chromaCaptureMode",chromaCaptureMode);
+	settings.setValue("replaceColor",replaceColor.rgb());
+	settings.setValue("chromaReplaceMode",chromaReplaceMode);
+
+	settings.setValue("foregroundEnabled",foregroundEnabled);
+	settings.setValue("chromaFGImage",chromaFGImage);
+	settings.setValue("chromaToleranceFarFG",chromaToleranceFarFG);
+	settings.setValue("chromaToleranceNearFG",chromaToleranceNearFG);
+	settings.setValue("chromaSpillRemoveFG",chromaSpillRemoveFG);
+	settings.setValue("chromaKeyFG",chromaKeyFG.rgb());
+
 	settings.endGroup();
 }

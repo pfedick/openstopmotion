@@ -30,6 +30,11 @@ class Config
 		int scalingMode;
 		int jpegQuality;
 		int pictureFormat;
+		bool saveCamShot;
+		bool saveComposited;
+
+		int jpegQualityComp;
+		int pictureFormatComp;
 
 		// Chroma-Keying
 		bool 			chromaKeyEnabled;
@@ -38,8 +43,16 @@ class Config
 		int				chromaToleranceNear;
 		int				chromaSpillRemove;
 		ppl7::grafix::Color	chromaKey;
-		int				chromaReplaceColor;
-		int				chromaCaptureMode;
+		ppl7::grafix::Color	replaceColor;
+		int				chromaReplaceMode;
+
+		// Foreground
+		bool 			foregroundEnabled;
+		ppl7::String	chromaFGImage;
+		int				chromaToleranceFarFG;
+		int				chromaToleranceNearFG;
+		int				chromaSpillRemoveFG;
+		ppl7::grafix::Color	chromaKeyFG;
 
 };
 

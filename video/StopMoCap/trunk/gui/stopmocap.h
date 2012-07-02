@@ -87,7 +87,8 @@ private:
     bool eventFilter(QObject *target, QEvent *event);
     bool consumeEvent(QObject *target, QEvent *event);
     void capture(ppl7::grafix::Image &img);
-    void UpdateColorKey(ppl7::grafix::Color c);
+    void UpdateColorKeyBG(ppl7::grafix::Color c);
+    void UpdateColorKeyFG(ppl7::grafix::Color c);
 
 protected:
     void resizeEvent ( QResizeEvent * event );
@@ -124,19 +125,29 @@ public slots:
     void on_jpegQualitySlider_valueChanged ( int value );
     void on_jpegQualitySpinBox_valueChanged ( int value );
 
+    void on_imageFormatComp_currentIndexChanged(int index);
+    void on_jpegQualitySliderComp_valueChanged ( int value );
+    void on_jpegQualitySpinBoxComp_valueChanged ( int value );
+
+
     void on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c);
     void on_tolNearSlider_valueChanged ( int value );
     void on_tolFarSlider_valueChanged ( int value );
     void on_spillSlider_valueChanged ( int value );
-
-    void on_chromaCaptureRed_toggled(bool checked);
-    void on_chromaCaptureGreen_toggled(bool checked);
-    void on_chromaCaptureBlue_toggled(bool checked);
     void on_chromaBackgroundSelect_clicked();
+    void on_chromaKeyingEnabled_toggled(bool checked);
 
-    void on_chromaCaptureColor_toggled(bool checked);
-    void on_chromaCaptureBg_toggled(bool checked);
-    void on_chromaCaptureOff_toggled(bool checked);
+
+    void on_foregroundEnabled_toggled(bool checked);
+    void on_tolNearSliderFG_valueChanged ( int value );
+    void on_tolFarSliderFG_valueChanged ( int value );
+    void on_spillSliderFG_valueChanged ( int value );
+    void on_chromaForegroundSelect_clicked();
+    void on_bgColorSelect_clicked();
+
+    void on_replaceChromaWithColor_toggled(bool checked);
+    void on_replaceChromaWithImage_toggled(bool checked);
+
 
 };
 

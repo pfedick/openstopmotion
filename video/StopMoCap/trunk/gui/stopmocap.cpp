@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QEvent>
 #include <QMessageBox>
+#include <QColorDialog>
 #include "selectscene.h"
 
 StopMoCap::StopMoCap(QWidget *parent)
@@ -54,6 +55,14 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 	ui.jpegQualitySlider->setValue(conf.jpegQuality);
 	ui.imageFormat->setCurrentIndex(conf.pictureFormat);
+	on_imageFormat_currentIndexChanged(conf.pictureFormat);
+
+	ui.jpegQualitySliderComp->setValue(conf.jpegQualityComp);
+	ui.imageFormatComp->setCurrentIndex(conf.pictureFormatComp);
+	on_imageFormatComp_currentIndexChanged(conf.pictureFormatComp);
+
+	ui.saveCamShot->setChecked(conf.saveCamShot);
+	ui.saveCompositedImage->setChecked(conf.saveComposited);
 
 
 
@@ -79,40 +88,53 @@ StopMoCap::StopMoCap(QWidget *parent)
 		const ppl7::grafix::Image &bg=bluebox.getBGImage();
 		QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 		ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
-				(220,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+				(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 		);
 	} catch (...) {
 
 	}
 	ui.chromaKeyingEnabled->setChecked(conf.chromaKeyEnabled);
+	bluebox.setBGChromaEnabled(conf.chromaKeyEnabled);
 	bluebox.setColorKey(conf.chromaKey);
-	bluebox.setNearTolerance(conf.chromaToleranceFar);
-	bluebox.setFarTolerance(conf.chromaToleranceNear);
+	bluebox.setNearTolerance(conf.chromaToleranceNear);
+	bluebox.setFarTolerance(conf.chromaToleranceFar);
 	bluebox.setSpillRemoval(conf.chromaSpillRemove);
-	if (conf.chromaReplaceColor==1) {
-		ui.chromaCaptureGreen->setChecked(true);
-		bluebox.setReplaceColor(ppl7::grafix::Color(0,255,0));
+
+
+	bluebox.setColorKeyFG(conf.chromaKeyFG);
+	bluebox.setNearToleranceFG(conf.chromaToleranceNearFG);
+	bluebox.setFarToleranceFG(conf.chromaToleranceFarFG);
+	bluebox.setSpillRemovalFG(conf.chromaSpillRemoveFG);
+	try {
+		bluebox.loadForeground(conf.chromaFGImage);
+		const ppl7::grafix::Image &bg=bluebox.getFGImage();
+		QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
+		ui.chromaForeground->setPixmap(QPixmap::fromImage(qi).scaled
+				(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+		);
+	} catch (...) {
+
 	}
-	else if (conf.chromaReplaceColor==2) {
-		ui.chromaCaptureRed->setChecked(true);
-		bluebox.setReplaceColor(ppl7::grafix::Color(255,0,0));
-	} else {
-		ui.chromaCaptureBlue->setChecked(true);
-		bluebox.setReplaceColor(ppl7::grafix::Color(0,0,255));
-	}
+	ui.foregroundEnabled->setChecked(conf.foregroundEnabled);
+	bluebox.setFGChromaEnabled(conf.foregroundEnabled);
+	UpdateColorKeyFG(bluebox.colorKeyFG());
+
+
+	bluebox.setReplaceColor(conf.replaceColor);
 
 	bluebox.setReplaceMode(0);
-	if (conf.chromaCaptureMode==0) ui.chromaCaptureOff->setChecked(true);
-	else if (conf.chromaCaptureMode==1) ui.chromaCaptureBg->setChecked(true);
-	else {
+	if (conf.chromaReplaceMode==1) {
 		bluebox.setReplaceMode(1);
-		ui.chromaCaptureColor->setChecked(true);
+		ui.replaceChromaWithColor->setChecked(true);
+	} else {
+		ui.replaceChromaWithImage->setChecked(true);
+		bluebox.setReplaceMode(0);
 	}
 
 	ui.tolNearSlider->setValue(bluebox.nearTolerance());
 	ui.tolFarSlider->setValue(bluebox.farTolerance());
 	ui.spillSlider->setValue(bluebox.spillRemoval());
-	UpdateColorKey(bluebox.colorKey());
+	UpdateColorKeyBG(bluebox.colorKey());
 }
 
 StopMoCap::~StopMoCap()
@@ -132,10 +154,14 @@ StopMoCap::~StopMoCap()
 	conf.scalingMode=ui.viewer->scalingMode();
 	conf.jpegQuality=ui.jpegQualitySlider->value();
 	conf.pictureFormat=ui.imageFormat->currentIndex();
+	conf.jpegQualityComp=ui.jpegQualitySliderComp->value();
+	conf.pictureFormatComp=ui.imageFormatComp->currentIndex();
+	conf.saveCamShot=ui.saveCamShot->isChecked();
+	conf.saveComposited=ui.saveCompositedImage->isChecked();
+
 	conf.chromaKeyEnabled=ui.chromaKeyingEnabled->isChecked();
-	if (ui.chromaCaptureColor->isChecked()) conf.chromaCaptureMode=2;
-	else if (ui.chromaCaptureBg->isChecked()) conf.chromaCaptureMode=1;
-	else conf.chromaCaptureMode=0;
+	if (ui.replaceChromaWithColor->isChecked()) conf.chromaReplaceMode=1;
+	else conf.chromaReplaceMode=0;
 	conf.save();
 	cam.close();
 	delete Timer;
@@ -337,8 +363,16 @@ void StopMoCap::grabFrame()
 		} else {
 			cam.readFrame(grabImg);
 		}
-		if (ui.chromaKeyingEnabled->isChecked()) bluebox.process(grabImg);
-		grabImg.bltBlend(lastFrame,blendFactor);
+		if (ui.pickChromaKeyFG->isChecked()) {
+			grabImg.blt(bluebox.getFGImage());
+		} else if (ui.pickChromaKey->isChecked()) {
+
+		} else {
+			bluebox.process(grabImg);
+			if (blendFactor>0) {
+				grabImg.bltBlend(lastFrame,blendFactor);
+			}
+		}
 	} catch (...) {
 
 	}
@@ -438,35 +472,61 @@ void StopMoCap::on_captureButton_clicked()
 {
 	if (cam.isOpen()==false) return;
 	ppl7::String Tmp;
+	SaveJob *job=NULL;
 	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
 	if (ppl7::Dir::exists(CaptureDir)==false) return;
-	SaveJob *job=new SaveJob;
-	if (!job) throw ppl7::OutOfMemoryException();
+	ppl7::grafix::Image img;
 	try {
-		capture(job->img);
+		capture(img);
 
 		if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 		lastFrameNum++;
 
-		job->Filename=CaptureDir;
-		job->Filename.appendf("/frame_%06i",lastFrameNum);
-		lastFrame=job->img;
-		if (ui.imageFormat->currentIndex()==0) {
-			job->format=PictureFormat::png;
-			job->Filename+=".png";
-		} else if (ui.imageFormat->currentIndex()==1) {
-			job->format=PictureFormat::bmp;
-			job->Filename+=".bmp";
-		} else if (ui.imageFormat->currentIndex()==2) {
-			job->format=PictureFormat::jpeg;
-			job->quality=ui.jpegQualitySlider->value();
-			job->Filename+=".jpg";
-		}
+		if (ui.saveCamShot->isChecked()) {
+			job=new SaveJob;
+			if (!job) throw ppl7::OutOfMemoryException();
+			job->img=img;
+			job->Filename=CaptureDir;
+			job->Filename.appendf("/frame_%06i",lastFrameNum);
+			lastFrame=img;
+			if (ui.imageFormat->currentIndex()==0) {
+				job->format=PictureFormat::png;
+				job->Filename+=".png";
+			} else if (ui.imageFormat->currentIndex()==1) {
+				job->format=PictureFormat::bmp;
+				job->Filename+=".bmp";
+			} else if (ui.imageFormat->currentIndex()==2) {
+				job->format=PictureFormat::jpeg;
+				job->quality=ui.jpegQualitySlider->value();
+				job->Filename+=".jpg";
+			}
 #ifdef USE_SCENEMANAGER
-		scm.setFilename(lastFrameNum,job->Filename);
-		scm.setImage(lastFrameNum,job->img);
+			scm.setFilename(lastFrameNum,job->Filename);
+			scm.setImage(lastFrameNum,job->img);
 #endif
-		savethread.addJob(job);
+			savethread.addJob(job);
+		}
+		if (ui.saveCompositedImage->isChecked()) {
+			job=new SaveJob;
+			if (!job) throw ppl7::OutOfMemoryException();
+			job->Filename=CaptureDir;
+			job->Filename.appendf("/comp_%06i",lastFrameNum);
+			bluebox.process(img);
+			job->img=img;
+			lastFrame=img;
+			if (ui.imageFormatComp->currentIndex()==0) {
+				job->format=PictureFormat::png;
+				job->Filename+=".png";
+			} else if (ui.imageFormatComp->currentIndex()==1) {
+				job->format=PictureFormat::bmp;
+				job->Filename+=".bmp";
+			} else if (ui.imageFormatComp->currentIndex()==2) {
+				job->format=PictureFormat::jpeg;
+				job->quality=ui.jpegQualitySliderComp->value();
+				job->Filename+=".jpg";
+			}
+			savethread.addJob(job);
+		}
 
 		Tmp.setf("%i",lastFrameNum);
 		ui.totalFrames->setText(Tmp);
@@ -706,9 +766,11 @@ void StopMoCap::on_selectScene_clicked()
 void StopMoCap::on_imageFormat_currentIndexChanged(int index)
 {
 	if (index==2) {
-		ui.jpegQuality->setEnabled(true);
+		ui.jpegQualitySlider->setEnabled(true);
+		ui.jpegQualitySpinBox->setEnabled(true);
 	} else {
-		ui.jpegQuality->setEnabled(false);
+		ui.jpegQualitySlider->setEnabled(false);
+		ui.jpegQualitySpinBox->setEnabled(false);
 	}
 }
 
@@ -722,15 +784,38 @@ void StopMoCap::on_jpegQualitySpinBox_valueChanged ( int value )
 	ui.jpegQualitySlider->setValue(value);
 }
 
-void StopMoCap::on_viewer_mouseClicked(int , int , ppl7::grafix::Color c)
+void StopMoCap::on_imageFormatComp_currentIndexChanged(int index)
 {
-	if (ui.pickChromaKey->isChecked()) {
-		UpdateColorKey(c);
-		//ui.pickChromaKey->setChecked(false);
+	if (index==2) {
+		ui.jpegQualitySliderComp->setEnabled(true);
+		ui.jpegQualitySpinBoxComp->setEnabled(true);
+	} else {
+		ui.jpegQualitySliderComp->setEnabled(false);
+		ui.jpegQualitySpinBoxComp->setEnabled(false);
 	}
 }
 
-void StopMoCap::UpdateColorKey(ppl7::grafix::Color c)
+void StopMoCap::on_jpegQualitySliderComp_valueChanged (int value)
+{
+	ui.jpegQualitySpinBoxComp->setValue(value);
+}
+
+void StopMoCap::on_jpegQualitySpinBoxComp_valueChanged ( int value )
+{
+	ui.jpegQualitySliderComp->setValue(value);
+}
+
+void StopMoCap::on_viewer_mouseClicked(int , int , ppl7::grafix::Color c)
+{
+	if (ui.pickChromaKey->isChecked()) {
+		UpdateColorKeyBG(c);
+		//ui.pickChromaKey->setChecked(false);
+	} else if (ui.pickChromaKeyFG->isChecked()) {
+		UpdateColorKeyFG(c);
+	}
+}
+
+void StopMoCap::UpdateColorKeyBG(ppl7::grafix::Color c)
 {
 	bluebox.setColorKey(c);
 	conf.chromaKey=c;
@@ -741,6 +826,19 @@ void StopMoCap::UpdateColorKey(ppl7::grafix::Color c)
 	ppl7::grafix::Color n=c.negativ();
 	Tmp.appendf("color: rgb(%i, %i, %i);",n.red(),n.green(),n.blue());
 	ui.keyColor->setStyleSheet(Tmp);
+}
+
+void StopMoCap::UpdateColorKeyFG(ppl7::grafix::Color c)
+{
+	bluebox.setColorKeyFG(c);
+	conf.chromaKeyFG=c;
+	ppl7::String Tmp;
+	Tmp.setf("r=%i, g=%i, b=%i",c.red(),c.green(),c.blue());
+	ui.keyColorFG->setText(Tmp);
+	Tmp.setf("background-color: rgb(%i, %i, %i);\n",c.red(),c.green(),c.blue());
+	ppl7::grafix::Color n=c.negativ();
+	Tmp.appendf("color: rgb(%i, %i, %i);",n.red(),n.green(),n.blue());
+	ui.keyColorFG->setStyleSheet(Tmp);
 }
 
 void StopMoCap::on_tolNearSlider_valueChanged ( int value )
@@ -761,36 +859,6 @@ void StopMoCap::on_spillSlider_valueChanged ( int value )
 	conf.chromaSpillRemove=value;
 }
 
-void StopMoCap::on_chromaCaptureRed_toggled(bool checked)
-{
-	if (checked) {
-		bluebox.setReplaceColor(ppl7::grafix::Color(255,0,0));
-		conf.chromaReplaceColor=2;
-		ui.chromaCaptureGreen->setChecked(false);
-		ui.chromaCaptureBlue->setChecked(false);
-	}
-}
-
-void StopMoCap::on_chromaCaptureGreen_toggled(bool checked)
-{
-	if (checked) {
-		bluebox.setReplaceColor(ppl7::grafix::Color(0,255,0));
-		conf.chromaReplaceColor=1;
-		ui.chromaCaptureRed->setChecked(false);
-		ui.chromaCaptureBlue->setChecked(false);
-	}
-}
-
-void StopMoCap::on_chromaCaptureBlue_toggled(bool checked)
-{
-	if (checked) {
-		bluebox.setReplaceColor(ppl7::grafix::Color(0,0,255));
-		conf.chromaReplaceColor=0;
-		ui.chromaCaptureRed->setChecked(false);
-		ui.chromaCaptureGreen->setChecked(false);
-	}
-}
-
 void StopMoCap::on_chromaBackgroundSelect_clicked()
 {
 	Timer->stop();
@@ -809,7 +877,7 @@ void StopMoCap::on_chromaBackgroundSelect_clicked()
 			const ppl7::grafix::Image &bg=bluebox.getBGImage();
 			QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 			ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
-					(220,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+					(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 			);
 		} catch (...) {
 
@@ -819,19 +887,91 @@ void StopMoCap::on_chromaBackgroundSelect_clicked()
 }
 
 
-void StopMoCap::on_chromaCaptureColor_toggled(bool checked)
+void StopMoCap::on_replaceChromaWithColor_toggled(bool checked)
 {
 	bluebox.setReplaceMode(1);
+	conf.chromaReplaceMode=1;
 }
 
-void StopMoCap::on_chromaCaptureBg_toggled(bool checked)
+void StopMoCap::on_replaceChromaWithImage_toggled(bool checked)
 {
 	bluebox.setReplaceMode(0);
+	conf.chromaReplaceMode=0;
 }
 
-void StopMoCap::on_chromaCaptureOff_toggled(bool checked)
+void StopMoCap::on_chromaKeyingEnabled_toggled(bool checked)
 {
-	bluebox.setReplaceMode(0);
+	bluebox.setBGChromaEnabled(checked);
+	conf.chromaKeyEnabled=checked;
+
+}
+
+void StopMoCap::on_foregroundEnabled_toggled(bool checked)
+{
+	bluebox.setFGChromaEnabled(checked);
+	conf.foregroundEnabled=checked;
+
+}
+
+void StopMoCap::on_tolNearSliderFG_valueChanged ( int value )
+{
+	bluebox.setNearToleranceFG(value);
+	conf.chromaToleranceNearFG=value;
+}
+
+void StopMoCap::on_tolFarSliderFG_valueChanged ( int value )
+{
+	bluebox.setFarToleranceFG(value);
+	conf.chromaToleranceFarFG=value;
+}
+
+void StopMoCap::on_spillSliderFG_valueChanged ( int value )
+{
+	bluebox.setSpillRemovalFG(value);
+	conf.chromaSpillRemoveFG=value;
+}
+
+void StopMoCap::on_chromaForegroundSelect_clicked()
+{
+	printf ("Debug 1\n");
+	Timer->stop();
+	ppl7::String Dir=ppl7::File::getPath(conf.chromaFGImage);
+	if (Dir.isEmpty()) {
+		Dir=ppl7::Dir::homePath();
+	}
+
+	QString newfile = QFileDialog::getOpenFileName(this, tr("Select foreground image"),
+			Dir,
+			tr("Images (*.png *.bmp *.jpg)"));
+	if (!newfile.isNull()) {
+		try {
+			bluebox.loadForeground(newfile);
+			conf.chromaFGImage=newfile;
+			const ppl7::grafix::Image &bg=bluebox.getFGImage();
+			QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
+			ui.chromaForeground->setPixmap(QPixmap::fromImage(qi).scaled
+					(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+			);
+		} catch (...) {
+
+		}
+	}
+	Timer->start(10);
 }
 
 
+void StopMoCap::on_bgColorSelect_clicked()
+{
+	Timer->stop();
+	QColorDialog dialog(this);
+	ppl7::grafix::Color c=bluebox.replaceColor();
+	dialog.setCurrentColor(QColor(c.red(),c.green(),c.blue(),c.alpha()));
+	dialog.setOption(QColorDialog::ShowAlphaChannel,true);
+	if (dialog.exec()==1) {
+		QColor qc=dialog.selectedColor();
+		conf.replaceColor.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
+		bluebox.setReplaceColor(conf.replaceColor);
+	}
+
+	Timer->start(10);
+}

@@ -49,15 +49,39 @@ static inline int getYCr(int r, int g, int b)
 BlueBox::BlueBox()
 {
 	Key.set(0,0,255);
+	KeyFG.set(0,0,255);
 	tola=50;
 	tolb=70;
 	spill=0;
 	mode=0;
+	fgChromaEnabled=false;
+	bgChromaEnabled=false;
+	tolaFG=50;
+	tolbFG=70;
+	spillFG=0;
+
+}
+
+void BlueBox::setBGChromaEnabled(bool flag)
+{
+	bgChromaEnabled=flag;
+}
+
+void BlueBox::setFGChromaEnabled(bool flag)
+{
+	fgChromaEnabled=flag;
+	UpdateForeground();
 }
 
 void BlueBox::setColorKey(const ppl7::grafix::Color &key)
 {
 	Key=key;
+}
+
+void BlueBox::setColorKeyFG(const ppl7::grafix::Color &key)
+{
+	KeyFG=key;
+	UpdateForeground();
 }
 
 void BlueBox::setReplaceColor(const ppl7::grafix::Color &color)
@@ -76,6 +100,12 @@ void BlueBox::loadBackground(const ppl7::String &file)
 	bgImage.load(file);
 }
 
+void BlueBox::loadForeground(const ppl7::String &file)
+{
+	fgImage.load(file);
+	UpdateForeground();
+}
+
 void BlueBox::setBackground(const ppl7::grafix::Drawable &img)
 {
 	bgImage.copy(img);
@@ -84,6 +114,7 @@ void BlueBox::setBackground(const ppl7::grafix::Drawable &img)
 void BlueBox::setForeground(const ppl7::grafix::Drawable &img)
 {
 	fgImage.copy(img);
+	UpdateForeground();
 }
 
 void BlueBox::setSpillRemoval(int value)
@@ -101,6 +132,25 @@ void BlueBox::setFarTolerance(int value)
 	tolb=value;
 }
 
+void BlueBox::setSpillRemovalFG(int value)
+{
+	spillFG=value;
+	UpdateForeground();
+}
+
+void BlueBox::setNearToleranceFG(int value)
+{
+	tolaFG=value;
+	UpdateForeground();
+}
+
+void BlueBox::setFarToleranceFG(int value)
+{
+	tolbFG=value;
+	UpdateForeground();
+}
+
+
 int BlueBox::nearTolerance() const
 {
 	return tola;
@@ -116,14 +166,44 @@ int BlueBox::spillRemoval() const
 	return spill;
 }
 
+int BlueBox::nearToleranceFG() const
+{
+	return tolaFG;
+}
+
+int BlueBox::farToleranceFG() const
+{
+	return tolbFG;
+}
+
+int BlueBox::spillRemovalFG() const
+{
+	return spillFG;
+}
+
 const ppl7::grafix::Image & BlueBox::getBGImage() const
 {
 	return bgImage;
 }
 
+const ppl7::grafix::Image & BlueBox::getFGImage() const
+{
+	return fgImage;
+}
+
 ppl7::grafix::Color BlueBox::colorKey() const
 {
 	return Key;
+}
+
+ppl7::grafix::Color BlueBox::colorKeyFG() const
+{
+	return KeyFG;
+}
+
+ppl7::grafix::Color BlueBox::replaceColor() const
+{
+	return Replace;
 }
 
 /*
@@ -161,18 +241,19 @@ void BlueBox::process(ppl7::grafix::Image &img)
 		}
 	}
 }
-*/
+ */
 
 
-void BlueBox::process(ppl7::grafix::Image &img)
+void BlueBox::UpdateForeground()
 {
+	if (fgChromaEnabled==false) return;
 	double mask;
 	int cb,cr;
-	int cb_key=Key.getYCb();
-	int cr_key=Key.getYCr();
-	int r_key = Key.red();
-	int g_key = Key.green();
-	int b_key = Key.blue();
+	int cb_key=KeyFG.getYCb();
+	int cr_key=KeyFG.getYCr();
+	int r_key = KeyFG.red();
+	int g_key = KeyFG.green();
+	int b_key = KeyFG.blue();
 
 	PIXEL c,bg,t;
 
@@ -180,35 +261,87 @@ void BlueBox::process(ppl7::grafix::Image &img)
 	bg.g=Replace.green();
 	bg.b=Replace.blue();
 
+	fgImageAlpha.create(fgImage.width(),fgImage.height(),fgImage.rgbformat());
 
-	ppluint32 *sadr=(ppluint32*)img.adr();
-	ppluint32 spitch=img.pitch()/4;
+	ppluint32 *sadr=(ppluint32*)fgImage.adr();
+	ppluint32 spitch=fgImage.pitch()/4;
 
-	ppluint32 *bgadr=(ppluint32*)bgImage.adr();
-	ppluint32 bgpitch=bgImage.pitch()/4;
+	ppluint32 *zadr=(ppluint32*)fgImageAlpha.adr();
+	ppluint32 zpitch=fgImageAlpha.pitch()/4;
 
 
-	for (int y=0;y<img.height();y++) {
-		for (int x=0;x<img.width();x++) {
+	for (int y=0;y<fgImage.height();y++) {
+		for (int x=0;x<fgImage.width();x++) {
 			c.c=sadr[x];
 			cb=getYCb(c.r,c.g,c.b);
 			cr=getYCr(c.r,c.g,c.b);
-			if (mode==0) bg.c=bgadr[x];
 
-			mask = 1-colorclose(cb, cr, cb_key, cr_key,tola,tolb);
-			if (mask==0.0) {
-				continue;
-			} else if (mask==1.0) {
-				sadr[x]=bg.c;
+			mask = colorclose(cb, cr, cb_key, cr_key,tolaFG,tolbFG);
+			if (mask==1.0) {
+				zadr[x]=c.c;
+				//zadr[x]=0;
+			} else if (mask==0.0) {
+				zadr[x]=0;
 			} else {
-				t.r=max(c.r-mask*r_key,0)+mask*bg.r;
-				t.g=max(c.g-mask*g_key,0)+mask*bg.g;
-				t.b=max(c.b-mask*b_key,0)+mask*bg.b;
-				sadr[x]=t.c;
+				c.a=mask*255;
+				zadr[x]=c.c;
 			}
 		}
 		sadr+=spitch;
-		bgadr+=bgpitch;
+		zadr+=zpitch;
+	}
+}
+
+void BlueBox::process(ppl7::grafix::Image &img)
+{
+	if (bgChromaEnabled) {
+		double mask;
+		int cb,cr;
+		int cb_key=Key.getYCb();
+		int cr_key=Key.getYCr();
+		int r_key = Key.red();
+		int g_key = Key.green();
+		int b_key = Key.blue();
+
+		PIXEL c,bg,t;
+
+		bg.r=Replace.red();
+		bg.g=Replace.green();
+		bg.b=Replace.blue();
+
+
+		ppluint32 *sadr=(ppluint32*)img.adr();
+		ppluint32 spitch=img.pitch()/4;
+
+		ppluint32 *bgadr=(ppluint32*)bgImage.adr();
+		ppluint32 bgpitch=bgImage.pitch()/4;
+
+
+		for (int y=0;y<img.height();y++) {
+			for (int x=0;x<img.width();x++) {
+				c.c=sadr[x];
+				cb=getYCb(c.r,c.g,c.b);
+				cr=getYCr(c.r,c.g,c.b);
+				if (mode==0) bg.c=bgadr[x];
+
+				mask = 1-colorclose(cb, cr, cb_key, cr_key,tola,tolb);
+				if (mask==0.0) {
+					continue;
+				} else if (mask==1.0) {
+					sadr[x]=bg.c;
+				} else {
+					t.r=max(c.r-mask*r_key,0)+mask*bg.r;
+					t.g=max(c.g-mask*g_key,0)+mask*bg.g;
+					t.b=max(c.b-mask*b_key,0)+mask*bg.b;
+					sadr[x]=t.c;
+				}
+			}
+			sadr+=spitch;
+			bgadr+=bgpitch;
+		}
+	}
+	if (fgChromaEnabled) {
+		img.bltAlpha(fgImageAlpha);
 	}
 }
 
