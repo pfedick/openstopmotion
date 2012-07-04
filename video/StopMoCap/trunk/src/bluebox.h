@@ -19,6 +19,7 @@ class BlueBox
 		ppl7::grafix::Color Replace;
 		ppl7::grafix::Image bgImage;
 		ppl7::grafix::Image fgImage;
+		ppl7::grafix::Image repImage;
 
 		ppl7::grafix::Image fgImageAlpha;
 
@@ -40,6 +41,7 @@ class BlueBox
 		//double colorclose(int Cb_p,int Cr_p,int Cb_key,int Cr_key);
 
 		void UpdateForeground();
+		void UpdateReplaceColor();
 
 	public:
 		BlueBox();

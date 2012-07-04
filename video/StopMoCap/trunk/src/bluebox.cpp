@@ -87,11 +87,15 @@ void BlueBox::setColorKeyFG(const ppl7::grafix::Color &key)
 void BlueBox::setReplaceColor(const ppl7::grafix::Color &color)
 {
 	Replace=color;
+	UpdateReplaceColor();
 }
 
 void BlueBox::setReplaceMode(int mode)
 {
-	if (mode==1) this->mode=1;
+	if (mode==1) {
+		this->mode=1;
+		UpdateReplaceColor();
+	}
 	else this->mode=0;
 }
 
@@ -247,15 +251,17 @@ void BlueBox::process(ppl7::grafix::Image &img)
 void BlueBox::UpdateForeground()
 {
 	if (fgChromaEnabled==false) return;
+	//fgImageAlpha.create(fgImage.width(),fgImage.height(),fgImage.rgbformat());
+	//fgImageAlpha.bltChromaKey(fgImage,KeyFG,tolaFG,tolbFG);
+	//return;
+
 	double mask;
 	int cb,cr;
 	int cb_key=KeyFG.getYCb();
 	int cr_key=KeyFG.getYCr();
-	int r_key = KeyFG.red();
-	int g_key = KeyFG.green();
-	int b_key = KeyFG.blue();
 
-	PIXEL c,bg,t;
+
+	PIXEL c,bg;
 
 	bg.r=Replace.red();
 	bg.g=Replace.green();
@@ -292,9 +298,30 @@ void BlueBox::UpdateForeground()
 	}
 }
 
+
+void BlueBox::UpdateReplaceColor()
+{
+	if (repImage.isEmpty()) return;
+	repImage.cls(Replace);
+}
+
+
 void BlueBox::process(ppl7::grafix::Image &img)
 {
 	if (bgChromaEnabled) {
+		/*
+		if (mode==0) {
+			img.bltBackgroundOnChromaKey(bgImage,Key,tola,tolb);
+		} else {
+			if (repImage.isEmpty()==true || repImage.width()!=img.width()
+					|| repImage.height()!=img.height()) {
+				repImage.create(img.width(),img.height(),img.rgbformat());
+				repImage.cls(Replace);
+			}
+			img.bltBackgroundOnChromaKey(repImage,Key,tola,tolb);
+		}
+		*/
+
 		double mask;
 		int cb,cr;
 		int cb_key=Key.getYCb();
@@ -339,6 +366,7 @@ void BlueBox::process(ppl7::grafix::Image &img)
 			sadr+=spitch;
 			bgadr+=bgpitch;
 		}
+
 	}
 	if (fgChromaEnabled) {
 		img.bltAlpha(fgImageAlpha);
