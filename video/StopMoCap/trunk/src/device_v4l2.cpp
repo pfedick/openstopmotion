@@ -110,6 +110,12 @@ void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevi
 			f.pixelformat=fmt.pixelformat;
 			f.flags=fmt.flags;
 			list.push_back(f);
+		} else if (fmt.pixelformat==V4L2_PIX_FMT_YUYV) {
+			VideoFormat f;
+			f.Description.set((const char*)fmt.description);
+			f.pixelformat=fmt.pixelformat;
+			f.flags=fmt.flags;
+			list.push_back(f);
 		}
 		fmt.index++;
 	}
@@ -283,6 +289,8 @@ void Device::startCapture(const VideoFormat &fmt, int width, int height)
 	if (myff<1) throw DeviceNotOpen();
 	if (captureRunning) stopCapturing();
 	this->fmt=fmt;
+	this->size.width=width;
+	this->size.height=height;
 
 	struct v4l2_cropcap cropcap;
 	struct v4l2_crop crop;
@@ -615,7 +623,11 @@ int Device::getControlValue(const CameraControl &ctl)
 	return c.value;
 }
 
-
+static int clamp(int value)
+{
+	if (value<=255) return value;
+	return 255;
+}
 void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 {
 	//printf ("Frame captured mit %i Bytes. ",size);
@@ -625,7 +637,36 @@ void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 		ppl7::MemFile File;
 		File.open(buffer,size);
 		img.load(File,ppl7::grafix::RGBFormat::X8R8G8B8);
+	} else if (fmt.pixelformat==V4L2_PIX_FMT_YUYV) {
+		//printf ("size: %i x %i\n",this->size.width, this->size.height);
+		if (img.width()!=this->size.width || img.height()!=this->size.height) {
+			//printf ("create Image\n");
+			img.create(this->size.width, this->size.height, ppl7::grafix::RGBFormat::X8R8G8B8);
+		}
+		//printf ("Size=%zi\n",size);
+		typedef struct {
+			unsigned char y1;
+			unsigned char cb;
+			unsigned char y2;
+			unsigned char cr;
+		} DPIXEL;
 
+		DPIXEL *ptr=(DPIXEL*)buffer;
+		ppl7::grafix::Color c;
+		for (int y=0;y<this->size.height;y++) {
+			for (int x=0;x<this->size.width;x+=2) {
+				c.setColor(clamp(ptr->y1+1.402 * (ptr->cr-128)),
+						clamp(ptr->y1+0.344 * (ptr->cb-128)-0.714*(ptr->cr-128)),
+						clamp(ptr->y1+1.772 * (ptr->cb-128)));
+
+				img.putPixel(x,y,c);
+				c.setColor(clamp(ptr->y2+1.402 * (ptr->cr-128)),
+						clamp(ptr->y2+0.344 * (ptr->cb-128)-0.714*(ptr->cr-128)),
+						clamp(ptr->y2+1.772 * (ptr->cb-128)));
+				img.putPixel(x+1,y,c);
+				ptr++;
+			}
+		}
 
 	}
 
