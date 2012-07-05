@@ -23,7 +23,7 @@
 #define STOPMOCAP_CONFIGKEY		"StopMoCap"
 #define STOPMOCAP_APPNAME		"StopMotion Capture"
 #define STOPMOCAP_COPYRIGHT		"(c) 2012 by Patrick Fedick"
-#define STOPMOCAP_VERSION		"0.3"
+#define STOPMOCAP_VERSION		"0.4"
 
 
 //#define USE_SCENEMANAGER

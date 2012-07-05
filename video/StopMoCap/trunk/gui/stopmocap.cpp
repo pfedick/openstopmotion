@@ -64,8 +64,6 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.saveCamShot->setChecked(conf.saveCamShot);
 	ui.saveCompositedImage->setChecked(conf.saveComposited);
 
-
-
 	std::list<VideoDevice> devices;
 	std::list<VideoDevice>::const_iterator it;
 
@@ -820,7 +818,7 @@ void StopMoCap::UpdateColorKeyBG(ppl7::grafix::Color c)
 	bluebox.setColorKey(c);
 	conf.chromaKey=c;
 	ppl7::String Tmp;
-	Tmp.setf("r=%i, g=%i, b=%i",c.red(),c.green(),c.blue());
+	Tmp.setf("%i, %i, %i",c.red(),c.green(),c.blue());
 	ui.keyColor->setText(Tmp);
 	Tmp.setf("background-color: rgb(%i, %i, %i);\n",c.red(),c.green(),c.blue());
 	ppl7::grafix::Color n=c.negativ();
@@ -833,7 +831,7 @@ void StopMoCap::UpdateColorKeyFG(ppl7::grafix::Color c)
 	bluebox.setColorKeyFG(c);
 	conf.chromaKeyFG=c;
 	ppl7::String Tmp;
-	Tmp.setf("r=%i, g=%i, b=%i",c.red(),c.green(),c.blue());
+	Tmp.setf("%i, %i, %i",c.red(),c.green(),c.blue());
 	ui.keyColorFG->setText(Tmp);
 	Tmp.setf("background-color: rgb(%i, %i, %i);\n",c.red(),c.green(),c.blue());
 	ppl7::grafix::Color n=c.negativ();
