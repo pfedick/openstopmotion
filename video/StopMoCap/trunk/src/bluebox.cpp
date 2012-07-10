@@ -57,6 +57,9 @@ void BlueBox::setReplaceMode(int mode)
 	if (mode==1) {
 		this->mode=1;
 		UpdateReplaceColor();
+	} else if (mode==2) {
+		this->mode=2;
+		UpdateReplaceColor();
 	}
 	else this->mode=0;
 }
@@ -184,7 +187,23 @@ void BlueBox::UpdateForeground()
 void BlueBox::UpdateReplaceColor()
 {
 	if (repImage.isEmpty()) return;
-	repImage.cls(Replace);
+	if (mode==2) {
+		ppl7::grafix::Color c[2];
+		c[0].set(255,255,255,0);
+		c[1].set(230,230,230,0);
+		int n;
+		int z=0;
+		for (int y=0;y<repImage.height();y+=8) {
+			n=z&1;
+			z++;
+			for (int x=0;x<repImage.width();x+=8) {
+				repImage.fillRect(x,y,x+8,y+8,c[n]);
+				n=!n;
+			}
+
+		}
+	}
+	else repImage.cls(Replace);
 }
 
 
@@ -197,8 +216,8 @@ void BlueBox::process(ppl7::grafix::Image &img)
 		} else {
 			if (repImage.isEmpty()==true || repImage.width()!=img.width()
 					|| repImage.height()!=img.height()) {
-				repImage.create(img.width(),img.height(),img.rgbformat());
-				repImage.cls(Replace);
+				repImage.create(img.width(),img.height(),ppl7::grafix::RGBFormat::A8R8G8B8);
+				UpdateReplaceColor();
 			}
 			img.bltBackgroundOnChromaKey(repImage,Key,tola,tolb);
 		}

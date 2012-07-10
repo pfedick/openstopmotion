@@ -124,6 +124,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 	if (conf.chromaReplaceMode==1) {
 		bluebox.setReplaceMode(1);
 		ui.replaceChromaWithColor->setChecked(true);
+	} else 	if (conf.chromaReplaceMode==2) {
+		bluebox.setReplaceMode(2);
+		ui.replaceChromaWithTransparent->setChecked(true);
 	} else {
 		ui.replaceChromaWithImage->setChecked(true);
 		bluebox.setReplaceMode(0);
@@ -159,6 +162,7 @@ StopMoCap::~StopMoCap()
 
 	conf.chromaKeyEnabled=ui.chromaKeyingEnabled->isChecked();
 	if (ui.replaceChromaWithColor->isChecked()) conf.chromaReplaceMode=1;
+	else if (ui.replaceChromaWithTransparent->isChecked()) conf.chromaReplaceMode=2;
 	else conf.chromaReplaceMode=0;
 	conf.save();
 	cam.close();
@@ -445,7 +449,7 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 	int r,g,b;
 	ppl7::grafix::Color c;
 	//ppl7::PrintDebugTime("Start merge\n");
-	img.create(width,height,ppl7::grafix::RGBFormat::X8R8G8B8);
+	img.create(width,height,ppl7::grafix::RGBFormat::A8R8G8B8);
 	for (int y=0;y<height;y++) {
 		for (int x=0;x<width;x++) {
 			r=g=b=0;
@@ -897,6 +901,12 @@ void StopMoCap::on_replaceChromaWithImage_toggled(bool checked)
 	conf.chromaReplaceMode=0;
 }
 
+void StopMoCap::on_replaceChromaWithTransparent_toggled(bool checked)
+{
+	bluebox.setReplaceMode(2);
+	conf.chromaReplaceMode=2;
+}
+
 void StopMoCap::on_chromaKeyingEnabled_toggled(bool checked)
 {
 	bluebox.setBGChromaEnabled(checked);
@@ -957,18 +967,18 @@ void StopMoCap::on_chromaForegroundSelect_clicked()
 	Timer->start(10);
 }
 
-
 void StopMoCap::on_bgColorSelect_clicked()
 {
 	Timer->stop();
 	QColorDialog dialog(this);
 	ppl7::grafix::Color c=bluebox.replaceColor();
+	dialog.setOption(QColorDialog::ShowAlphaChannel,false);
 	dialog.setCurrentColor(QColor(c.red(),c.green(),c.blue(),c.alpha()));
-	dialog.setOption(QColorDialog::ShowAlphaChannel,true);
 	if (dialog.exec()==1) {
 		QColor qc=dialog.selectedColor();
 		conf.replaceColor.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
 		bluebox.setReplaceColor(conf.replaceColor);
+		//printf ("color alpha=%i\n",qc.alpha());
 	}
 
 	Timer->start(10);

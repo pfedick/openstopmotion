@@ -147,6 +147,7 @@ public slots:
 
     void on_replaceChromaWithColor_toggled(bool checked);
     void on_replaceChromaWithImage_toggled(bool checked);
+    void on_replaceChromaWithTransparent_toggled(bool checked);
 
 
 };

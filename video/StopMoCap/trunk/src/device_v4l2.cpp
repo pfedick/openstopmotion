@@ -636,12 +636,12 @@ void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 	if (fmt.pixelformat==V4L2_PIX_FMT_JPEG || fmt.pixelformat==V4L2_PIX_FMT_MJPEG) {
 		ppl7::MemFile File;
 		File.open(buffer,size);
-		img.load(File,ppl7::grafix::RGBFormat::X8R8G8B8);
+		img.load(File,ppl7::grafix::RGBFormat::A8R8G8B8);
 	} else if (fmt.pixelformat==V4L2_PIX_FMT_YUYV) {
 		//printf ("size: %i x %i\n",this->size.width, this->size.height);
 		if (img.width()!=this->size.width || img.height()!=this->size.height) {
 			//printf ("create Image\n");
-			img.create(this->size.width, this->size.height, ppl7::grafix::RGBFormat::X8R8G8B8);
+			img.create(this->size.width, this->size.height, ppl7::grafix::RGBFormat::A8R8G8B8);
 		}
 		//printf ("Size=%zi\n",size);
 		typedef struct {
