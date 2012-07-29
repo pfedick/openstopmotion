@@ -26,6 +26,10 @@ Config::~Config()
 void Config::load()
 {
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, STOPMOCAP_ORGANISATION,STOPMOCAP_CONFIGKEY);
+	settings.beginGroup("window");
+	ScreenGeometry=settings.value("geometry").toByteArray();
+	settings.endGroup();
+
 	settings.beginGroup("common");
 	CaptureDir=settings.value("CaptureDir").toString();
 	Scene=settings.value("Scene").toString();
@@ -52,7 +56,7 @@ void Config::load()
 	chromaBGImage=settings.value("chromaBGImage","").toString();
 	chromaToleranceFar=settings.value("chromaToleranceFar",0).toInt();
 	chromaToleranceNear=settings.value("chromaToleranceNear",0).toInt();
-	chromaKey.setColor((ppluint32)settings.value("chromaKey",0x00ff0000).toInt());
+	chromaKey.setColor((ppluint32)settings.value("chromaKconfey",0x00ff0000).toInt());
 	replaceColor.setColor((ppluint32)settings.value("replaceColor",0x00ff0000).toInt());
 	chromaReplaceMode=settings.value("chromaReplaceMode",0).toInt();
 
@@ -68,6 +72,10 @@ void Config::load()
 void Config::save()
 {
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, STOPMOCAP_ORGANISATION,STOPMOCAP_CONFIGKEY);
+	settings.beginGroup("window");
+	settings.setValue("geometry",ScreenGeometry);
+	settings.endGroup();
+
 	settings.beginGroup("common");
 	settings.setValue("CaptureDir",CaptureDir);
 	settings.setValue("Scene",Scene);

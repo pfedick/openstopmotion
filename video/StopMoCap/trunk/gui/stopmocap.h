@@ -20,10 +20,10 @@
 #include "bluebox.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
-#define STOPMOCAP_CONFIGKEY		"StopMoCap"
-#define STOPMOCAP_APPNAME		"StopMotion Capture"
+#define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
+#define STOPMOCAP_APPNAME		"OpenStopMotion"
 #define STOPMOCAP_COPYRIGHT		"(c) 2012 by Patrick Fedick"
-#define STOPMOCAP_VERSION		"0.4"
+#define STOPMOCAP_VERSION		"0.5"
 
 
 //#define USE_SCENEMANAGER
@@ -93,6 +93,7 @@ private:
 protected:
     void resizeEvent ( QResizeEvent * event );
     void showEvent (  QShowEvent * event );
+    void closeEvent (  QCloseEvent * event );
 
 public slots:
     void on_deviceComboBox_currentIndexChanged(int index);

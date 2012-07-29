@@ -34,6 +34,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 	connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
 
+
 	ui.captureDir->setText(conf.CaptureDir);
 	ui.sceneName->setText(conf.Scene);
 	on_sceneName_editingFinished();
@@ -86,7 +87,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 		const ppl7::grafix::Image &bg=bluebox.getBGImage();
 		QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 		ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
-				(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+				(200,140,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 		);
 	} catch (...) {
 
@@ -108,7 +109,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 		const ppl7::grafix::Image &bg=bluebox.getFGImage();
 		QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 		ui.chromaForeground->setPixmap(QPixmap::fromImage(qi).scaled
-				(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+				(200,140,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 		);
 	} catch (...) {
 
@@ -134,8 +135,10 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 	ui.tolNearSlider->setValue(bluebox.nearTolerance());
 	ui.tolFarSlider->setValue(bluebox.farTolerance());
-	ui.spillSlider->setValue(bluebox.spillRemoval());
+	//ui.spillSlider->setValue(bluebox.spillRemoval());
 	UpdateColorKeyBG(bluebox.colorKey());
+
+	this->restoreGeometry(conf.ScreenGeometry);
 }
 
 StopMoCap::~StopMoCap()
@@ -354,6 +357,12 @@ void StopMoCap::showEvent (  QShowEvent * event )
 	const ppl7::grafix::Image &bg=bluebox.getBGImage();
 
 	QWidget::showEvent(event);
+}
+
+void StopMoCap::closeEvent(QCloseEvent *event)
+{
+	conf.ScreenGeometry=saveGeometry();
+    QWidget::closeEvent(event);
 }
 
 void StopMoCap::grabFrame()
@@ -811,9 +820,10 @@ void StopMoCap::on_viewer_mouseClicked(int , int , ppl7::grafix::Color c)
 {
 	if (ui.pickChromaKey->isChecked()) {
 		UpdateColorKeyBG(c);
-		//ui.pickChromaKey->setChecked(false);
+		ui.pickChromaKey->setChecked(false);
 	} else if (ui.pickChromaKeyFG->isChecked()) {
 		UpdateColorKeyFG(c);
+		ui.pickChromaKeyFG->setChecked(false);
 	}
 }
 
@@ -879,7 +889,7 @@ void StopMoCap::on_chromaBackgroundSelect_clicked()
 			const ppl7::grafix::Image &bg=bluebox.getBGImage();
 			QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 			ui.chromaBackground->setPixmap(QPixmap::fromImage(qi).scaled
-					(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+					(200,140,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 			);
 		} catch (...) {
 
@@ -958,7 +968,7 @@ void StopMoCap::on_chromaForegroundSelect_clicked()
 			const ppl7::grafix::Image &bg=bluebox.getFGImage();
 			QImage qi((uchar*)bg.adr(),bg.width(),bg.height(), bg.pitch(), QImage::Format_RGB32);
 			ui.chromaForeground->setPixmap(QPixmap::fromImage(qi).scaled
-					(200,160,Qt::KeepAspectRatio,Qt::SmoothTransformation)
+					(200,140,Qt::KeepAspectRatio,Qt::SmoothTransformation)
 			);
 		} catch (...) {
 

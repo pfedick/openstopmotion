@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>StopMotion Capture</string>
+   <string>OpenStopMotion</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../resources.qrc">
@@ -909,32 +909,20 @@
              </widget>
             </item>
             <item row="3" column="0">
-             <widget class="QLabel" name="label_21">
+             <widget class="QLabel" name="label_19">
               <property name="text">
-               <string>Remove Spill:</string>
+               <string>Background:</string>
               </property>
              </widget>
             </item>
             <item row="3" column="1">
-             <widget class="QSlider" name="spillSlider">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimum">
-               <number>0</number>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <widget class="QRadioButton" name="replaceChromaWithTransparent">
+              <property name="text">
+               <string>Transparent</string>
               </property>
              </widget>
             </item>
-            <item row="5" column="1">
+            <item row="4" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_13">
               <item>
                <widget class="QRadioButton" name="replaceChromaWithColor">
@@ -962,7 +950,7 @@
               </item>
              </layout>
             </item>
-            <item row="6" column="1">
+            <item row="5" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <property name="topMargin">
                <number>0</number>
@@ -996,20 +984,6 @@
               </item>
              </layout>
             </item>
-            <item row="4" column="1">
-             <widget class="QRadioButton" name="replaceChromaWithTransparent">
-              <property name="text">
-               <string>Transparent</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_19">
-              <property name="text">
-               <string>Background:</string>
-              </property>
-             </widget>
-            </item>
            </layout>
           </item>
           <item>
@@ -1017,13 +991,13 @@
             <property name="minimumSize">
              <size>
               <width>200</width>
-              <height>160</height>
+              <height>140</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>200</width>
-              <height>160</height>
+              <height>140</height>
              </size>
             </property>
             <property name="frameShape">
@@ -1051,6 +1025,9 @@
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
            <layout class="QFormLayout" name="formLayout_3">
+            <property name="fieldGrowthPolicy">
+             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+            </property>
             <property name="topMargin">
              <number>0</number>
             </property>
@@ -1105,34 +1082,6 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_23">
-              <property name="text">
-               <string>Tolerance Far:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_24">
-              <property name="text">
-               <string>Remove Spill:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="label_25">
-              <property name="text">
-               <string>Image:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QPushButton" name="chromaForegroundSelect">
-              <property name="text">
-               <string>select</string>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="1">
              <widget class="QSlider" name="tolNearSliderFG">
               <property name="maximum">
@@ -1143,6 +1092,13 @@
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_23">
+              <property name="text">
+               <string>Tolerance Far:</string>
               </property>
              </widget>
             </item>
@@ -1162,19 +1118,17 @@
               </property>
              </widget>
             </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="label_25">
+              <property name="text">
+               <string>Image:</string>
+              </property>
+             </widget>
+            </item>
             <item row="3" column="1">
-             <widget class="QSlider" name="spillSliderFG">
-              <property name="minimum">
-               <number>0</number>
-              </property>
-              <property name="maximum">
-               <number>255</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
+             <widget class="QPushButton" name="chromaForegroundSelect">
+              <property name="text">
+               <string>select</string>
               </property>
              </widget>
             </item>
@@ -1185,13 +1139,13 @@
             <property name="minimumSize">
              <size>
               <width>200</width>
-              <height>160</height>
+              <height>140</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
               <width>200</width>
-              <height>160</height>
+              <height>140</height>
              </size>
             </property>
             <property name="frameShape">

@@ -17,7 +17,7 @@ class Config
 		void load();
 		void save();
 
-
+		QByteArray ScreenGeometry;
 		ppl7::String	CaptureDir;
 		ppl7::String	Scene;
 		ppl7::String	DeviceName;

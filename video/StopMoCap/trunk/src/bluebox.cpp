@@ -179,6 +179,7 @@ ppl7::grafix::Color BlueBox::replaceColor() const
 void BlueBox::UpdateForeground()
 {
 	if (fgChromaEnabled==false) return;
+	if (fgImage.isEmpty()) return;
 	fgImageAlpha.create(fgImage.width(),fgImage.height(),fgImage.rgbformat());
 	fgImageAlpha.bltChromaKey(fgImage,KeyFG,tolaFG,tolbFG);
 }
@@ -224,7 +225,7 @@ void BlueBox::process(ppl7::grafix::Image &img)
 
 
 	}
-	if (fgChromaEnabled) {
+	if (fgChromaEnabled==true && fgImageAlpha.isEmpty()==false) {
 		img.bltAlpha(fgImageAlpha);
 	}
 }
