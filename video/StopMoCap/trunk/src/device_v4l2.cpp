@@ -103,7 +103,7 @@ void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevi
 	fmt.type=V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
 	while (0 == xioctl (ff, VIDIOC_ENUM_FMT, &fmt)) {
-		//printf ("Standardname: %s\n", fmt.description);
+		printf ("Standardname: %s\n", fmt.description);
 		if (fmt.pixelformat==V4L2_PIX_FMT_JPEG || fmt.pixelformat==V4L2_PIX_FMT_MJPEG) {
 			VideoFormat f;
 			f.Description.set((const char*)fmt.description);
@@ -116,6 +116,14 @@ void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevi
 			f.pixelformat=fmt.pixelformat;
 			f.flags=fmt.flags;
 			list.push_back(f);
+			/*
+		} else if (fmt.pixelformat==V4L2_PIX_FMT_H264) {
+			VideoFormat f;
+			f.Description.set((const char*)fmt.description);
+			f.pixelformat=fmt.pixelformat;
+			f.flags=fmt.flags;
+			list.push_back(f);
+			*/
 		}
 		fmt.index++;
 	}
@@ -656,12 +664,12 @@ void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 		for (int y=0;y<this->size.height;y++) {
 			for (int x=0;x<this->size.width;x+=2) {
 				c.setColor(clamp(ptr->y1+1.402 * (ptr->cr-128)),
-						clamp(ptr->y1+0.344 * (ptr->cb-128)-0.714*(ptr->cr-128)),
+						clamp(ptr->y1-0.34414 * (ptr->cb-128)-0.71414*(ptr->cr-128)),
 						clamp(ptr->y1+1.772 * (ptr->cb-128)));
 
 				img.putPixel(x,y,c);
 				c.setColor(clamp(ptr->y2+1.402 * (ptr->cr-128)),
-						clamp(ptr->y2+0.344 * (ptr->cb-128)-0.714*(ptr->cr-128)),
+						clamp(ptr->y2-0.34414 * (ptr->cb-128)-0.71414*(ptr->cr-128)),
 						clamp(ptr->y2+1.772 * (ptr->cb-128)));
 				img.putPixel(x+1,y,c);
 				ptr++;
