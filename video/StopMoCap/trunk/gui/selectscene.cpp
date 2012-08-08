@@ -49,14 +49,13 @@ QIcon SelectScene::getIcon(const ppl7::String &Filename, int width, int height)
 {
 
 	ppl7::grafix::Image img;
-	img.load(Filename);
-	QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-	return QPixmap::fromImage(qi.scaled(width,height,Qt::KeepAspectRatio,Qt::SmoothTransformation));
-/*
-	QPixmap pix;
-	pix.load(Filename);
-	return pix.scaled(width,height,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-*/
+	try {
+		img.load(Filename);
+		QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
+		return QPixmap::fromImage(qi.scaled(width,height,Qt::KeepAspectRatio,Qt::SmoothTransformation));
+	} catch (...) {
+		return QIcon();
+	}
 }
 
 void SelectScene::scanDir(const ppl7::String &path)

@@ -40,11 +40,13 @@ void MySlider::setMaximum(int value)
 void MySlider::setSingleStep(int value)
 {
 	ui.slider->setSingleStep(value);
+	ui.spinBox->setSingleStep(value);
 }
 
 void MySlider::setPageStep(int value)
 {
 	ui.slider->setPageStep(value);
+	//ui.spinBox->setPageStep(value);
 }
 
 
