@@ -354,7 +354,7 @@ void StopMoCap::resizeEvent ( QResizeEvent * event )
 
 void StopMoCap::showEvent (  QShowEvent * event )
 {
-	const ppl7::grafix::Image &bg=bluebox.getBGImage();
+	//const ppl7::grafix::Image &bg=bluebox.getBGImage();
 
 	QWidget::showEvent(event);
 }
@@ -542,6 +542,70 @@ void StopMoCap::on_captureButton_clicked()
 		Tmp.setf("%i",lastFrameNum);
 		ui.totalFrames->setText(Tmp);
 		ui.frameSlider->setMaximum(lastFrameNum);
+	} catch (const ppl7::Exception &e) {
+		delete job;
+		QApplication::restoreOverrideCursor();
+		DisplayException(e,this);
+	}
+}
+
+void StopMoCap::on_captureBackgroundButton_clicked()
+{
+	if (cam.isOpen()==false) return;
+	ppl7::String Tmp;
+	SaveJob *job=NULL;
+	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
+	if (ppl7::Dir::exists(CaptureDir)==false) return;
+	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
+	if (lastFrameNum==0) return;
+	ppl7::grafix::Image img;
+	try {
+		capture(img);
+		if (ui.saveCamShot->isChecked()) {
+			job=new SaveJob;
+			if (!job) throw ppl7::OutOfMemoryException();
+			job->img=img;
+			job->Filename=CaptureDir;
+			job->Filename.appendf("/frame_bg_%06i",lastFrameNum);
+			lastFrame=img;
+			if (ui.imageFormat->currentIndex()==0) {
+				job->format=PictureFormat::png;
+				job->Filename+=".png";
+			} else if (ui.imageFormat->currentIndex()==1) {
+				job->format=PictureFormat::bmp;
+				job->Filename+=".bmp";
+			} else if (ui.imageFormat->currentIndex()==2) {
+				job->format=PictureFormat::jpeg;
+				job->quality=ui.jpegQualitySlider->value();
+				job->Filename+=".jpg";
+			}
+#ifdef USE_SCENEMANAGER
+			scm.setFilename(lastFrameNum,job->Filename);
+			scm.setImage(lastFrameNum,job->img);
+#endif
+			savethread.addJob(job);
+		}
+		if (ui.saveCompositedImage->isChecked()) {
+			job=new SaveJob;
+			if (!job) throw ppl7::OutOfMemoryException();
+			job->Filename=CaptureDir;
+			job->Filename.appendf("/comp_bg_%06i",lastFrameNum);
+			bluebox.process(img);
+			job->img=img;
+			lastFrame=img;
+			if (ui.imageFormatComp->currentIndex()==0) {
+				job->format=PictureFormat::png;
+				job->Filename+=".png";
+			} else if (ui.imageFormatComp->currentIndex()==1) {
+				job->format=PictureFormat::bmp;
+				job->Filename+=".bmp";
+			} else if (ui.imageFormatComp->currentIndex()==2) {
+				job->format=PictureFormat::jpeg;
+				job->quality=ui.jpegQualitySliderComp->value();
+				job->Filename+=".jpg";
+			}
+			savethread.addJob(job);
+		}
 	} catch (const ppl7::Exception &e) {
 		delete job;
 		QApplication::restoreOverrideCursor();
