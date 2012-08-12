@@ -567,7 +567,7 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 			job->img=img;
 			job->Filename=CaptureDir;
 			job->Filename.appendf("/frame_bg_%06i",lastFrameNum);
-			lastFrame=img;
+			//lastFrame=img;
 			if (ui.imageFormat->currentIndex()==0) {
 				job->format=PictureFormat::png;
 				job->Filename+=".png";
@@ -592,7 +592,7 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 			job->Filename.appendf("/comp_bg_%06i",lastFrameNum);
 			bluebox.process(img);
 			job->img=img;
-			lastFrame=img;
+			//lastFrame=img;
 			if (ui.imageFormatComp->currentIndex()==0) {
 				job->format=PictureFormat::png;
 				job->Filename+=".png";
