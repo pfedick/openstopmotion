@@ -16,7 +16,7 @@
 #include "myslider.h"
 #include "ppl7imageviewer.h"
 #include "savethread.h"
-#include "scenemanager.h"
+#include "FrameBuffer.h"
 #include "bluebox.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
@@ -67,9 +67,7 @@ private:
     std::vector<ppl7::grafix::Size> FrameSizes;
     SaveThread savethread;
     BlueBox bluebox;
-#ifdef USE_SCENEMANAGER
-    SceneManager scm;
-#endif
+    FrameBuffer fBuffer;
     QVBoxLayout *controlLayout;
     bool inPlayback;
     bool inPreviewMode;
@@ -77,7 +75,7 @@ private:
     QTimer *Timer;
     QTimer *PlaybackTimer;
     ppl7::grafix::Image grabImg;
-
+    int interpolateSequence;
     Device cam;
     ppluint64 fpsTimer;
     int fpsCounter;
@@ -114,6 +112,7 @@ public slots:
     void on_playButton_clicked();
     void on_stopButton_clicked();
     void on_undoButton_clicked();
+    void on_frameRate_valueChanged(int value);
 
     void on_previewButton_toggled ( bool checked );
     void on_zoom11_clicked ( bool checked );

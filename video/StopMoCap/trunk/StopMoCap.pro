@@ -12,16 +12,17 @@ else {
     win32:TARGET = StopMoCap
     unix:TARGET = release/StopMoCap
 }
-HEADERS += gui/stopmocap.h \
+HEADERS += src/FrameBuffer.h \
+    gui/stopmocap.h \
     gui/selectscene.h \
     src/savethread.h \
     gui/myslider.h \
     gui/ppl7imageviewer.h \
     src/device.h \
     src/config.h \
-    src/bluebox.h \
-    src/scenemanager.h
-SOURCES += gui/stopmocap.cpp \
+    src/bluebox.h
+SOURCES += src/FrameBuffer.cpp \
+    gui/stopmocap.cpp \
     gui/selectscene.cpp \
     src/savethread.cpp \
     gui/myslider.cpp \
@@ -30,8 +31,7 @@ SOURCES += gui/stopmocap.cpp \
     src/device_win32.cpp \
     src/main.cpp \
     src/config.cpp \
-    src/bluebox.cpp \
-    src/scenemanager.cpp
+    src/bluebox.cpp
 FORMS += gui/stopmocap.ui \
     gui/selectscene.ui \
     gui/myslider.ui

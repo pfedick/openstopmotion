@@ -14,6 +14,7 @@
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
+	interpolateSequence=0;
 	ppl7::String Tmp;
 	ui.setupUi(this);
 	ui.controlTab->setCurrentIndex(0);
@@ -53,6 +54,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 			ui.zoomSmooth->setChecked(true);
 			break;
 	}
+
+	ui.frameRate->setValue(conf.frameRate);
+	ui.interpolateFrames->setChecked(conf.interpolate);
 
 	ui.jpegQualitySlider->setValue(conf.jpegQuality);
 	ui.imageFormat->setCurrentIndex(conf.pictureFormat);
@@ -138,6 +142,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	//ui.spillSlider->setValue(bluebox.spillRemoval());
 	UpdateColorKeyBG(bluebox.colorKey());
 
+	ui.frameSlider->setMinimum(1);
 	this->restoreGeometry(conf.ScreenGeometry);
 }
 
@@ -149,6 +154,8 @@ StopMoCap::~StopMoCap()
 #endif
 	PlaybackTimer->stop();
 	Timer->stop();
+	conf.interpolate=ui.interpolateFrames->isChecked();
+	conf.frameRate=ui.frameRate->value();
 	conf.mergeFrames=ui.mergeFrames->value();
 	conf.skipFrames=ui.skipFrames->value();
 	conf.onionValue=ui.onionSkinning->value();
@@ -511,10 +518,7 @@ void StopMoCap::on_captureButton_clicked()
 				job->quality=ui.jpegQualitySlider->value();
 				job->Filename+=".jpg";
 			}
-#ifdef USE_SCENEMANAGER
-			scm.setFilename(lastFrameNum,job->Filename);
-			scm.setImage(lastFrameNum,job->img);
-#endif
+			fBuffer.setImage(lastFrameNum,img);
 			savethread.addJob(job);
 		}
 		if (ui.saveCompositedImage->isChecked()) {
@@ -541,7 +545,8 @@ void StopMoCap::on_captureButton_clicked()
 
 		Tmp.setf("%i",lastFrameNum);
 		ui.totalFrames->setText(Tmp);
-		ui.frameSlider->setMaximum(lastFrameNum);
+		if (lastFrameNum>0)	ui.frameSlider->setMaximum(lastFrameNum);
+		else ui.frameSlider->setMaximum(1);
 	} catch (const ppl7::Exception &e) {
 		delete job;
 		QApplication::restoreOverrideCursor();
@@ -650,13 +655,12 @@ void StopMoCap::on_undoButton_clicked()
 		DisplayException(e,this);
 		return;
 	}
-#ifdef USE_SCENEMANAGER
-	scm.deleteFrame(lastFrameNum);
-#endif
+	fBuffer.popBack();
 	lastFrameNum=highestSceneFrame();
 	Tmp.setf("%i",lastFrameNum);
 	ui.totalFrames->setText(Tmp);
-	ui.frameSlider->setMaximum(lastFrameNum);
+	if (lastFrameNum>0)	ui.frameSlider->setMaximum(lastFrameNum);
+	else ui.frameSlider->setMaximum(1);
 	Filename=conf.CaptureDir+"/"+conf.Scene;
 	Filename.appendf("/frame_%06i.png",lastFrameNum);
 	try {
@@ -699,11 +703,9 @@ void StopMoCap::on_sceneName_editingFinished()
 	ppl7::String Tmp;
 	Tmp.setf("%i",lastFrameNum);
 	ui.totalFrames->setText(Tmp);
-	ui.frameSlider->setMaximum(lastFrameNum);
-#ifdef USE_SCENEMANAGER
-	scm.clear();
-	scm.loadScene(conf.CaptureDir+"/"+conf.Scene);
-#endif
+	if (lastFrameNum>0)	ui.frameSlider->setMaximum(lastFrameNum);
+	else ui.frameSlider->setMaximum(1);
+	fBuffer.loadAsync(conf.CaptureDir+"/"+conf.Scene);
 }
 
 void StopMoCap::on_createScene_clicked()
@@ -713,13 +715,14 @@ void StopMoCap::on_createScene_clicked()
 		ppl7::Dir::mkDir(Tmp,true);
 		ui.createScene->setEnabled(false);
 	}
+	fBuffer.clear();
 	lastFrameNum=0;
 }
 
 void StopMoCap::on_frameSlider_sliderPressed()
 {
 	if (lastFrameNum<1) return;
-	playbackFrame=0;
+	playbackFrame=1;
 	inPlayback=true;
 	on_frameSlider_valueChanged((int)ui.frameSlider->value());
 }
@@ -737,36 +740,36 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 	Tmp.setf("%i",value);
 	ui.frameNum->setText(Tmp);
 	if (!inPlayback) return;
-#ifdef USE_SCENEMANAGER
 	try {
-		scm.getImage(value,grabImg);
-	} catch (...) {
-		grabImg.clear();
-	}
-	if (grabImg.isEmpty()) {
-#endif
-		ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
-		Filename.appendf("/frame_%06i.png",value);
-		try {
-			grabImg.load(Filename);
-#ifdef USE_SCENEMANAGER
-			scm.setImage(value,grabImg);
-#endif
-		} catch (...) {
-			return;
+		if (ui.interpolateFrames->isChecked()==true && (interpolateSequence&1)==1) {
+			fBuffer.copyImage(value,grabImg);
+			int next=value+1;
+			if (next>lastFrameNum) next=1;
+			grabImg.bltBlend(fBuffer.getImage(next),0.5);
+		} else {
+			fBuffer.copyImage(value,grabImg);
 		}
-		if (ui.chromaKeyingEnabled->isChecked()) bluebox.process(grabImg);
-#ifdef USE_SCENEMANAGER
+	} catch (...) {
+		return ;
 	}
-#endif
+	/*
+	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
+	Filename.appendf("/frame_%06i.png",value);
+	try {
+		grabImg.load(Filename);
+	} catch (...) {
+		return;
+	}
+	*/
+	if (ui.chromaKeyingEnabled->isChecked()) bluebox.process(grabImg);
 	ui.viewer->update();
-
 }
 
 void StopMoCap::on_playButton_clicked()
 {
+	interpolateSequence=0;
 	inPlayback=true;
-	playbackFrame=0;
+	playbackFrame=1;
 	PlaybackTimer->start(1000/ui.frameRate->value());
 }
 
@@ -778,9 +781,23 @@ void StopMoCap::on_stopButton_clicked()
 
 void StopMoCap::on_playbackTimer_fired()
 {
+	if (playbackFrame<1) playbackFrame=1;
 	ui.frameSlider->setValue(playbackFrame);
-	playbackFrame++;
-	if (playbackFrame>lastFrameNum) playbackFrame=0;
+	if (ui.interpolateFrames->isChecked()==true) {
+		interpolateSequence++;
+		if ((interpolateSequence&1)==1) playbackFrame++;
+	} else {
+		playbackFrame++;
+	}
+	if (playbackFrame>lastFrameNum) playbackFrame=1;
+}
+
+void StopMoCap::on_frameRate_valueChanged(int value)
+{
+	if (inPlayback) {
+		PlaybackTimer->stop();
+		PlaybackTimer->start(1000/value);
+	}
 }
 
 void StopMoCap::on_previewButton_toggled ( bool checked )

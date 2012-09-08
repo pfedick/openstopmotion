@@ -16,6 +16,8 @@ Config::Config()
 	scalingMode=PPL7ImageViewer::Smooth;
 	saveCamShot=true;
 	saveComposited=false;
+	frameRate=30;
+	interpolate=false;
 }
 
 Config::~Config()
@@ -41,6 +43,8 @@ void Config::load()
 	onionValue=settings.value("onionValue",0).toInt();
 	jpegQuality=settings.value("jpegQuality",90).toInt();
 	pictureFormat=settings.value("pictureFormat",0).toInt();
+	frameRate=settings.value("frameRate",30).toInt();
+	interpolate=settings.value("interpolate",false).toBool();
 
 	jpegQualityComp=settings.value("jpegQualityComp",90).toInt();
 	pictureFormatComp=settings.value("pictureFormatComp",0).toInt();
@@ -92,6 +96,8 @@ void Config::save()
 	settings.setValue("pictureFormatComp",pictureFormatComp);
 	settings.setValue("saveCamShot",saveCamShot);
 	settings.setValue("saveComposited",saveComposited);
+	settings.setValue("frameRate",frameRate);
+	settings.setValue("interpolate",interpolate);
 	settings.endGroup();
 
 	settings.beginGroup("chromaKeying");

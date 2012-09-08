@@ -589,6 +589,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="interpolateFrames">
+         <property name="text">
+          <string>interpolate</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>

@@ -36,6 +36,9 @@ class Config
 		int jpegQualityComp;
 		int pictureFormatComp;
 
+		int frameRate;
+		bool interpolate;
+
 		// Chroma-Keying
 		bool 			chromaKeyEnabled;
 		ppl7::String	chromaBGImage;
