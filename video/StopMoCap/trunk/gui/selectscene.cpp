@@ -5,6 +5,14 @@ SelectScene::SelectScene(QWidget *parent)
     : QDialog(parent)
 {
 	ui.setupUi(this);
+	qRegisterMetaType<Scene>("Scene");
+
+//	connect(this, SIGNAL(update_signal(Scene)),
+//	            this, SLOT(updateTree(Scene)), Qt::QueuedConnection);
+
+	connect(this, SIGNAL(update_signal(Scene)),
+	            this, SLOT(updateTree(Scene)), Qt::AutoConnection);
+
 }
 
 SelectScene::~SelectScene()
@@ -45,16 +53,16 @@ void SelectScene::getFrames(const ppl7::String &path, FrameIdent &first, FrameId
 	}
 }
 
-QIcon SelectScene::getIcon(const ppl7::String &Filename, int width, int height)
+QImage SelectScene::getIcon(const ppl7::String &Filename, int width, int height)
 {
 
 	ppl7::grafix::Image img;
 	try {
 		img.load(Filename);
 		QImage qi((uchar*)img.adr(),img.width(),img.height(), img.pitch(), QImage::Format_RGB32);
-		return QPixmap::fromImage(qi.scaled(width,height,Qt::KeepAspectRatio,Qt::SmoothTransformation));
+		return qi.scaled(width,height,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 	} catch (...) {
-		return QIcon();
+		return QImage();
 	}
 }
 
@@ -63,44 +71,85 @@ void SelectScene::scanDir(const ppl7::String &path)
 	ppl7::String Tmp;
 	ui.sceneTable->clear();
 	ppl7::Dir dir;
+	//ppl7::PrintDebugTime("SelectScene::scanDir: %s\n",(const char*)path);
 	dir.open(path,ppl7::Dir::SORT_FILENAME);
 	ppl7::DirEntry e;
 	ppl7::Dir::Iterator it;
 	dir.reset(it);
-	FrameIdent first,last;
 	QTreeWidgetItem *item;
+	ui.sceneTable->setSortingEnabled(false);
+
 	while (dir.getNext(e,it)) {
 		if (e.Filename=="." || e.Filename=="..") continue;
 		if (e.isDir()==true || e.isLink()==true) {
-			getFrames(e.File,first,last);
-			//printf ("e.Filename=%s\n",(const char*)e.Filename);
-			//printf ("   e.File=%s\n",(const char*)e.File);
-			//printf ("   first=%i, last=%i\n",first.num,last.num);
+			//getFrames(e.File,first,last);
 			item=new QTreeWidgetItem;
 			item->setText(0,e.Filename);
-			if (first.num>=0) Tmp.setf("%i",(last.num-first.num+1));
-			else Tmp.set("0");
-			item->setText(1,Tmp);
-			if (first.Filename.notEmpty()) {
-				item->setIcon(2,getIcon(first.Filename,60,60*9/16));
-			}
-			if (last.Filename.notEmpty()) {
-				item->setIcon(3,getIcon(last.Filename,60,60*9/16));
-			}
+			Scene s;
+			s.item=item;
+			s.File=e.File;
+			SceneList.push_back(s);
 			ui.sceneTable->addTopLevelItem(item);
 		}
 	}
 	//ui.sceneTable->ad
+	ui.sceneTable->sortByColumn ( 0, Qt::AscendingOrder );
+	ui.sceneTable->setSortingEnabled(true);
+
+	threadStart();
 }
+
+void SelectScene::run()
+{
+	std::list<Scene>::iterator it;
+	for (it=SceneList.begin();it!=SceneList.end();it++) {
+		if (threadShouldStop()) break;
+		//ppl7::PrintDebugTime("SelectScene::scanDir: next: %s\n",(const char*)it->File);
+		getFrames(it->File,it->first,it->last);
+		//ppl7::PrintDebugTime ("   first=%i, last=%i\n",it->first.num,it->last.num);
+		if (threadShouldStop()) break;
+		if (it->first.Filename.notEmpty()) {
+			it->firstIcon=getIcon(it->first.Filename,60,60*9/16);
+		}
+		if (threadShouldStop()) break;
+		if (it->last.Filename.notEmpty()) {
+			it->lastIcon=getIcon(it->last.Filename,60,60*9/16);
+		}
+		if (threadShouldStop()) break;
+
+		emit update_signal(*it);
+
+	}
+}
+
+void SelectScene::updateTree(Scene s)
+{
+	ppl7::String Tmp;
+	//ppl7::PrintDebugTime ("SelectScene::updateTree\n");
+	if (s.first.num>=0) Tmp.setf("%i",(s.last.num-s.first.num+1));
+	else Tmp.set("0");
+	s.item->setText(1,Tmp);
+	if (s.first.Filename.notEmpty()) {
+		s.item->setIcon(2,QPixmap::fromImage(s.firstIcon));
+	}
+	if (s.last.Filename.notEmpty()) {
+		s.item->setIcon(3,QPixmap::fromImage(s.lastIcon));
+	}
+	qApp->processEvents();
+
+}
+
 
 
 void SelectScene::on_cancelButton_clicked()
 {
+	threadStop();
 	done(0);
 }
 
 void SelectScene::on_sceneTable_itemDoubleClicked ( QTreeWidgetItem * item, int  )
 {
+	threadStop();
 	SelectedDir=item->text(0);
 	done(1);
 }
