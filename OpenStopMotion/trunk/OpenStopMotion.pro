@@ -1,16 +1,16 @@
 TEMPLATE = app
-TARGET = StopMoCap
+TARGET = OpenStopMotion
 QT += core \
     gui \
     opengl
 CONFIG += debug_and_release
 CONFIG(debug, debug|release) { 
-    win32:TARGET = StopMoCap
-    unix:TARGET = debug/StopMoCap
+    win32:TARGET = OpenStopMotion
+    unix:TARGET = debug/OpenStopMotion
 }
 else { 
-    win32:TARGET = StopMoCap
-    unix:TARGET = release/StopMoCap
+    win32:TARGET = OpenStopMotion
+    unix:TARGET = release/OpenStopMotion
 }
 HEADERS += src/FrameBuffer.h \
     gui/stopmocap.h \
@@ -91,5 +91,3 @@ else {
 }
 CODECFORSRC = UTF-8
 CODECFORTR = UTF-8
-TRANSLATIONS = stopmocap_de.ts \
-    stopmocap_en.ts
