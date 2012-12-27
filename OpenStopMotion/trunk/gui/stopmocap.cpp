@@ -1074,3 +1074,58 @@ void StopMoCap::on_bgColorSelect_clicked()
 
 	Timer->start(10);
 }
+
+
+void StopMoCap::getSceneList(ppl7::Array &scenes)
+{
+	scenes.clear();
+	ppl7::Dir dir;
+	dir.open(conf.CaptureDir,ppl7::Dir::SORT_FILENAME);
+	ppl7::DirEntry e;
+	ppl7::Dir::Iterator it;
+	dir.reset(it);
+
+	while (dir.getNext(e,it)) {
+		if (e.Filename=="." || e.Filename=="..") continue;
+		if (e.isDir()==true || e.isLink()==true) {
+			scenes.add(e.Filename);
+		}
+	}
+
+}
+
+
+
+void StopMoCap::on_sceneUpButton_clicked()
+{
+	ppl7::Array scenes;
+	getSceneList(scenes);
+	ppl7::String prev;
+	ppl7::String current=ui.sceneName->text();
+	for (size_t i=0;i<scenes.size();i++) {
+		if (scenes[i]==current) {
+			if (prev.notEmpty()) {
+				ui.sceneName->setText(prev);
+				on_sceneName_editingFinished();
+				on_playButton_clicked();
+			}
+			break;
+		}
+		prev=scenes[i];
+	}
+}
+
+void StopMoCap::on_sceneDownButton_clicked()
+{
+	ppl7::Array scenes;
+	getSceneList(scenes);
+	ppl7::String current=ui.sceneName->text();
+	for (size_t i=0;i<scenes.size()-1;i++) {
+		if (scenes[i]==current) {
+			ui.sceneName->setText(scenes[i+1]);
+			on_sceneName_editingFinished();
+			on_playButton_clicked();
+			break;
+		}
+	}
+}

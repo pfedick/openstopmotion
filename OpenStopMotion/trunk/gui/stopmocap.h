@@ -87,6 +87,7 @@ private:
     void capture(ppl7::grafix::Image &img);
     void UpdateColorKeyBG(ppl7::grafix::Color c);
     void UpdateColorKeyFG(ppl7::grafix::Color c);
+    void getSceneList(ppl7::Array &scenes);
 
 protected:
     void resizeEvent ( QResizeEvent * event );
@@ -118,6 +119,10 @@ public slots:
     void on_zoom11_clicked ( bool checked );
     void on_zoomFast_clicked ( bool checked );
     void on_zoomSmooth_clicked ( bool checked );
+
+    void on_sceneUpButton_clicked();
+    void on_sceneDownButton_clicked();
+
 
     void on_deleteScene_clicked();
     void on_selectScene_clicked();

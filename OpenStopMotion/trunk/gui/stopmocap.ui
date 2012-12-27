@@ -342,6 +342,45 @@
         <widget class="QLineEdit" name="sceneName"/>
        </item>
        <item>
+        <layout class="QVBoxLayout" name="verticalLayout_12">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QToolButton" name="sceneUpButton">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>8</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="sceneDownButton">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>8</height>
+            </size>
+           </property>
+           <property name="autoRaise">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QPushButton" name="createScene">
          <property name="enabled">
           <bool>false</bool>

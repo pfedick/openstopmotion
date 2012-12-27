@@ -39,6 +39,9 @@ void FrameBuffer::setImage(size_t nr, const ppl7::grafix::Drawable &img)
 const ppl7::grafix::Drawable &FrameBuffer::getImage(size_t nr)
 {
 	//ppl7::PrintDebugTime("FrameBuffer::getImage(nr=%zd)\n",nr-1);
+	const ppl7::grafix::Image &cache=Frames[nr-1];
+	if (cache.isEmpty()) loadNow(nr);
+
 	return Frames[nr-1];
 }
 
@@ -46,6 +49,12 @@ void FrameBuffer::copyImage(size_t nr, ppl7::grafix::Image &img)
 {
 	//ppl7::PrintDebugTime("FrameBuffer::copyImage(nr=%zd)\n",nr);
 	mutex.lock();
+	const ppl7::grafix::Image &cache=Frames[nr-1];
+	if (cache.isEmpty()) {
+		mutex.unlock();
+		loadNow(nr);
+		mutex.lock();
+	}
 	img.copy(Frames[nr-1]);
 	mutex.unlock();
 }
@@ -121,4 +130,21 @@ void FrameBuffer::run()
 		}
 	}
 	//ppl7::PrintDebugTime("FrameBuffer::run() ended\n");
+}
+
+void FrameBuffer::loadNow(size_t nr)
+{
+	ppl7::String Filename;
+	Filename=Path;
+	Filename.appendf("/frame_%06zu.png",nr);
+	ppl7::grafix::Image img;
+	try {
+		img.load(Filename);
+		mutex.lock();
+		ppl7::grafix::Image &cache=Frames[nr-1];
+		cache.copy(img);
+		mutex.unlock();
+	} catch (...) {
+
+	}
 }

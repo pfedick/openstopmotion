@@ -20,6 +20,7 @@ class FrameBuffer : private ppl7::Thread
 		ppl7::String Path;
 
 		void run();
+		void loadNow(size_t nr);
 
 	public:
 		FrameBuffer();
