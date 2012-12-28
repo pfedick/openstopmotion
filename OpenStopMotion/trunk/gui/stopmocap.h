@@ -18,6 +18,7 @@
 #include "savethread.h"
 #include "FrameBuffer.h"
 #include "bluebox.h"
+#include "framepaint.h"
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
@@ -79,6 +80,7 @@ private:
     Device cam;
     ppluint64 fpsTimer;
     int fpsCounter;
+    FramePaint fpaint;
 
     void grabFrame();
     int highestSceneFrame();
@@ -154,6 +156,9 @@ public slots:
     void on_replaceChromaWithColor_toggled(bool checked);
     void on_replaceChromaWithImage_toggled(bool checked);
     void on_replaceChromaWithTransparent_toggled(bool checked);
+
+    void on_lightAndDarkButton_toggled(bool checked);
+    void on_editScene_clicked();
 
 
 };

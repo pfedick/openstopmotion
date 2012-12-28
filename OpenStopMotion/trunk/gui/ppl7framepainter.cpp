@@ -1,28 +1,22 @@
-/*
- * ppl7imageviewer.cpp
- *
- *  Created on: 09.06.2012
- *      Author: patrick
- */
 
-#include "ppl7imageviewer.h"
+#include "ppl7framepainter.h"
 #include <QPainter>
 #include <QImage>
 #include <QMouseEvent>
 
-PPL7ImageViewer::PPL7ImageViewer(QWidget *parent)
+PPL7FramePainter::PPL7FramePainter(QWidget *parent)
 	:QGLWidget(parent)
 {
 	img=NULL;
 	smode=None;
 }
 
-void PPL7ImageViewer::setDrawable(ppl7::grafix::Drawable *draw)
+void PPL7FramePainter::setDrawable(ppl7::grafix::Drawable *draw)
 {
 	img=draw;
 }
 
-void PPL7ImageViewer::setScaling(ScalingMode mode)
+void PPL7FramePainter::setScaling(ScalingMode mode)
 {
 	smode=mode;
 	QPainter painter(this);
@@ -30,13 +24,13 @@ void PPL7ImageViewer::setScaling(ScalingMode mode)
 	painter.eraseRect(r);
 }
 
-PPL7ImageViewer::ScalingMode PPL7ImageViewer::scalingMode() const
+PPL7FramePainter::ScalingMode PPL7FramePainter::scalingMode() const
 {
 	return smode;
 }
 
 
-void PPL7ImageViewer::paintEvent(QPaintEvent *)
+void PPL7FramePainter::paintEvent(QPaintEvent *)
 {
 	if (!img) return;
 	QPainter painter(this);
@@ -94,7 +88,7 @@ void PPL7ImageViewer::paintEvent(QPaintEvent *)
 
 }
 
-void PPL7ImageViewer::mousePressEvent(QMouseEvent *event)
+void PPL7FramePainter::mousePressEvent(QMouseEvent *event)
 {
 	if (!img) return;
 	ppl7::grafix::Color c;
@@ -135,7 +129,7 @@ void PPL7ImageViewer::mousePressEvent(QMouseEvent *event)
 	QWidget::mousePressEvent(event);
 }
 
-void PPL7ImageViewer::setBackground(const QColor &c)
+void PPL7FramePainter::setBackground(const QColor &c)
 {
 	QPainter painter(this);
 	QRect r=painter.window();

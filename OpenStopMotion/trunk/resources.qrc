@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="/translation"/>
   <qresource prefix="/icons">
+    <file>resources/weather-clear-night.png</file>
+    <file>resources/weather-clear.png</file>
     <file>resources/color-line.png</file>
     <file>resources/colorpicker.png</file>
     <file>resources/gtk-color-picker.png</file>

@@ -85,6 +85,27 @@
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QToolButton" name="lightAndDarkButton">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources.qrc">
+           <normaloff>:/icons/resources/weather-clear-night.png</normaloff>
+           <activeon>:/icons/resources/weather-clear.png</activeon>:/icons/resources/weather-clear-night.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -107,70 +128,6 @@
        </item>
        <item row="0" column="1">
         <widget class="QFrame" name="frame">
-         <property name="palette">
-          <palette>
-           <active>
-            <colorrole role="Base">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
-              </color>
-             </brush>
-            </colorrole>
-            <colorrole role="Window">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>249</red>
-               <green>246</green>
-               <blue>242</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </active>
-           <inactive>
-            <colorrole role="Base">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
-              </color>
-             </brush>
-            </colorrole>
-            <colorrole role="Window">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>249</red>
-               <green>246</green>
-               <blue>242</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </inactive>
-           <disabled>
-            <colorrole role="Base">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>249</red>
-               <green>246</green>
-               <blue>242</blue>
-              </color>
-             </brush>
-            </colorrole>
-            <colorrole role="Window">
-             <brush brushstyle="SolidPattern">
-              <color alpha="255">
-               <red>249</red>
-               <green>246</green>
-               <blue>242</blue>
-              </color>
-             </brush>
-            </colorrole>
-           </disabled>
-          </palette>
-         </property>
          <property name="autoFillBackground">
           <bool>true</bool>
          </property>
@@ -411,6 +368,26 @@
          <property name="icon">
           <iconset resource="../resources.qrc">
            <normaloff>:/icons/resources/folder-open-20.png</normaloff>:/icons/resources/folder-open-20.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="editScene">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>edit</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources.qrc">
+           <normaloff>:/icons/resources/gtk-color-picker.png</normaloff>:/icons/resources/gtk-color-picker.png</iconset>
          </property>
          <property name="iconSize">
           <size>

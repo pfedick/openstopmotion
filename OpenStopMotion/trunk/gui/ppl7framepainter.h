@@ -1,19 +1,14 @@
-/*
- * ppl7imageviewer.h
- *
- *  Created on: 09.06.2012
- *      Author: patrick
- */
 
-#ifndef PPL7IMAGEVIEWER_H_
-#define PPL7IMAGEVIEWER_H_
+
+#ifndef PPL7FRAMEPAINTER_H_
+#define PPL7FRAMEPAINTER_H_
 
 #include <QWidget>
 #include <QtOpenGL/QGLWidget>
 #include <ppl7.h>
 #include <ppl7-grafix.h>
 
-class PPL7ImageViewer : public QGLWidget
+class PPL7FramePainter : public QGLWidget
 {
 		Q_OBJECT
 	public:
@@ -23,7 +18,7 @@ class PPL7ImageViewer : public QGLWidget
 			Smooth
 		};
 
-		PPL7ImageViewer(QWidget *parent = 0);
+		PPL7FramePainter(QWidget *parent = 0);
 		void setDrawable(ppl7::grafix::Drawable *draw);
 		void setScaling(ScalingMode mode);
 		ScalingMode scalingMode() const;
@@ -46,4 +41,4 @@ class PPL7ImageViewer : public QGLWidget
 };
 
 
-#endif /* PPL7IMAGEVIEWER_H_ */
+#endif /* PPL7FRAMEPAINTER_H_ */

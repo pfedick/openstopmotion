@@ -19,6 +19,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.setupUi(this);
 	ui.controlTab->setCurrentIndex(0);
 
+
 	Tmp.setf("%s - Version %s",STOPMOCAP_APPNAME,STOPMOCAP_VERSION);
 	this->setWindowTitle(Tmp);
 	controlLayout=NULL;
@@ -143,12 +144,14 @@ StopMoCap::StopMoCap(QWidget *parent)
 	UpdateColorKeyBG(bluebox.colorKey());
 
 	ui.frameSlider->setMinimum(1);
+	on_lightAndDarkButton_toggled(false);
 	this->restoreGeometry(conf.ScreenGeometry);
 }
 
 StopMoCap::~StopMoCap()
 {
 	savethread.stop();
+	fpaint.close();
 #ifdef USERENDERTHREAD
 	rthread.stop();
 #endif
@@ -1128,4 +1131,24 @@ void StopMoCap::on_sceneDownButton_clicked()
 			break;
 		}
 	}
+}
+
+void StopMoCap::on_lightAndDarkButton_toggled(bool checked)
+{
+	if (checked) {
+		setStyleSheet("background-color: rgb(48, 48, 48);\ncolor: rgb(175, 175, 175);");
+		ui.viewer->setBackground(QColor(0,0,0));
+
+	} else {
+		setStyleSheet("");
+		ui.viewer->setBackground(QColor(233,232,230));
+	}
+
+
+}
+
+
+void StopMoCap::on_editScene_clicked()
+{
+	fpaint.show();
 }
