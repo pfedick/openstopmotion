@@ -80,7 +80,7 @@ private:
     Device cam;
     ppluint64 fpsTimer;
     int fpsCounter;
-    FramePaint fpaint;
+    FramePaint *fpaint;
 
     void grabFrame();
     int highestSceneFrame();

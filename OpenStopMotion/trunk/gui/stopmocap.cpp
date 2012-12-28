@@ -14,6 +14,7 @@
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
+	fpaint=NULL;
 	interpolateSequence=0;
 	ppl7::String Tmp;
 	ui.setupUi(this);
@@ -151,7 +152,11 @@ StopMoCap::StopMoCap(QWidget *parent)
 StopMoCap::~StopMoCap()
 {
 	savethread.stop();
-	fpaint.close();
+	if (fpaint) {
+		fpaint->close();
+		delete fpaint;
+		fpaint=NULL;
+	}
 #ifdef USERENDERTHREAD
 	rthread.stop();
 #endif
@@ -373,6 +378,11 @@ void StopMoCap::closeEvent(QCloseEvent *event)
 {
 	conf.ScreenGeometry=saveGeometry();
     QWidget::closeEvent(event);
+    if (fpaint) {
+    	fpaint->close();
+    	delete fpaint;
+    	fpaint=NULL;
+    }
 }
 
 void StopMoCap::grabFrame()
@@ -1150,5 +1160,9 @@ void StopMoCap::on_lightAndDarkButton_toggled(bool checked)
 
 void StopMoCap::on_editScene_clicked()
 {
-	fpaint.show();
+	if (!fpaint) {
+		fpaint=new FramePaint();
+		fpaint->setWindowFlags(Qt::Window);
+	}
+	fpaint->show();
 }

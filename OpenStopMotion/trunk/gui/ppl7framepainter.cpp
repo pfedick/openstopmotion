@@ -30,8 +30,10 @@ PPL7FramePainter::ScalingMode PPL7FramePainter::scalingMode() const
 }
 
 
-void PPL7FramePainter::paintEvent(QPaintEvent *)
+void PPL7FramePainter::paintEvent(QPaintEvent *event)
 {
+	QWidget::paintEvent(event);
+	return;
 	if (!img) return;
 	QPainter painter(this);
 	QPoint p(0,0);

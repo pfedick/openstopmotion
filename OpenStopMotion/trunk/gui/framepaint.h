@@ -27,4 +27,4 @@ public slots:
 
 };
 
-#endif // SELECTSCENE_H
+#endif // FRAMEPAINT_H
