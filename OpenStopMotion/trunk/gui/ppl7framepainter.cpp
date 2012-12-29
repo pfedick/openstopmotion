@@ -29,11 +29,9 @@ PPL7FramePainter::ScalingMode PPL7FramePainter::scalingMode() const
 	return smode;
 }
 
-
-void PPL7FramePainter::paintEvent(QPaintEvent *event)
+void PPL7FramePainter::paintEvent(QPaintEvent *)
 {
-	QWidget::paintEvent(event);
-	return;
+
 	if (!img) return;
 	QPainter painter(this);
 	QPoint p(0,0);
@@ -89,7 +87,7 @@ void PPL7FramePainter::paintEvent(QPaintEvent *event)
 
 
 }
-
+/*
 void PPL7FramePainter::mousePressEvent(QMouseEvent *event)
 {
 	if (!img) return;
@@ -130,6 +128,7 @@ void PPL7FramePainter::mousePressEvent(QMouseEvent *event)
 	//printf ("Event: %i/%i => %i/%i, Color: %i, %i, %i\n",p.x(),p.y(),x,y,c.red(),c.green(),c.blue());
 	QWidget::mousePressEvent(event);
 }
+*/
 
 void PPL7FramePainter::setBackground(const QColor &c)
 {

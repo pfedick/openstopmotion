@@ -29,15 +29,15 @@ class PPL7FramePainter : public QGLWidget
 		ppl7::grafix::Image myImg;
 		ScalingMode smode;
 
-
 	protected:
 		void paintEvent(QPaintEvent *event);
-		void mousePressEvent(QMouseEvent *event);
+		//void mousePressEvent(QMouseEvent *event);
 
 
 
 	signals:
-	     void mouseClicked(int x, int y, ppl7::grafix::Color c);
+	     //void mouseClicked(int x, int y, ppl7::grafix::Color c);
+
 };
 
 

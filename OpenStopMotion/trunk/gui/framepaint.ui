@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1212</width>
-    <height>958</height>
+    <width>1655</width>
+    <height>923</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,7 +51,7 @@
      <item>
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Overlay:</string>
+        <string>Overlay Previous Frame</string>
        </property>
       </widget>
      </item>
@@ -59,18 +59,18 @@
       <widget class="QSlider" name="overlaySlider">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>200</width>
          <height>16777215</height>
         </size>
        </property>
        <property name="minimum">
-        <number>-100</number>
+        <number>-10</number>
        </property>
        <property name="maximum">
-        <number>100</number>
+        <number>10</number>
        </property>
-       <property name="tracking">
-        <bool>true</bool>
+       <property name="singleStep">
+        <number>1</number>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -83,6 +83,44 @@
        </property>
        <property name="tickPosition">
         <enum>QSlider::TicksAbove</enum>
+       </property>
+       <property name="tickInterval">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="onionSkinValue">
+       <property name="minimumSize">
+        <size>
+         <width>30</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>30</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Sunken</enum>
+       </property>
+       <property name="text">
+        <string>0</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Next Frame</string>
        </property>
       </widget>
      </item>
@@ -544,13 +582,6 @@
        </property>
        <property name="value">
         <number>30</number>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="interpolateFrames">
-       <property name="text">
-        <string>interpolate</string>
        </property>
       </widget>
      </item>

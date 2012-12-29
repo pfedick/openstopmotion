@@ -20,6 +20,7 @@
 #include "bluebox.h"
 #include "framepaint.h"
 
+
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
 #define STOPMOCAP_APPNAME		"OpenStopMotion"

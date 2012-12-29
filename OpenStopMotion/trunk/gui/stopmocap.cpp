@@ -1163,6 +1163,12 @@ void StopMoCap::on_editScene_clicked()
 	if (!fpaint) {
 		fpaint=new FramePaint();
 		fpaint->setWindowFlags(Qt::Window);
+		fpaint->setFrameBuffer(fBuffer);
+		fpaint->setConfig(conf);
 	}
+	fpaint->init();
+	fpaint->setMaxFrameNumber(lastFrameNum);
+	fpaint->setFrameRate(ui.frameRate->value());
+	fpaint->setDarkColorScheme(ui.lightAndDarkButton->isChecked());
 	fpaint->show();
 }
