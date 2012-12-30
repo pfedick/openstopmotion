@@ -58,6 +58,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	}
 
 	ui.frameRate->setValue(conf.frameRate);
+	ui.overblendFactor->setValue(conf.overblendFactor);
 	ui.interpolateFrames->setChecked(conf.interpolate);
 
 	ui.jpegQualitySlider->setValue(conf.jpegQuality);
@@ -145,7 +146,8 @@ StopMoCap::StopMoCap(QWidget *parent)
 	UpdateColorKeyBG(bluebox.colorKey());
 
 	ui.frameSlider->setMinimum(1);
-	on_lightAndDarkButton_toggled(false);
+	ui.lightAndDarkButton->setChecked(conf.darkLayout);
+	on_lightAndDarkButton_toggled(conf.darkLayout);
 	this->restoreGeometry(conf.ScreenGeometry);
 }
 
@@ -164,6 +166,7 @@ StopMoCap::~StopMoCap()
 	Timer->stop();
 	conf.interpolate=ui.interpolateFrames->isChecked();
 	conf.frameRate=ui.frameRate->value();
+	conf.overblendFactor=ui.overblendFactor->value();
 	conf.mergeFrames=ui.mergeFrames->value();
 	conf.skipFrames=ui.skipFrames->value();
 	conf.onionValue=ui.onionSkinning->value();
@@ -177,6 +180,7 @@ StopMoCap::~StopMoCap()
 	conf.pictureFormatComp=ui.imageFormatComp->currentIndex();
 	conf.saveCamShot=ui.saveCamShot->isChecked();
 	conf.saveComposited=ui.saveCompositedImage->isChecked();
+	conf.darkLayout=ui.lightAndDarkButton->isChecked();
 
 	conf.chromaKeyEnabled=ui.chromaKeyingEnabled->isChecked();
 	if (ui.replaceChromaWithColor->isChecked()) conf.chromaReplaceMode=1;
@@ -630,6 +634,73 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 		DisplayException(e,this);
 	}
 }
+
+void StopMoCap::on_captureOverblendButton_clicked()
+{
+	if (cam.isOpen()==false) return;
+	ppl7::String Tmp;
+	SaveJob *job=NULL;
+	ppl7::String CaptureDir=conf.CaptureDir+"/"+conf.Scene;
+	if (ppl7::Dir::exists(CaptureDir)==false) return;
+	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
+	if (lastFrameNum==0) return;
+	ppl7::grafix::Image img;
+	float blendFactor=1.0f-(float)(ui.overblendFactor->value())/100.0f;
+
+
+	try {
+		capture(img);
+		if (ui.saveCamShot->isChecked()) {
+			job=new SaveJob;
+			if (!job) throw ppl7::OutOfMemoryException();
+			job->Filename=CaptureDir;
+			job->Filename.appendf("/frame_%06i",lastFrameNum);
+			lastFrame.bltBlend(img,blendFactor);
+			job->img=lastFrame;
+			if (ui.imageFormat->currentIndex()==0) {
+				job->format=PictureFormat::png;
+				job->Filename+=".png";
+			} else if (ui.imageFormat->currentIndex()==1) {
+				job->format=PictureFormat::bmp;
+				job->Filename+=".bmp";
+			} else if (ui.imageFormat->currentIndex()==2) {
+				job->format=PictureFormat::jpeg;
+				job->quality=ui.jpegQualitySlider->value();
+				job->Filename+=".jpg";
+			}
+			fBuffer.setImage(lastFrameNum,lastFrame);
+			savethread.addJob(job);
+		}
+		if (ui.saveCompositedImage->isChecked()) {
+			job=new SaveJob;
+			if (!job) throw ppl7::OutOfMemoryException();
+			job->Filename=CaptureDir;
+			job->Filename.appendf("/comp_%06i",lastFrameNum);
+			bluebox.process(img);
+			lastFrame.bltBlend(img,blendFactor);
+			job->img=lastFrame;
+			//lastFrame=img;
+			if (ui.imageFormatComp->currentIndex()==0) {
+				job->format=PictureFormat::png;
+				job->Filename+=".png";
+			} else if (ui.imageFormatComp->currentIndex()==1) {
+				job->format=PictureFormat::bmp;
+				job->Filename+=".bmp";
+			} else if (ui.imageFormatComp->currentIndex()==2) {
+				job->format=PictureFormat::jpeg;
+				job->quality=ui.jpegQualitySliderComp->value();
+				job->Filename+=".jpg";
+			}
+			savethread.addJob(job);
+		}
+	} catch (const ppl7::Exception &e) {
+		delete job;
+		QApplication::restoreOverrideCursor();
+		DisplayException(e,this);
+	}
+}
+
+
 
 int StopMoCap::highestSceneFrame()
 {

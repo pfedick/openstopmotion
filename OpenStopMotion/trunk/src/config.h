@@ -32,11 +32,14 @@ class Config
 		int pictureFormat;
 		bool saveCamShot;
 		bool saveComposited;
+		bool darkLayout;
 
 		int jpegQualityComp;
 		int pictureFormatComp;
 
 		int frameRate;
+		int overblendFactor;
+
 		bool interpolate;
 
 		// Chroma-Keying

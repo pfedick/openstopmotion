@@ -105,6 +105,7 @@ public slots:
     void on_playbackTimer_fired();
     void on_captureButton_clicked();
     void on_captureBackgroundButton_clicked();
+    void on_captureOverblendButton_clicked();
     void on_selectDir_clicked();
     void on_sceneName_textChanged ( const QString & text );
     void on_sceneName_editingFinished();

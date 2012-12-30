@@ -18,6 +18,8 @@ Config::Config()
 	saveComposited=false;
 	frameRate=30;
 	interpolate=false;
+	overblendFactor=50;
+	darkLayout=false;
 }
 
 Config::~Config()
@@ -45,6 +47,8 @@ void Config::load()
 	pictureFormat=settings.value("pictureFormat",0).toInt();
 	frameRate=settings.value("frameRate",30).toInt();
 	interpolate=settings.value("interpolate",false).toBool();
+	darkLayout=settings.value("darkLayout",false).toBool();
+	overblendFactor=settings.value("overblendFactor",50).toInt();
 
 	jpegQualityComp=settings.value("jpegQualityComp",90).toInt();
 	pictureFormatComp=settings.value("pictureFormatComp",0).toInt();
@@ -98,6 +102,8 @@ void Config::save()
 	settings.setValue("saveComposited",saveComposited);
 	settings.setValue("frameRate",frameRate);
 	settings.setValue("interpolate",interpolate);
+	settings.setValue("overblendFactor",overblendFactor);
+	settings.setValue("darkLayout",darkLayout);
 	settings.endGroup();
 
 	settings.beginGroup("chromaKeying");
