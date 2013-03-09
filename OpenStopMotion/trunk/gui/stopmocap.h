@@ -19,6 +19,8 @@
 #include "FrameBuffer.h"
 #include "bluebox.h"
 #include "framepaint.h"
+#include "arduino.h"
+#include "ledcontrol.h"
 
 
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
@@ -82,6 +84,8 @@ private:
     ppluint64 fpsTimer;
     int fpsCounter;
     FramePaint *fpaint;
+    Arduino arduino;
+    LedControl *ledcontrol;
 
     void grabFrame();
     int highestSceneFrame();
@@ -101,6 +105,7 @@ public slots:
     void on_deviceComboBox_currentIndexChanged(int index);
     void on_formatComboBox_currentIndexChanged(int index);
     void on_useDevice_clicked();
+    void on_arduinoButton_clicked();
     void on_timer_fired();
     void on_playbackTimer_fired();
     void on_captureButton_clicked();

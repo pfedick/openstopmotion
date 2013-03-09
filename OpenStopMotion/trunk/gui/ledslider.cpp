@@ -47,6 +47,7 @@ int LedSlider::id() const
 void LedSlider::on_slider_valueChanged ( int value )
 {
 	ui.lineEdit->setText(QString::number(value));
+	emit valueChanged(myId,value);
 }
 
 void LedSlider::on_lineEdit_editingFinished()

@@ -13,7 +13,9 @@ else {
     unix:TARGET = release/OpenStopMotion
 }
 HEADERS += src/FrameBuffer.h \
+	src/arduino.h \
 	gui/ledslider.h \
+	gui/ledcontrol.h \
 	gui/framepaint.h \
 	gui/ppl7framepainter.h \
     gui/stopmocap.h \
@@ -25,7 +27,9 @@ HEADERS += src/FrameBuffer.h \
     src/config.h \
     src/bluebox.h
 SOURCES += src/FrameBuffer.cpp \
+	src/arduino.cpp \
 	gui/ledslider.cpp \
+	gui/ledcontrol.cpp \
 	gui/framepaint.cpp \
 	gui/ppl7framepainter.cpp \
     gui/stopmocap.cpp \
@@ -40,6 +44,7 @@ SOURCES += src/FrameBuffer.cpp \
     src/bluebox.cpp
 FORMS += gui/stopmocap.ui \
 	gui/ledslider.ui \
+	gui/ledcontrol.ui \
 	gui/framepaint.ui \
     gui/selectscene.ui \
     gui/myslider.ui

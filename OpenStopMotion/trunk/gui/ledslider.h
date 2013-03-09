@@ -1,6 +1,6 @@
 #ifndef LEDSLIDER_H
 #define LEDSLIDER_H
-
+#define WITH_QT
 #include <QtGui/QWidget>
 #include <QSlider>
 #include <QSizePolicy>
@@ -33,6 +33,11 @@ public slots:
 	void on_lineEdit_editingFinished();
 	void on_setKey_clicked();
 	void on_delKey_clicked();
+
+
+signals:
+	void valueChanged(int id, int value);
+
 };
 
 #endif // LEDSLIDER_H

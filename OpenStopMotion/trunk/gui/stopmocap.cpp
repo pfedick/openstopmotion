@@ -15,6 +15,7 @@ StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
 	fpaint=NULL;
+	ledcontrol=NULL;
 	interpolateSequence=0;
 	ppl7::String Tmp;
 	ui.setupUi(this);
@@ -154,6 +155,11 @@ StopMoCap::StopMoCap(QWidget *parent)
 StopMoCap::~StopMoCap()
 {
 	savethread.stop();
+	if (ledcontrol) {
+		ledcontrol->close();
+		delete ledcontrol;
+		ledcontrol=NULL;
+	}
 	if (fpaint) {
 		fpaint->close();
 		delete fpaint;
@@ -386,6 +392,11 @@ void StopMoCap::closeEvent(QCloseEvent *event)
     	fpaint->close();
     	delete fpaint;
     	fpaint=NULL;
+    }
+    if (ledcontrol) {
+    	ledcontrol->close();
+    	delete ledcontrol;
+    	ledcontrol=NULL;
     }
 }
 
@@ -822,6 +833,7 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 	if (lastFrameNum<1) return;
 	ppl7::String Tmp;
 	Tmp.setf("%i",value);
+	arduino.setCounter(value);
 	ui.frameNum->setText(Tmp);
 	if (!inPlayback) return;
 	try {
@@ -1219,10 +1231,12 @@ void StopMoCap::on_lightAndDarkButton_toggled(bool checked)
 	if (checked) {
 		setStyleSheet("background-color: rgb(48, 48, 48);\ncolor: rgb(175, 175, 175);");
 		ui.viewer->setBackground(QColor(0,0,0));
+		if (ledcontrol) ledcontrol->setColorScheme(1);
 
 	} else {
 		setStyleSheet("");
 		ui.viewer->setBackground(QColor(233,232,230));
+		if (ledcontrol) ledcontrol->setColorScheme(0);
 	}
 
 
@@ -1242,4 +1256,17 @@ void StopMoCap::on_editScene_clicked()
 	fpaint->setFrameRate(ui.frameRate->value());
 	fpaint->setDarkColorScheme(ui.lightAndDarkButton->isChecked());
 	fpaint->show();
+}
+
+void StopMoCap::on_arduinoButton_clicked()
+{
+	if (!ledcontrol) {
+		ledcontrol=new LedControl();
+		ledcontrol->setWindowFlags(Qt::Window);
+		ledcontrol->setConfig(conf);
+		ledcontrol->setArduino(arduino);
+		if (ui.lightAndDarkButton->isChecked()) ledcontrol->setColorScheme(1);
+		else ledcontrol->setColorScheme(0);
+	}
+	ledcontrol->show();
 }
