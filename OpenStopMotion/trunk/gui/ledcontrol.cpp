@@ -62,6 +62,6 @@ void LedControl::on_connectButton_clicked()
 
 void LedControl::on_slider_valueChangedfired(int id, int value)
 {
-	printf ("Slider: %d, Value: %d\n",id,value);
+	//printf ("Slider: %d, Value: %d\n",id,value);
 	arduino->setLight(id,value);
 }
