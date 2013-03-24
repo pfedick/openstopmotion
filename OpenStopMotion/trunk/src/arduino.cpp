@@ -94,6 +94,7 @@ bool Arduino::open(const ppl7::String device, int baud)
 
 void Arduino::writeBytes(const char *buffer, int size)
 {
+	if (!fd) return;
 	int bytes=::write(fd,buffer,size);
 	//printf ("%d of %d Bytes gesendet\n",bytes,size);
 	if (bytes!=size) {
