@@ -25,17 +25,30 @@ public:
     void setArduino (Arduino &conf);
     void setColorScheme(int scheme);
 
+protected:
+    void resizeEvent ( QResizeEvent * event );
+    void showEvent (  QShowEvent * event );
+    bool eventFilter(QObject *obj, QEvent *event);
 
 private:
     Ui::LedControlClass ui;
     Config *conf;
     Arduino *arduino;
     LedSlider *slider[12];
+    ppl7::grafix::Image img;
+    int myColorScheme;
+    ppl7::grafix::Color lc[12];
+
+    ppl7::AVLTree<int, int> keyframes[12];
+
+    void updateFrameView();
 
 public slots:
 
 	void on_connectButton_clicked();
-	void on_slider_valueChangedfired(int id, int value);
+	void on_slider_valueChanged_fired(int id, int value);
+	void on_keyFrameSet_fired(int id, int value);
+	void on_keyFrameDelete_fired(int id);
 
 };
 

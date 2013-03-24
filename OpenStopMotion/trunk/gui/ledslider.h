@@ -22,6 +22,7 @@ public:
 
     int value() const;
     int id() const;
+    bool state() const;
 
 
 private:
@@ -33,10 +34,13 @@ public slots:
 	void on_lineEdit_editingFinished();
 	void on_setKey_clicked();
 	void on_delKey_clicked();
+	void on_onOff_clicked();
 
 
 signals:
 	void valueChanged(int id, int value);
+	void keyFrameSet(int id, int value);
+	void keyFrameDelete(int id);
 
 };
 
