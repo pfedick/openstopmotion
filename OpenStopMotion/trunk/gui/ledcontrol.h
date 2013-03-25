@@ -40,8 +40,10 @@ private:
     ppl7::grafix::Color lc[12];
 
     ppl7::AVLTree<int, int> keyframes[12];
+    ppl7::AVLTree<int, int> interpolatedframes[12];
 
     void updateFrameView();
+    void recalcFrames(int id);
 
 public slots:
 
@@ -49,6 +51,8 @@ public slots:
 	void on_slider_valueChanged_fired(int id, int value);
 	void on_keyFrameSet_fired(int id, int value);
 	void on_keyFrameDelete_fired(int id);
+
+	void on_frameSlider_valueChanged(int value);
 
 };
 

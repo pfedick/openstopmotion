@@ -114,14 +114,72 @@ void LedControl::on_slider_valueChanged_fired(int id, int value)
 
 void LedControl::on_keyFrameSet_fired(int id, int value)
 {
+	try {
+		keyframes[id].erase(ui.frameSlider->value());
+	} catch (...) {
+
+	}
 	keyframes[id].add(ui.frameSlider->value(),value);
+	recalcFrames(id);
 	ui.frameview->update();
 }
 
 void LedControl::on_keyFrameDelete_fired(int id)
 {
-	keyframes[id].erase(ui.frameSlider->value());
+	try {
+		keyframes[id].erase(ui.frameSlider->value());
+	} catch (...) {
+
+	}
+	recalcFrames(id);
 	ui.frameview->update();
+}
+
+void LedControl::on_frameSlider_valueChanged(int value)
+{
+	ppl7::String Tmp;
+	Tmp.setf("%d",value);
+	ui.currentFrame->setText(Tmp);
+}
+
+void LedControl::recalcFrames(int id)
+{
+	interpolatedframes[id].clear();
+	int frame=0;
+	int maxf=ui.maxFrame->text().toInt();
+	int value=0;
+	int nextframe;
+	int nextvalue;
+	int steps;
+
+	ppl7::AVLTree<int, int>::Iterator it;
+	keyframes[id].reset(it);
+
+	while (keyframes[id].getNext(it)) {
+		nextframe=it.key();
+		nextvalue=it.value();
+		steps=nextframe-frame;
+		if (steps>1) {
+			for (int f=0;f<steps;f++) {
+				try {
+					interpolatedframes[id].add(frame+f,value*(steps-f)/steps+nextvalue*f/steps);
+				} catch (...) {
+
+				}
+			}
+		}
+		try {
+			interpolatedframes[id].erase(nextframe);
+		} catch(...) {
+
+		}
+		interpolatedframes[id].add(nextframe,nextvalue);
+		frame=nextframe;
+		value=nextvalue;
+	}
+
+
+
 }
 
 void LedControl::updateFrameView()
@@ -153,12 +211,12 @@ void LedControl::updateFrameView()
 		for (int f=0;f<endframe;f++) {
 			if (f>=startframe) {
 				int value=lastvalue;
-				if (keyframes[led].exists(f)) value=keyframes[led][f];
+				if (interpolatedframes[led].exists(f)) value=interpolatedframes[led][f];
 				img.line(x,y,x+5,bottom-led-(value*scale/255),lc[led]);
 				x+=5;
 				y=bottom-led-(value*scale/255);
 			}
-			if (keyframes[led].exists(f)) lastvalue=keyframes[led][f];
+			if (interpolatedframes[led].exists(f)) lastvalue=interpolatedframes[led][f];
 		}
 
 	}
