@@ -49,7 +49,7 @@ void Device::enumerateDevices(std::list<VideoDevice> &list)
 				VideoDevice d;
 				enumerateDevice(DeviceName,i,d);
 				list.push_back(d);
-			} catch (const ppl7::FileObject::FileNotFoundException &e) {
+			} catch (const ppl7::FileNotFoundException &e) {
 			} catch (const Device::InvalidDevice &e) {
 
 			} catch (...) {
@@ -63,7 +63,7 @@ void Device::enumerateDevices(std::list<VideoDevice> &list)
 void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDevice &d)
 {
 	int ff=::open((const char*)DeviceName, O_RDONLY);
-	if (ff==-1) ppl7::File::throwErrno(errno,DeviceName);
+	if (ff==-1) ppl7::throwExceptionFromErrno(errno,DeviceName);
 	struct v4l2_input argp;
 	CLEAR(argp);
 	argp.index=index;
@@ -96,7 +96,7 @@ void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDev
 void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevice &device)
 {
 	int ff=::open((const char*)device.DeviceName, O_RDONLY);
-	if (ff==-1) ppl7::File::throwErrno(errno,device.DeviceName);
+	if (ff==-1) ppl7::throwExceptionFromErrno(errno,device.DeviceName);
 
 	struct v4l2_fmtdesc fmt;
 	memset (&fmt, 0, sizeof (fmt));
@@ -133,7 +133,7 @@ void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevi
 void Device::enumerateFrameSizes(std::list<ppl7::grafix::Size> &list, const VideoDevice &device, const VideoFormat &fmt)
 {
 	int ff=::open((const char*)device.DeviceName, O_RDONLY);
-	if (ff==-1) ppl7::File::throwErrno(errno,device.DeviceName);
+	if (ff==-1) ppl7::throwExceptionFromErrno(errno,device.DeviceName);
 	struct v4l2_frmsizeenum s;
 	memset (&s, 0, sizeof (s));
 	s.pixel_format=fmt.pixelformat;
@@ -154,7 +154,7 @@ void Device::open(const VideoDevice &dev)
 	close();
 	if (!(dev.caps&VideoDevice::CAP_VIDEO_CAPTURE)) throw DeviceDoesNotSupportCapture();
 	myff=::open((const char*)dev.DeviceName, O_RDWR /* required */ | O_NONBLOCK,0);
-	if (myff==-1) ppl7::File::throwErrno(errno,dev.DeviceName);
+	if (myff==-1) ppl7::throwExceptionFromErrno(errno,dev.DeviceName);
 	this->dev=dev;
 }
 
