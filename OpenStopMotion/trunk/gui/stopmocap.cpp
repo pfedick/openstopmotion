@@ -591,6 +591,7 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 	if (ppl7::Dir::exists(CaptureDir)==false) return;
 	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 	if (lastFrameNum==0) return;
+	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum);
 	ppl7::grafix::Image img;
 	try {
 		capture(img);
@@ -644,6 +645,7 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 		QApplication::restoreOverrideCursor();
 		DisplayException(e,this);
 	}
+	if (ledcontrol) ledcontrol->setCurrentFrame(ui.frameSlider->value());
 }
 
 void StopMoCap::on_captureOverblendButton_clicked()
