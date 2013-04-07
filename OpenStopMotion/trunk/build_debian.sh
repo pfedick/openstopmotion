@@ -298,10 +298,16 @@ create_dir $DISTFILES
 if [ -f "OpenStopMotion.pro" ] ; then
 	#rm -rf tmp
 	create_dir "tmp"
-	cd tmp
+	cd $WORK
 	gather_sources
+	rm -rf $PROGNAME-$VERSION
 	create_dir "$PROGNAME-$VERSION"
-	find ppl7 osm | cpio -pdm "$PROGNAME-$VERSION"
+	cd ppl7
+	find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdm "$WORK/$PROGNAME-$VERSION/ppl7"
+	cd $WORK
+	cd osm
+	find *.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$WORK/$PROGNAME-$VERSION/osm"
+	cd $WORK
 	cp ../build_debian.sh "$PROGNAME-$VERSION"
 	cp ../*.TXT "$PROGNAME-$VERSION"
 	tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 "$PROGNAME-$VERSION"
