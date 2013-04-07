@@ -87,8 +87,8 @@
         <string>Save</string>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>../resources/filesave.png</normaloff>../resources/filesave.png</iconset>
+        <iconset resource="../resources.qrc">
+         <normaloff>:/icons/resources/filesave.png</normaloff>:/icons/resources/filesave.png</iconset>
        </property>
        <property name="iconSize">
         <size>

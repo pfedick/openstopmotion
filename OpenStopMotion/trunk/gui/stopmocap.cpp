@@ -523,11 +523,11 @@ void StopMoCap::on_captureButton_clicked()
 	if (ppl7::Dir::exists(CaptureDir)==false) return;
 	ppl7::grafix::Image img;
 	try {
-		capture(img);
-
 		if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 		lastFrameNum++;
 		if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum-1);
+		capture(img);
+
 		if (ui.saveCamShot->isChecked()) {
 			job=new SaveJob;
 			if (!job) throw ppl7::OutOfMemoryException();
@@ -768,6 +768,11 @@ void StopMoCap::on_undoButton_clicked()
 	} catch (...) {
 		lastFrame.clear();
 	}
+	if (ledcontrol) {
+		if (lastFrameNum>0)	ledcontrol->setCurrentFrame(lastFrameNum-1);
+		else ledcontrol->setCurrentFrame(0);
+	}
+
 }
 
 void StopMoCap::on_sceneName_textChanged (const QString & text)
