@@ -527,7 +527,7 @@ void StopMoCap::on_captureButton_clicked()
 
 		if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 		lastFrameNum++;
-
+		if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum-1);
 		if (ui.saveCamShot->isChecked()) {
 			job=new SaveJob;
 			if (!job) throw ppl7::OutOfMemoryException();
@@ -570,6 +570,7 @@ void StopMoCap::on_captureButton_clicked()
 			}
 			savethread.addJob(job);
 		}
+		if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum);
 
 		Tmp.setf("%i",lastFrameNum);
 		ui.totalFrames->setText(Tmp);
@@ -591,7 +592,7 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 	if (ppl7::Dir::exists(CaptureDir)==false) return;
 	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 	if (lastFrameNum==0) return;
-	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum);
+	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum-1);
 	ppl7::grafix::Image img;
 	try {
 		capture(img);
@@ -645,7 +646,7 @@ void StopMoCap::on_captureBackgroundButton_clicked()
 		QApplication::restoreOverrideCursor();
 		DisplayException(e,this);
 	}
-	if (ledcontrol) ledcontrol->setCurrentFrame(ui.frameSlider->value());
+	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum);
 }
 
 void StopMoCap::on_captureOverblendButton_clicked()
@@ -660,6 +661,7 @@ void StopMoCap::on_captureOverblendButton_clicked()
 	ppl7::grafix::Image img;
 	float blendFactor=1.0f-(float)(ui.overblendFactor->value())/100.0f;
 
+	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum-1);
 
 	try {
 		capture(img);
@@ -711,6 +713,7 @@ void StopMoCap::on_captureOverblendButton_clicked()
 		QApplication::restoreOverrideCursor();
 		DisplayException(e,this);
 	}
+	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum);
 }
 
 
