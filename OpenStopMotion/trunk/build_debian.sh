@@ -9,7 +9,7 @@
 # $Id$
 #
 #
-# Copyright (c) 2013 Patrick Fedick
+# Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ gather_sources()
 		echo "INFO: Copy OpenStopMotion-sources from local directory: $OSMSOURCE..."
 		create_dir "osm"
 		cd $OSMSOURCE
-		find README.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$CUR/osm"
+		find *.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$CUR/osm"
                 echo "INFO: done"
         else
 		echo "INFO: checkout OpenStopMotion-sources from svn repository..."
@@ -189,6 +189,9 @@ ubuntu_write_control ()
                 echo "Description: $DESCRIPTION"
                 cat osm/README.TXT | while read line
                 do
+                        if [ -z "$line" ] ; then
+                        	line="."
+                        fi
                         echo " $line"
                 done
         ) > debian/control
@@ -294,6 +297,21 @@ if [ "$ARCH" = "x86_64" ] ; then
 fi
 
 
+create_dir $DISTFILES
+
+if [ -f "OpenStopMotion.pro" ] ; then
+	#rm -rf tmp
+	create_dir "tmp"
+	cd tmp
+	gather_sources
+	create_dir "$PROGNAME-$VERSION"
+	find ppl7 osm | cpio -pdm "$PROGNAME-$VERSION"
+	cp ../build_debian.sh "$PROGNAME-$VERSION"
+	cp ../*.TXT "$PROGNAME-$VERSION"
+	tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 "$PROGNAME-$VERSION"
+fi
+
+
 if [ "$DISTRIB_ID" != "Ubuntu" ] ; then
 	if [ "$DISTRIB_ID" != "Debian" ] ; then
 		echo "ERROR: This build-script is for Ubuntu or Debian based systems only"
@@ -336,18 +354,7 @@ if [ "$MISSING" ] ; then
 fi
 echo "INFO: all required packages are installed"
 
-create_dir $DISTFILES
 
-if [ -f "OpenStopMotion.pro" ] ; then
-	#rm -rf tmp
-	create_dir "tmp"
-	cd tmp
-	gather_sources
-	create_dir "$PROGNAME-$VERSION"
-	find ppl7 osm | cpio -pdm "$PROGNAME-$VERSION"
-	cp ../build_debian.sh "$PROGNAME-$VERSION"
-	tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 "$PROGNAME-$VERSION"
-fi
 
 CUR=`pwd`
 build_ppl7 $CUR
