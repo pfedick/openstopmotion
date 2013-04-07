@@ -835,6 +835,7 @@ void StopMoCap::on_frameSlider_sliderPressed()
 void StopMoCap::on_frameSlider_sliderReleased()
 {
 	inPlayback=false;
+	if (ledcontrol) ledcontrol->setCurrentFrame(lastFrameNum);
 }
 
 
