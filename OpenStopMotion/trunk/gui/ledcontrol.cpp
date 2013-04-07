@@ -3,11 +3,13 @@
 #include <QPainter>
 #include <QImage>
 #include <QFileDialog>
+#include <QMessageBox>
 
 
 LedControl::LedControl(QWidget *parent)
     : QWidget(parent)
 {
+	unsaved=false;
 	PlaybackTimer=new QTimer(this);
 	myColorScheme=0;
 	ppl7::String Tmp;
@@ -51,6 +53,7 @@ LedControl::~LedControl()
 {
 	PlaybackTimer->stop();
 	delete PlaybackTimer;
+	if (unsaved) remindSave();
 }
 
 void LedControl::resizeEvent ( QResizeEvent * event )
@@ -87,7 +90,8 @@ void LedControl::setArduino (Arduino &arduino)
 
 void LedControl::setCurrentFrame(int frame)
 {
-	ui.frameSlider->setValue(frame);
+	int offset=ui.offsetFrame->text().toInt();
+	ui.frameSlider->setValue(frame+offset);
 }
 
 void LedControl::setColorScheme(int scheme)
@@ -132,6 +136,7 @@ void LedControl::on_keyFrameSet_fired(int id, int value)
 
 	}
 	keyframes[id].add(ui.frameSlider->value(),value);
+	unsaved=true;
 	recalcFrames(id);
 	ui.frameview->update();
 }
@@ -143,6 +148,7 @@ void LedControl::on_keyFrameDelete_fired(int id)
 	} catch (...) {
 
 	}
+	unsaved=true;
 	recalcFrames(id);
 	ui.frameview->update();
 }
@@ -164,10 +170,18 @@ void LedControl::on_frameSlider_valueChanged(int value)
 void LedControl::on_maxFrame_textChanged(const QString & text)
 {
 	ui.frameSlider->setMaximum(text.toInt());
+	unsaved=true;
 }
+
+void LedControl::on_offsetFrame_textChanged(const QString & text)
+{
+	unsaved=true;
+}
+
 
 void LedControl::on_loadButton_clicked()
 {
+	if (unsaved) remindSave();
 	ppl7::String Path=Filename;
 	if (Path.isEmpty()) Path=conf->LedControlFile;
 	if (Path.isEmpty()) Path=ppl7::Dir::currentPath();
@@ -183,6 +197,7 @@ void LedControl::on_loadButton_clicked()
 			DisplayException(e);
 		}
 	}
+	unsaved=false;
 }
 
 void LedControl::on_saveButton_clicked()
@@ -250,6 +265,16 @@ void LedControl::on_playbackTimer_fired()
 	if (frame<ui.frameSlider->maximum()) ui.frameSlider->setValue(frame);
 }
 
+void LedControl::remindSave()
+{
+	int ret = QMessageBox::warning(this, tr("OpenStopMotion: LED-Control"),
+	                                tr("Light-values or keyframes have been modified.\n"
+	                                   "Do you want to save your changes?"),
+	                                QMessageBox::Save | QMessageBox::Discard
+	                                | QMessageBox::Cancel,
+	                                QMessageBox::Save);
+	if (ret==QMessageBox::Save) on_saveButton_clicked();
+}
 
 void LedControl::load(const ppl7::String &filename)
 {
@@ -268,7 +293,9 @@ void LedControl::load(const ppl7::String &filename)
 		if (header.pregMatch("/\\<maxframes\\>(.*?)\\<\\/maxframes\\>/s",matches)) {
 			ui.maxFrame->setText(matches[1].trimmed());
 		}
-
+		if (header.pregMatch("/\\<offsetFrame\\>(.*?)\\<\\/offsetFrame\\>/s",matches)) {
+			ui.offsetFrame->setText(matches[1].trimmed());
+		}
 	}
 	ppl7::Array rows;
 	rows.explode(content,"<led>");
@@ -303,6 +330,7 @@ void LedControl::save(const ppl7::String &filename)
 	s+="<ledcontrol>\n";
 	s+="<header>\n";
 	s+="   <maxframes>"+ui.maxFrame->text()+"</maxframes>\n";
+	s+="   <offsetFrame>"+ui.offsetFrame->text()+"</offsetFrame>\n";
 	s+="</header>\n";
 	for (int led=0;led<12;led++) {
 		s+="<led>\n";

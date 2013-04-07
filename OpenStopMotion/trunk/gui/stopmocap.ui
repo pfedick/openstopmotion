@@ -90,9 +90,13 @@
          <property name="text">
           <string>Arduino</string>
          </property>
+         <property name="icon">
+          <iconset resource="../resources.qrc">
+           <normaloff>:/other/resources/arduino.png</normaloff>:/other/resources/arduino.png</iconset>
+         </property>
          <property name="iconSize">
           <size>
-           <width>16</width>
+           <width>31</width>
            <height>16</height>
           </size>
          </property>

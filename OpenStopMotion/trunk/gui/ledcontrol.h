@@ -51,6 +51,9 @@ private:
 
     void updateFrameView();
     void recalcFrames(int id);
+    bool unsaved;
+
+    void remindSave();
 
 public slots:
 
@@ -59,6 +62,7 @@ public slots:
 	void on_keyFrameSet_fired(int id, int value);
 	void on_keyFrameDelete_fired(int id);
 	void on_maxFrame_textChanged(const QString & text);
+	void on_offsetFrame_textChanged(const QString & text);
 
 	void on_frameSlider_valueChanged(int value);
 

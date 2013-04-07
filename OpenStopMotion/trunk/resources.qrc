@@ -26,5 +26,7 @@
     <file>resources/fileopen.png</file>
     <file>resources/filesaveas.png</file>
   </qresource>
-  <qresource prefix="/other"/>
+  <qresource prefix="/other">
+    <file>resources/arduino.png</file>
+  </qresource>
 </RCC>
