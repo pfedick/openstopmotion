@@ -55,28 +55,25 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QFrame" name="colorFrame">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="onOff">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>16</width>
-          <height>16</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -152,6 +149,10 @@
           <property name="text">
            <string/>
           </property>
+          <property name="icon">
+           <iconset resource="../resources.qrc">
+            <normaloff>:/icons/resources/key_set.png</normaloff>:/icons/resources/key_set.png</iconset>
+          </property>
           <property name="iconSize">
            <size>
             <width>16</width>
@@ -164,6 +165,10 @@
          <widget class="QToolButton" name="delKey">
           <property name="text">
            <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources.qrc">
+            <normaloff>:/icons/resources/key_delete.png</normaloff>:/icons/resources/key_delete.png</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -180,6 +185,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

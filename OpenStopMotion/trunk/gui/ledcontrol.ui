@@ -65,16 +65,53 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="loadButton">
        <property name="text">
         <string>Load</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/icons/resources/fileopen.png</normaloff>:/icons/resources/fileopen.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="saveButton">
        <property name="text">
         <string>Save</string>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normaloff>../resources/filesave.png</normaloff>../resources/filesave.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="saveAsButton">
+       <property name="text">
+        <string>Save As</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources.qrc">
+         <normaloff>:/icons/resources/filesaveas.png</normaloff>:/icons/resources/filesaveas.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>16</width>
+         <height>16</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -144,6 +181,9 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="text">
+        <string>0</string>
        </property>
       </widget>
      </item>

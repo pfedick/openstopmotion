@@ -18,11 +18,10 @@ public:
     void setName(const QString &name);
     void setId(int id);
     void setValue(int value);
-    void setState(bool onOff);
+    void setColor(const ppl7::grafix::Color &c);
 
     int value() const;
     int id() const;
-    bool state() const;
 
 
 private:
@@ -34,7 +33,6 @@ public slots:
 	void on_lineEdit_editingFinished();
 	void on_setKey_clicked();
 	void on_delKey_clicked();
-	void on_onOff_clicked();
 
 
 signals:

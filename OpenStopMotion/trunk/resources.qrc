@@ -1,6 +1,8 @@
 <RCC>
   <qresource prefix="/translation"/>
   <qresource prefix="/icons">
+    <file>resources/key_delete.png</file>
+    <file>resources/key_set.png</file>
     <file>resources/weather-clear-night.png</file>
     <file>resources/weather-clear.png</file>
     <file>resources/color-line.png</file>
@@ -20,6 +22,9 @@
     <file>resources/media-skip-backward.png</file>
     <file>resources/media-skip-forward.png</file>
     <file>resources/trash-16.png</file>
+    <file>resources/filesave.png</file>
+    <file>resources/fileopen.png</file>
+    <file>resources/filesaveas.png</file>
   </qresource>
   <qresource prefix="/other"/>
 </RCC>

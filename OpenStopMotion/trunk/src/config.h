@@ -24,6 +24,10 @@ class Config
 		ppl7::String	ImageFormat;
 		ppl7::String	ImageSize;
 
+		ppl7::String	LedControlFile;
+		ppl7::String	ArduinoDevice;
+		int				ArduinoBaudRate;
+
 		int mergeFrames;
 		int skipFrames;
 		int	onionValue;

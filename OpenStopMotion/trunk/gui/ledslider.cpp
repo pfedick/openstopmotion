@@ -4,6 +4,7 @@ LedSlider::LedSlider(QWidget *parent)
     : QWidget(parent)
 {
 	ui.setupUi(this);
+	ui.lineEdit->setText(QString::number(ui.slider->value()));
 }
 
 
@@ -12,14 +13,18 @@ LedSlider::~LedSlider()
 
 }
 
+
+void LedSlider::setColor(const ppl7::grafix::Color &c)
+{
+	ppl7::String s;
+	s.setf("background-color: rgb(%d,%d,%d);",c.red(),c.green(),c.blue());
+	ui.colorFrame->setStyleSheet(s);
+
+}
+
 void LedSlider::setName(const QString &name)
 {
 	ui.label->setText(name);
-}
-
-void LedSlider::setState(bool onOff)
-{
-	ui.onOff->setDown(onOff);
 }
 
 void LedSlider::setValue(int value)
@@ -33,10 +38,6 @@ int LedSlider::value() const
 	return ui.slider->value();
 }
 
-bool LedSlider::state() const
-{
-	return ui.onOff->isChecked();
-}
 
 void LedSlider::setId(int id)
 {
@@ -52,12 +53,7 @@ int LedSlider::id() const
 void LedSlider::on_slider_valueChanged ( int value )
 {
 	ui.lineEdit->setText(QString::number(value));
-	emit valueChanged(myId, ( ui.onOff->isChecked() ? ui.slider->value() : 0));
-}
-
-void LedSlider::on_onOff_clicked()
-{
-	emit valueChanged(myId, ( ui.onOff->isChecked() ? ui.slider->value() : 0));
+	emit valueChanged(myId, ui.slider->value());
 }
 
 void LedSlider::on_lineEdit_editingFinished()
@@ -67,7 +63,7 @@ void LedSlider::on_lineEdit_editingFinished()
 
 void LedSlider::on_setKey_clicked()
 {
-	emit keyFrameSet(myId,(ui.onOff->isChecked() ? ui.slider->value() : 0));
+	emit keyFrameSet(myId,ui.slider->value());
 }
 
 void LedSlider::on_delKey_clicked()

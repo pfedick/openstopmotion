@@ -75,6 +75,15 @@ void Config::load()
 	chromaKeyFG.setColor((ppluint32)settings.value("chromaKeyFG",0x00ff0000).toInt());
 
 	settings.endGroup();
+
+	settings.beginGroup("ledcontrol");
+	LedControlFile=settings.value("LedControlFile").toString();
+	ArduinoDevice=settings.value("ArduinoDevice","/dev/cuaU0").toString();
+	ArduinoBaudRate=settings.value("ArduinoBaudRate",57600).toInt();
+	settings.endGroup();
+
+
+
 }
 
 void Config::save()
@@ -122,6 +131,11 @@ void Config::save()
 	settings.setValue("chromaToleranceNearFG",chromaToleranceNearFG);
 	settings.setValue("chromaSpillRemoveFG",chromaSpillRemoveFG);
 	settings.setValue("chromaKeyFG",chromaKeyFG.rgb());
+	settings.endGroup();
 
+	settings.beginGroup("ledcontrol");
+	settings.setValue("LedControlFile",LedControlFile);
+	settings.setValue("ArduinoDevice",ArduinoDevice);
+	settings.setValue("ArduinoBaudRate",ArduinoBaudRate);
 	settings.endGroup();
 }

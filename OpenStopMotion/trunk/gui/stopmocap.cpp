@@ -834,6 +834,7 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 	ppl7::String Tmp;
 	Tmp.setf("%i",value);
 	arduino.setCounter(value);
+	if (ledcontrol) ledcontrol->setCurrentFrame(value);
 	ui.frameNum->setText(Tmp);
 	if (!inPlayback) return;
 	try {
@@ -894,6 +895,7 @@ void StopMoCap::on_frameRate_valueChanged(int value)
 		PlaybackTimer->stop();
 		PlaybackTimer->start(1000/value);
 	}
+	conf.frameRate=value;
 }
 
 void StopMoCap::on_previewButton_toggled ( bool checked )
