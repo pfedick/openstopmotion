@@ -181,18 +181,14 @@ ubuntu_write_control ()
                 echo "Architecture: $PLATFORM"
                 echo "Depends: $DEPENDS"
                 echo "Installed-Size: 1000"
-		echo "Checksums-Sha256:"
-		gen_checksum usr/bin/OpenStopMotion
-		gen_checksum usr/share/pixmaps/$PROGNAME.png
-		gen_checksum usr/share/applications/$PROGNAME.desktop
-		
                 echo "Description: $DESCRIPTION"
                 cat osm/README.TXT | while read line
-                do
+		do
                         if [ -z "$line" ] ; then
-                        	line="."
+                        	echo " ."
+                        else
+                        	echo "  $line"
                         fi
-                        echo " $line"
                 done
         ) > debian/control
 }
