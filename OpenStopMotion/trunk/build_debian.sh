@@ -42,13 +42,12 @@ check_package()
 gather_sources()
 {
 	CUR=`pwd`
-	cp ../build_debian.sh ./
 
 	if [ -d "$PPL7SOURCE" ] ; then
 		echo "INFO: Copy PPL7-sources from local directory: $PPL7SOURCE..."
 		create_dir "ppl7"
 		cd $PPL7SOURCE
-		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdmv "$CUR/ppl7"
+		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdm "$CUR/ppl7"
 		echo "INFO: done"
 	else
 		echo "INFO: checkout PPL7-sources from svn repository..."
@@ -64,7 +63,7 @@ gather_sources()
 		echo "INFO: Copy OpenStopMotion-sources from local directory: $OSMSOURCE..."
 		create_dir "osm"
 		cd $OSMSOURCE
-		find README.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdmv "$CUR/osm"
+		find README.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$CUR/osm"
                 echo "INFO: done"
         else
 		echo "INFO: checkout OpenStopMotion-sources from svn repository..."
@@ -128,11 +127,26 @@ build_osm ()
 	echo "INFO: building $PROGNAME done"
 }
 
+gen_checksum ()
+{
+	SUM=`sha256sum -b debian/$1 | awk '{print $1}'`
+	if [ $? -ne 0 ] ; then
+		echo "ERROR: Generating checksum failed: $SUM"
+		exit 1
+	fi
+	SIZE=`stat --format=%s debian/$1`
+	if [ $? -ne 0 ] ; then
+		echo "ERROR: stat failed: $SIZE"
+		exit 1
+	fi
+	echo " $SUM $SIZE $1"
+}
+
 ubuntu_write_control ()
 {
 	(
 		echo "Source: $PROGNAME"
-		echo "Section: misc"
+		echo "Section: video"
 		echo "Priority: optional"
 		echo "Maintainer: $MAINTAINER"
                 echo "Package: $PROGNAME"
@@ -141,11 +155,16 @@ ubuntu_write_control ()
                 echo "Architecture: $PLATFORM"
                 echo "Depends: $DEPENDS"
                 echo "Installed-Size: 1000"
+		echo "Checksums-Sha256:"
+		gen_checksum usr/bin/OpenStopMotion
+		gen_checksum usr/share/pixmaps/$PROGNAME.png
+		gen_checksum usr/share/applications/$PROGNAME.desktop
+		
                 echo "Description: $DESCRIPTION"
-                #cat osm/README.TXT | while read line
-                #do
-                #        echo " $line"
-                #done
+                cat osm/README.TXT | while read line
+                do
+                        echo " $line"
+                done
         ) > debian/control
 }
 
@@ -291,14 +310,19 @@ if [ "$MISSING" ] ; then
 fi
 echo "INFO: all required packages are installed"
 
+create_dir $DISTFILES
+
 if [ -f "OpenStopMotion.pro" ] ; then
 	#rm -rf tmp
 	create_dir "tmp"
 	cd tmp
 	gather_sources
+	create_dir "$PROGNAME-$VERSION"
+	find ppl7 osm | cpio -pdm "$PROGNAME-$VERSION"
+	cp ../build_debian.sh "$PROGNAME-$VERSION"
+	tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 "$PROGNAME-$VERSION"
 fi
 
-create_dir $DISTFILES
 CUR=`pwd`
 build_ppl7 $CUR
 cd $CUR
