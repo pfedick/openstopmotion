@@ -267,7 +267,7 @@ void LedControl::on_playbackTimer_fired()
 
 void LedControl::remindSave()
 {
-	int ret = QMessageBox::warning(this, tr("OpenStopMotion: LED-Control"),
+	int ret = QMessageBox::warning(NULL, tr("OpenStopMotion: LED-Control"),
 	                                tr("Light-values or keyframes have been modified.\n"
 	                                   "Do you want to save your changes?"),
 	                                QMessageBox::Save | QMessageBox::Discard
