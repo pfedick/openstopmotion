@@ -52,6 +52,7 @@ RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += gui
 INCLUDEPATH += src
+unix:INCLUDEPATH += ../include
 unix:INCLUDEPATH += /usr/local/include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib
