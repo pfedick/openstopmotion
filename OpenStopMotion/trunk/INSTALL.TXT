@@ -1,0 +1,168 @@
+OpenStopMotion Installation Instructions
+========================================
+
+In this file you find instructions on how to compile OpenStopMotion from
+source.
+
+Contents:
+  1. FreeBSD
+  2. Ubuntu / Debian
+  3. RedHat / CentOS
+  4. Automated compilation
+
+
+1. General
+==========
+
+
+2. FreeBSD
+==========
+
+OpenStopMotion runs smooth on FreeBSD 9. FreeBSD is also the main development
+platform for OpenStopMotion. It requires the webcamd daemon, which provides
+USB device drivers for hundreds of different USB based webcam and DVB USB
+devices. It is actualy a port of "Video4Linux" into userspace on FreeBSD.
+
+Install the following ports from the ports-collection:
+
+   multimedia/webcamd
+   lang/nasm
+   devel/pcre
+   graphics/png
+   graphics/jpeg
+   graphics/tiff
+   print/freetype
+   converters/libiconv
+   devel/qt4
+   
+Edit /etc/rc.conf to enable the webcamd daemon and start it:
+
+   echo "webcamd_enable=\"YES\"" >> /etc/rc.conf
+   /usr/local/etc/rc.d/webcamd start   
+
+
+Untar the source distribution:
+
+   tar -xjf OpenStopMotion-0.6.0-src.tar.bz2
+
+Build the ppl7-library:
+
+   cd OpenStopMotion-0.6.0
+   mkdir -p bin include lib
+   WORK=`pwd`
+   cd ppl7
+   ./configure --with-pcre=/usr/local --with-libiconv-prefix=/usr/local \
+               --with-nasm --with-jpeg --with-png --with-libtiff=/usr/local \
+               --prefix=$WORK
+   make install
+   cd ..
+   
+Build OpenStopMotion
+
+   PATH="$WORK/bin:$PATH"
+   export PATH
+   cd osm
+   qmake-qt4
+   make
+   
+After that, you can find the compiled binary in the release subdirectory,
+which is all you need. You could copy it to /usr/local/bin:
+
+  cp release/OpenStopMotion /usr/local/bin
+  
+
+
+3. Ubuntu / Debian
+==================
+
+Ubuntu is my secondary development platform for OpenStopMotion, so it should
+work without problems. It is developed and testet on Ubuntu 12.04 LTS, but
+it should work on older or newer versions, too.
+
+Install the following packages:
+
+   sudu apt-get install libpcre3-dev libjpeg-dev libpng12-dev libtiff4-dev \
+        libfreetype6-dev libbz2-dev zlib1g-dev libqt4-dev qt4-dev-tools \
+        qt4-qmake libqt4-opengl-dev nasm
+        
+Untar the source distribution:
+
+   tar -xjf OpenStopMotion-0.6.0-src.tar.bz2
+
+Build the ppl7-library:
+
+   cd OpenStopMotion-0.6.0
+   mkdir -p bin include lib
+   WORK=`pwd`
+   cd ppl7
+   ./configure --with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr \
+               --with-nasm --prefix=$WORK
+   make install
+   cd ..
+   
+Build OpenStopMotion
+
+   PATH="$WORK/bin:$PATH"
+   export PATH
+   cd osm
+   qmake-qt4
+   make
+   
+After that, you can find the compiled binary in the release subdirectory,
+which is all you need. You could copy it to /usr/bin:
+
+  cp release/OpenStopMotion /usr/bin 
+   
+   
+4. RedHat / CentOS
+==================
+
+Install the following packages:
+
+TODO!!!
+
+Untar the source distribution:
+
+   tar -xjf OpenStopMotion-0.6.0-src.tar.bz2
+
+Build the ppl7-library:
+
+   cd OpenStopMotion-0.6.0
+   mkdir -p bin include lib
+   WORK=`pwd`
+   cd ppl7
+   ./configure --with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr \
+               --with-nasm --prefix=$WORK
+   make install
+   cd ..
+   
+Build OpenStopMotion
+
+   PATH="$WORK/bin:$PATH"
+   export PATH
+   cd osm
+   qmake-qt4
+   make
+   
+After that, you can find the compiled binary in the release subdirectory,
+which is all you need. You could copy it to /usr/bin:
+
+  cp release/OpenStopMotion /usr/bin 
+
+
+5. Automated compilation
+========================
+
+For generating binary packages for different platforms in an automated way,
+I have written some scripts, which do all the work. The scrips are released
+in the source distribution. In theory, you unpack the sources and start
+the build script for your platform. If all goes well, you will find a
+binary package in the subfolder "distfiles".
+
+At this time, there is only one script:
+
+  - build_debian.sh       Ubuntu and Debian
+  
+   
+
+
