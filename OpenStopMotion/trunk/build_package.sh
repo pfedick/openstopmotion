@@ -218,7 +218,6 @@ build_debian ()
 	build_osm $CUR
 
 	cd $CUR
-	build_debian 
 
 	echo "INFO: Build Debian-Packet for $DISTRIB_ID $DISTRIB_RELEASE: $DISTRIB_CODENAME"
 	DISTNAME="$PROGNAME-$VERSION"
@@ -380,9 +379,9 @@ fi
 create_dir $DISTFILES
 
 create_dir "tmp"
-cd $WORK
 
 if [ -f "OpenStopMotion.pro" ] ; then
+	cd $WORK
 	gather_sources
 	if [ "$1" = "source" ] ; then
 		rm -rf $PROGNAME-$VERSION
@@ -398,7 +397,7 @@ if [ -f "OpenStopMotion.pro" ] ; then
 		tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 "$PROGNAME-$VERSION"
 	fi
 fi
-
+cd $WORK
 
 echo "Build $PROGNAME $VERSION for: $DISTRIB_ID $DISTRIB_RELEASE..."
 echo ""

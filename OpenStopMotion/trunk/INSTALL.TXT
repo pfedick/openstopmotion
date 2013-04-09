@@ -5,14 +5,23 @@ In this file you find instructions on how to compile OpenStopMotion from
 source.
 
 Contents:
-  1. FreeBSD
-  2. Ubuntu / Debian
-  3. RedHat / CentOS
-  4. Automated compilation
+  1. General
+  2. FreeBSD
+  3. Ubuntu / Debian
+  4. RedHat / CentOS
+  5. Automated compilation
 
 
 1. General
 ==========
+
+You need to download the source distribution from Sourceforge, which you
+can find here:
+
+    https://sourceforge.net/projects/openstopmotion/files/
+    
+The source distribution fille is called OpenStopMotion-0.6.0-src.tar.bz2
+
 
 
 2. FreeBSD
@@ -154,15 +163,16 @@ which is all you need. You could copy it to /usr/bin:
 ========================
 
 For generating binary packages for different platforms in an automated way,
-I have written some scripts, which do all the work. The scrips are released
+I have written a script, which does all the work. The script is released
 in the source distribution. In theory, you unpack the sources and start
-the build script for your platform. If all goes well, you will find a
-binary package in the subfolder "distfiles".
+the build script. It will detect your platform, and if all goes well, you
+will find a binary package in the subfolder "distfiles".
 
-At this time, there is only one script:
+At this time, the script supports Debian/Ubuntu, RedHat/CentOS and
+FreeBSD.
 
-  - build_debian.sh       Ubuntu and Debian
-  
-   
+The script is in the root directory of the source distribution and is
+called build_package.sh
+
 
 
