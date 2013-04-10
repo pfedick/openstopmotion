@@ -91,6 +91,7 @@ public slots:
 
 	void on_frameSlider_valueChanged(int value);
 
+	void on_clearButton_clicked();
 	void on_loadButton_clicked();
 	void on_saveButton_clicked();
 	void on_saveAsButton_clicked();

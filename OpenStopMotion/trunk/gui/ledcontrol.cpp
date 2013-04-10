@@ -204,6 +204,28 @@ void LedControl::on_offsetFrame_textChanged(const QString & text)
 }
 
 
+void LedControl::on_clearButton_clicked()
+{
+	if (unsaved) {
+		int ret = QMessageBox::warning(NULL, tr("OpenStopMotion: LED-Control"),
+		                                tr("Light-values or keyframes have been modified.\n"
+		                                   "Do you want to save your changes?"),
+		                                QMessageBox::Yes | QMessageBox::No
+		                                | QMessageBox::Cancel,
+		                                QMessageBox::Cancel);
+		if (ret==QMessageBox::Save) on_saveButton_clicked();
+		else if (ret==QMessageBox::Cancel) return;
+	}
+	Filename="";
+	unsaved=false;
+	for (int i=0;i<12;i++) {
+		keyframes[i].clear();
+		interpolatedframes[i].clear();
+		ui.frameview->update();
+	}
+}
+
+
 void LedControl::on_loadButton_clicked()
 {
 	if (unsaved) remindSave();
@@ -295,9 +317,9 @@ void LedControl::remindSave()
 	int ret = QMessageBox::warning(NULL, tr("OpenStopMotion: LED-Control"),
 	                                tr("Light-values or keyframes have been modified.\n"
 	                                   "Do you want to save your changes?"),
-	                                QMessageBox::Save | QMessageBox::Discard
+	                                QMessageBox::Yes | QMessageBox::No
 	                                | QMessageBox::Cancel,
-	                                QMessageBox::Save);
+	                                QMessageBox::Cancel);
 	if (ret==QMessageBox::Save) on_saveButton_clicked();
 }
 

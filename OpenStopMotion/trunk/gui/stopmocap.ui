@@ -395,26 +395,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="editScene">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="text">
-          <string>edit</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../resources.qrc">
-           <normaloff>:/icons/resources/gtk-color-picker.png</normaloff>:/icons/resources/gtk-color-picker.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>16</width>
-           <height>16</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="deleteScene">
          <property name="enabled">
           <bool>false</bool>

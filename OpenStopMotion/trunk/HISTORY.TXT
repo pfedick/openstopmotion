@@ -1,0 +1,12 @@
+OpenStopMotion Changelog
+========================
+
+0.6.1
+  - added clear-button in LED control
+  - removed edit-button on main screen
+  - wrote installation instructions
+  - refactured build-script
+
+0.6.0 2013-04-08
+  - First public release
+  - LED control with Arduino

@@ -52,7 +52,7 @@
 #define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
 #define STOPMOCAP_APPNAME		"OpenStopMotion"
 #define STOPMOCAP_COPYRIGHT		"(c) 2013 by Patrick Fedick"
-#define STOPMOCAP_VERSION		"0.6"
+#define STOPMOCAP_VERSION		"0.6.1"
 
 
 //#define USE_SCENEMANAGER
@@ -190,7 +190,7 @@ public slots:
     void on_replaceChromaWithTransparent_toggled(bool checked);
 
     void on_lightAndDarkButton_toggled(bool checked);
-    void on_editScene_clicked();
+    //void on_editScene_clicked();
 
 
 };

@@ -1280,7 +1280,7 @@ void StopMoCap::on_lightAndDarkButton_toggled(bool checked)
 
 }
 
-
+/*
 void StopMoCap::on_editScene_clicked()
 {
 	if (!fpaint) {
@@ -1295,6 +1295,7 @@ void StopMoCap::on_editScene_clicked()
 	fpaint->setDarkColorScheme(ui.lightAndDarkButton->isChecked());
 	fpaint->show();
 }
+*/
 
 void StopMoCap::on_arduinoButton_clicked()
 {
