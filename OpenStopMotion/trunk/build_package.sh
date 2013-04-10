@@ -28,6 +28,7 @@
 
 PROGNAME="OpenStopMotion"
 VERSION="0.6.0"
+REVISION="1"
 PPL7SOURCE=../../../ppl7
 OSMSOURCE=../
 PPL7REPO="http://svn.code.sf.net/p/pplib/code/lib/trunk"
@@ -277,6 +278,187 @@ build_debian ()
 
 }
 
+check_rpm_package ()
+{
+	PKG=$1
+	echo -n "$PKG: "
+	rpm -qa | grep $PKG >/dev/null 2>&1
+	if [ $? -ne 0 ] ; then
+		echo "no"
+		MISSING="$MISSING $PKG"
+	else
+		echo "ok"
+	fi
+}
+
+write_specfile ()
+{
+	(
+	echo "%define __spec_prep_post true"
+	echo "%define __spec_prep_pre true"
+	echo "%define __spec_build_post true"
+	echo "%define __spec_build_pre true"
+	echo "%define __spec_install_post true"
+	echo "%define __spec_install_pre true"
+	echo "%define __spec_clean_post true"
+	echo "%define __spec_clean_pre true"
+	echo "%define _binary_filedigest_algorithm 1"
+	echo "%define _binary_payload w9.gzdio"
+	echo ""
+	echo "Name: $PROGNAME"
+	echo "Version: $VERSION"
+	echo "Release: $REVISION"
+	echo "Summary: $DESCRIPTION"
+	echo "BuildArch: $ARCH"
+	echo "AutoReqProv: yes"
+	echo "BuildRoot: %buildroot"
+	echo ""
+	echo "Prefix: /"
+	echo ""
+	echo "Group: Applications/Multimedia"
+	echo "License: GPL3"
+	echo "Vendor: $MAINTAINER"
+	echo "URL: $HOMEPAGE"
+	echo "Packager: $MAINTAINER"
+	echo ""
+	echo "%description"
+	cat ../README.TXT
+	echo ""
+	echo "%prep"
+	echo "# noop"
+	echo ""
+	echo "%build"
+	echo "# noop"
+	echo ""
+	echo "%install"
+	echo "[ ! -d $BUILD/usr/bin ] && mkdir -p $BUILD/usr/bin"
+	echo "cp $WORK/package/usr/bin/$PROGNAME $BUILD/usr/bin/$PROGNAME"
+	echo "[ ! -d $BUILD/usr/share/pixmaps ] && mkdir -p $BUILD/usr/share/pixmaps"
+	echo "cp $WORK/package/usr/share/pixmaps/$PROGNAME.png $BUILD/usr/share/pixmaps/$PROGNAME.png"
+	echo "[ ! -d $BUILD/usr/share/applications ] && mkdir -p $BUILD/usr/share/applications"
+	echo "cp $WORK/package/usr/share/applications/$PROGNAME.desktop $BUILD/usr/share/applications/$PROGNAME.desktop"
+	echo ""
+	echo "%clean"
+	echo "# noop"
+	echo ""
+	echo "%files"
+	echo "%defattr(-,root,root,-)"
+	echo "/usr/bin/OpenStopMotion"
+	echo "/usr/share/pixmaps/OpenStopMotion.png"
+	echo "/usr/share/applications/OpenStopMotion.desktop"
+	echo ""
+	echo "%changelog"
+	) > $PROGNAME.spec
+}
+
+build_redhat ()
+{
+	if [ ! -f packages.checked ] ; then
+		#
+	        # Check Dependencies
+	        #
+	        MISSING=""
+	        echo "INFO: Checking dependency packages..."
+	        check_rpm_package "pcre-devel"
+	        check_rpm_package "libjpeg-devel"
+	        check_rpm_package "libpng-devel"
+	        check_rpm_package "libtiff-devel"
+	        check_rpm_package "freetype-devel"
+	        check_rpm_package "bzip2-devel"
+	        check_rpm_package "zlib-devel"
+	        check_rpm_package "qt-devel"
+	        check_rpm_package "nasm"
+	        check_rpm_package "subversion"
+	        check_rpm_package "rpm-devel"
+		if [ "$1" = "fpm" ] ; then
+		        check_rpm_package "ruby"
+		        check_rpm_package "ruby-devel"
+		        check_rpm_package "rubygems"
+		fi
+
+	        if [ "$MISSING" ] ; then
+	                echo "ERROR: Missing packages, please run the following command as root:"
+	                echo ""
+	                echo "   yum install $MISSING"
+			if [ "$1" = "fpm" ] ; then
+				fpm -h > /dev/null 2>&1
+				if [ $0 -ne 0 ] ; then
+		                	echo "   ruby install fpm"
+				fi
+			fi
+	                echo ""
+	                exit 1
+	        fi
+		if [ "$1" = "fpm" ] ; then
+		fpm -h > /dev/null 2>&1
+			if [ $0 -ne 0 ] ; then
+				echo "ERROR: fpm not installed, please run the following command as root:"
+		                echo ""
+		                echo "   ruby install fpm"
+		                echo ""
+				exit 1
+			fi
+		fi
+	
+		
+		touch packages.checked
+	fi
+        echo "INFO: all required packages are installed"
+
+	CUR=`pwd`
+        CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm"
+        build_ppl7 $CUR
+        cd $CUR
+        build_osm $CUR
+
+        cd $CUR
+
+        echo "INFO: Build rpm for $DISTRIB_ID $DISTRIB_RELEASE: $DISTRIB_CODENAME"
+
+	create_dir package
+	create_dir package/usr/bin
+	create_dir package/usr/share/applications
+	create_dir package/usr/share/pixmaps
+
+	(
+                echo "[Desktop Entry]"
+                echo "Encoding=UTF-8"
+                echo "Name=$PROGNAME"
+                echo "Comment=$DESCRIPTION"
+                echo "Exec=/usr/bin/$PROGNAME"
+                echo "Terminal=false"
+                echo "Type=Application"
+                echo "Categories=GTK;GNOME;AudioVideo;"
+                echo "Icon=/usr/share/pixmaps/$PROGNAME.png"
+        ) > package/usr/share/applications/$PROGNAME.desktop
+
+	cp osm/resources/icon256x256.png package/usr/share/pixmaps/$PROGNAME.png
+	cp bin/$PROGNAME package/usr/bin
+
+	if [ "$1" = "fpm" ] ; then
+	cd package
+		fpm -p $DISTFILES -t rpm -s dir -n $PROGNAME -v $VERSION \
+			--iteration $REVISION --url "$HOMEPAGE" \
+			--license "GPL3" --description "$DESCRIPTION" \
+			--category "Applications/Multimedia" \
+			--maintainer "$MAINTAINER" --vendor "$MAINTAINER" \
+			-e ./
+	
+		cd $WORK
+	else
+		create_dir build/BUILD
+		BUILD=`pwd`/build/BUILD
+		write_specfile
+		rpmbuild --buildroot=$BUILD --define "_rpmdir ."  -bb $PROGNAME.spec
+		if [ $? -ne 0 ] ; then
+			echo "ERROR: rpmbuild failed"
+			exit 1
+		fi
+		mv $ARCH/$PROGNAME* $DISTFILES
+	fi
+
+}
+
 freebsd_dep ()
 {
 	NAME=`pkg_info | grep "^$1-" | awk '{print $1}'`
@@ -409,6 +591,12 @@ elif [ "$DISTRIB_ID" = "Debian" ] ; then
 	build_debian
 elif [ "$DISTRIB_ID" = "FreeBSD" ] ; then
 	build_freebsd
+elif [ "$DISTRIB_ID" = "CentOS" ] ; then
+	build_redhat $1
+elif [ "$DISTRIB_ID" = "Fedora" ] ; then
+	build_redhat $1
+elif [ "$DISTRIB_ID" = "RedHat" ] ; then
+	build_redhat $1
 else
 	echo "ERROR: no automated build for this system"
 	echo "INFO: DISTRIB_ID=$DISTRIB_ID"
