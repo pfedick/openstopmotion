@@ -343,12 +343,28 @@ void StopMoCap::on_useDevice_clicked()
 
 	ui.captureButton->setFocus();
 	//grabFrame();
-	Timer->start(10);
+	startCapture();
 #ifdef USERENDERTHREAD
 	rthread.setImageSize(ui.viewer->width(),ui.viewer->height());
 	rthread.start();
 #endif
 }
+
+void StopMoCap::stopCapture()
+{
+	if (Timer->isActive()) Timer->stop();
+}
+
+void StopMoCap::startCapture()
+{
+	Timer->start(10);
+}
+
+bool StopMoCap::isCaptureActive()
+{
+	return Timer->isActive();
+}
+
 
 bool StopMoCap::eventFilter(QObject *target, QEvent *event)
 {
@@ -771,6 +787,7 @@ int StopMoCap::highestSceneFrame()
 
 void StopMoCap::on_undoButton_clicked()
 {
+	ui.captureButton->setFocus();
 	ppl7::String Tmp;
 	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
@@ -1302,9 +1319,10 @@ void StopMoCap::on_arduinoButton_clicked()
 {
 	if (!ledcontrol) {
 		ledcontrol=new LedControl();
+		ledcontrol->setMainCapture(this);
 		ledcontrol->setWindowFlags(Qt::Window);
-		ledcontrol->setConfig(conf);
 		ledcontrol->setArduino(arduino);
+		ledcontrol->setConfig(conf);
 		if (ui.lightAndDarkButton->isChecked()) ledcontrol->setColorScheme(1);
 		else ledcontrol->setColorScheme(0);
 	}

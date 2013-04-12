@@ -39,6 +39,8 @@
 #include "ledslider.h"
 #include "ui_ledcontrol.h"
 
+class StopMoCap;
+
 class LedControl : public QWidget
 {
     Q_OBJECT
@@ -47,6 +49,7 @@ public:
     LedControl(QWidget *parent = 0);
     ~LedControl();
 
+    void setMainCapture(StopMoCap *cap);
     void setConfig (Config &conf);
     void setArduino (Arduino &conf);
     void setColorScheme(int scheme);
@@ -62,6 +65,7 @@ protected:
 
 private:
     Ui::LedControlClass ui;
+    StopMoCap *cap;
     Config *conf;
     Arduino *arduino;
     LedSlider *slider[12];

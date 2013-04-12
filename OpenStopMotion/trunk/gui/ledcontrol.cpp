@@ -35,6 +35,7 @@
 LedControl::LedControl(QWidget *parent)
     : QWidget(parent)
 {
+	cap=NULL;
 	unsaved=false;
 	PlaybackTimer=new QTimer(this);
 	myColorScheme=0;
@@ -107,6 +108,7 @@ bool LedControl::eventFilter(QObject *obj, QEvent *event)
 void LedControl::setConfig (Config &conf)
 {
 	this->conf=&conf;
+	if (conf.LedControlFile.notEmpty()) load (conf.LedControlFile);
 }
 
 void LedControl::setArduino (Arduino &arduino)
@@ -133,6 +135,10 @@ void LedControl::setColorScheme(int scheme)
 	}
 }
 
+void LedControl::setMainCapture(StopMoCap *cap)
+{
+	this->cap=cap;
+}
 
 
 void LedControl::on_connectButton_clicked()
@@ -230,6 +236,11 @@ void LedControl::on_clearButton_clicked()
 void LedControl::on_loadButton_clicked()
 {
 	if (unsaved) remindSave();
+	bool active=false;
+	if (cap) active=cap->isCaptureActive();
+	if (active) cap->stopCapture();
+
+
 	ppl7::String Path=Filename;
 	if (Path.isEmpty()) Path=conf->LedControlFile;
 	if (Path.isEmpty()) Path=ppl7::Dir::currentPath();
@@ -245,6 +256,7 @@ void LedControl::on_loadButton_clicked()
 			DisplayException(e);
 		}
 	}
+	if (active) cap->startCapture();
 	unsaved=false;
 }
 
@@ -262,6 +274,10 @@ void LedControl::on_saveButton_clicked()
 
 void LedControl::on_saveAsButton_clicked()
 {
+	bool active=false;
+	if (cap) active=cap->isCaptureActive();
+	if (active) cap->stopCapture();
+
 	ppl7::String Path=Filename;
 	if (Path.isEmpty()) Path=ppl7::Dir::currentPath();
 	ppl7::String newfile = QFileDialog::getSaveFileName(this, tr("Save LED-Control data"),
@@ -276,6 +292,7 @@ void LedControl::on_saveAsButton_clicked()
 			DisplayException(e);
 		}
 	}
+	if (active) cap->startCapture();
 }
 
 void LedControl::on_frameNextButton_clicked()
@@ -315,6 +332,9 @@ void LedControl::on_playbackTimer_fired()
 
 void LedControl::remindSave()
 {
+	bool active=false;
+	if (cap) active=cap->isCaptureActive();
+	if (active) cap->stopCapture();
 	int ret = QMessageBox::warning(NULL, tr("OpenStopMotion: LED-Control"),
 	                                tr("Light-values or keyframes have been modified.\n"
 	                                   "Do you want to save your changes?"),
@@ -322,6 +342,7 @@ void LedControl::remindSave()
 	                                | QMessageBox::Cancel,
 	                                QMessageBox::Cancel);
 	if (ret==QMessageBox::Save) on_saveButton_clicked();
+	if (active) cap->startCapture();
 }
 
 void LedControl::load(const ppl7::String &filename)

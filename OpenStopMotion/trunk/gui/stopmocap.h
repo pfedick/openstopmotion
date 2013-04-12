@@ -114,6 +114,11 @@ private:
     void UpdateColorKeyFG(ppl7::grafix::Color c);
     void getSceneList(ppl7::Array &scenes);
 
+public:
+    void stopCapture();
+    void startCapture();
+    bool isCaptureActive();
+
 protected:
     void resizeEvent ( QResizeEvent * event );
     void showEvent (  QShowEvent * event );
