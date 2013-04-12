@@ -12,7 +12,8 @@ else {
     win32:TARGET = OpenStopMotion
     unix:TARGET = release/OpenStopMotion
 }
-HEADERS += src/FrameBuffer.h \
+HEADERS += include/osm.h \ 
+	src/FrameBuffer.h \
 	src/arduino.h \
 	gui/ledslider.h \
 	gui/ledcontrol.h \
@@ -53,6 +54,7 @@ RC_FILE = resource.rc
 INCLUDEPATH += gui
 INCLUDEPATH += src
 unix:INCLUDEPATH += ../include
+unix:INCLUDEPATH += include
 unix:INCLUDEPATH += /usr/local/include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib

@@ -20,7 +20,7 @@ can find here:
 
     https://sourceforge.net/projects/openstopmotion/files/
     
-The source distribution fille is called OpenStopMotion-0.6.0-src.tar.bz2
+The source distribution fille is called OpenStopMotion-0.6.1-src.tar.bz2
 
 
 
@@ -52,11 +52,11 @@ Edit /etc/rc.conf to enable the webcamd daemon and start it:
 
 Untar the source distribution:
 
-   tar -xjf OpenStopMotion-0.6.0-src.tar.bz2
+   tar -xjf OpenStopMotion-0.6.1-src.tar.bz2
 
 Build the ppl7-library:
 
-   cd OpenStopMotion-0.6.0
+   cd OpenStopMotion-0.6.1
    mkdir -p bin include lib
    WORK=`pwd`
    cd ppl7
@@ -96,11 +96,11 @@ Install the following packages:
         
 Untar the source distribution:
 
-   tar -xjf OpenStopMotion-0.6.0-src.tar.bz2
+   tar -xjf OpenStopMotion-0.6.1-src.tar.bz2
 
 Build the ppl7-library:
 
-   cd OpenStopMotion-0.6.0
+   cd OpenStopMotion-0.6.1
    mkdir -p bin include lib
    WORK=`pwd`
    cd ppl7
@@ -132,11 +132,11 @@ TODO!!!
 
 Untar the source distribution:
 
-   tar -xjf OpenStopMotion-0.6.0-src.tar.bz2
+   tar -xjf OpenStopMotion-0.6.1-src.tar.bz2
 
 Build the ppl7-library:
 
-   cd OpenStopMotion-0.6.0
+   cd OpenStopMotion-0.6.1
    mkdir -p bin include lib
    WORK=`pwd`
    cd ppl7

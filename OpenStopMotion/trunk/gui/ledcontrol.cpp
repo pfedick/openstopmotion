@@ -23,6 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "osm.h"
 #include "ledcontrol.h"
 #include "stopmocap.h"
 #include <QPainter>

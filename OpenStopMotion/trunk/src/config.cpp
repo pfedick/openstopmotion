@@ -29,6 +29,7 @@
 #include <ppl7-grafix.h>
 #include <QSettings>
 #include <QDesktopServices>
+#include "osm.h"
 #include "stopmocap.h"
 
 

@@ -48,13 +48,6 @@
 #include "ledcontrol.h"
 
 
-#define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
-#define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
-#define STOPMOCAP_APPNAME		"OpenStopMotion"
-#define STOPMOCAP_COPYRIGHT		"(c) 2013 by Patrick Fedick"
-#define STOPMOCAP_VERSION		"0.6.1"
-
-
 //#define USE_SCENEMANAGER
 
 void DisplayException(const ppl7::Exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());

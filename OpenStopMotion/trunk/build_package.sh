@@ -27,7 +27,7 @@
  
 
 PROGNAME="OpenStopMotion"
-VERSION="0.6.0"
+VERSION="0.6.1"
 REVISION="1"
 PPL7SOURCE=../../../ppl7
 OSMSOURCE=../
@@ -69,16 +69,18 @@ check_debian_package()
 gather_sources()
 {
 	CUR=`pwd`
+	TARGET=$1
 
 	if [ -d "$PPL7SOURCE" ] ; then
 		echo "INFO: Copy PPL7-sources from local directory: $PPL7SOURCE..."
-		create_dir "ppl7"
+		echo "INFO: Ziel: $TARGET/ppl7"
+		create_dir "$TARGET/ppl7"
 		cd $PPL7SOURCE
-		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdm "$CUR/ppl7"
+		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdm "$TARGET/ppl7" > /dev/null 2>&1
 		echo "INFO: done"
 	else
 		echo "INFO: checkout PPL7-sources from svn repository..."
-		svn checkout $PPL7REPO ppl7
+		svn checkout $PPL7REPO $TARGET/ppl7
 		if [ $? -ne 0 ] ; then
 			echo "ERROR: checkout failed"
 			exit 1
@@ -88,13 +90,14 @@ gather_sources()
 	cd $CUR
 	if [ -d "$OSMSOURCE" ] ; then
 		echo "INFO: Copy OpenStopMotion-sources from local directory: $OSMSOURCE..."
-		create_dir "osm"
+		echo "INFO: Ziel: $TARGET/osm"
+		create_dir "$TARGET/osm"
 		cd $OSMSOURCE
-		find *.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$CUR/osm"
-                echo "INFO: done"
-        else
+		find *.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
+        echo "INFO: done"
+    else
 		echo "INFO: checkout OpenStopMotion-sources from svn repository..."
-                svn checkout $OSMREPO osm
+                svn checkout $OSMREPO $TARGET/osm
                 if [ $? -ne 0 ] ; then
                         echo "ERROR: checkout failed"
                         exit 1
@@ -151,7 +154,7 @@ build_osm ()
                 echo "ERROR: make for $PROGNAME failed"
                 exit 1
         fi
-	cp release/OpenStopMotion $1/bin
+	cp release/OpenStopMotion $1/bin/$PROGNAME
 	echo "INFO: building $PROGNAME done"
 }
 
@@ -213,7 +216,7 @@ build_debian ()
 	echo "INFO: all required packages are installed"
 
 	CUR=`pwd`
-	CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm"
+	CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
 	build_ppl7 $CUR
 	cd $CUR
 	build_osm $CUR
@@ -240,7 +243,7 @@ build_debian ()
                 echo "Exec=/usr/bin/$PROGNAME"
                 echo "Terminal=false"
                 echo "Type=Application"
-                echo "Categories=GTK;GNOME;AudioVideo;"
+                echo "Categories=Qt;AudioVideo;"
                 echo "Icon=/usr/share/pixmaps/$PROGNAME.png"
         ) > debian/usr/share/applications/$PROGNAME.desktop
         (
@@ -406,7 +409,7 @@ build_redhat ()
         echo "INFO: all required packages are installed"
 
 	CUR=`pwd`
-        CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm"
+        CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
         build_ppl7 $CUR
         cd $CUR
         build_osm $CUR
@@ -513,10 +516,128 @@ build_freebsd ()
 	) > pkg_list
 	
 	pkg_create -v -d ../README.TXT -p package -f pkg_list -c "-$DESCRIPTION" $PROGNAME-$VERSION
-	cp $PROGNAME-$VERSION.tbz $DISTFILES/$DISTNAME.tbz
-	
-	
+	cp $PROGNAME-$VERSION.tbz $DISTFILES/$DISTNAME.tbz	
 }
+
+
+
+
+build_srpm() {
+	if [ ! -d ~.rpmmacros ] ; then
+		echo "Bereite RPM-Buildsystem vor..."
+		mkdir -p ~/rpmbuild/BUILD ~/rpmbuild/RPMS ~/rpmbuild/SOURCES ~/rpmbuild/SPECS ~/rpmbuild/SRPMS
+		if [ $? -ne 0 ] ; then
+			echo "Konnte RPM-Verzeichnisse nicht anlegen: ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}"
+			exit 1
+		fi
+		echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros
+	fi
+	cd $WORK
+	COMMENT=`cat ../README.TXT| grep -v "^===.*" `
+	(
+	echo "Name:		$PROGNAME"
+	echo "Version:	$VERSION"
+	echo "Release:	$REVISION"
+	echo "Summary:	$DESCRIPTION"
+	echo "Autoreq:  yes"
+	echo ""
+	echo "Group:		Applications/Multimedia"
+	echo "License:	GPL3"
+	echo "URL:		$HOMEPAGE"
+	echo "Source:	$PROGNAME-%{version}-src.tar.bz2"
+	echo "BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)"
+	echo ""
+	echo "BuildRequires:	gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
+	#echo "Requires: libgcc bzip2 zlib libjpeg libpng freetype libtiff libstdc++ qt glibc pcre"
+	echo ""	
+	echo "%description"
+	echo "$COMMENT"
+	echo ""
+	echo "%prep"
+	echo "%setup -q -n %{name}-%{version}"
+	echo ""
+	echo "%build"
+	echo "WORK=\`pwd\`"
+	echo "mkdir -p bin lib include"
+	echo "cd ppl7"
+	echo "./configure --prefix=\$WORK --with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
+	echo "make install"
+	echo "cd ../osm"
+	echo "PATH=\"\$WORK/bin:\$PATH\""
+	echo "$QMAKE"
+	echo "make -j2 release"
+	echo "cp release/OpenStopMotion \$WORK/bin/$PROGNAME"
+	echo ""
+	echo "%install"
+	echo "rm -rf \$RPM_BUILD_ROOT"
+	echo "mkdir -p \$RPM_BUILD_ROOT/usr/bin"
+	echo "mkdir -p \$RPM_BUILD_ROOT/usr/share/icons"
+	echo "mkdir -p \$RPM_BUILD_ROOT/usr/share/applications"
+	echo "cp bin/$PROGNAME \$RPM_BUILD_ROOT/usr/bin"
+	echo "cp osm/resources/icon256x256.png \$RPM_BUILD_ROOT/usr/share/icons/$PROGNAME.png"
+	echo ""
+	echo "# Desktop menu entry"
+	echo "cat > %{name}.desktop << EOF"
+	echo "[Desktop Entry]"
+	echo "Name=$PROGNAME"
+	echo "Comment=$DESCRIPTION"
+	echo "Exec=/usr/bin/$PROGNAME"
+	echo "Icon=/usr/share/pixmaps/$PROGNAME.png"
+	echo "Terminal=0"
+	echo "Type=Application"
+	echo "Categories=Qt;AudioVideo;"
+	echo "EOF"
+	echo ""
+	echo "desktop-file-install --vendor \"Patrick F.-Productions\" \\"
+  	echo "  --dir \$RPM_BUILD_ROOT/usr/share/applications \\"
+  	echo "  --add-category Qt \\"
+  	echo "  --add-category AudioVideo \\"
+  	echo "%{name}.desktop"
+  	echo ""
+	echo "%clean"
+	echo "rm -rf \$RPM_BUILD_ROOT"
+	echo ""
+	echo "%files"
+	echo "%defattr(-,root,root,-)"
+	echo "/usr/bin/*"
+	echo "/usr/share/icons/*"
+	echo "/usr/share/applications/*"
+	echo "%doc"
+	echo ""
+	echo "%changelog"
+	echo ""
+	) > $WORK/$PROGNAME.spec
+	
+	
+	
+	TOPDIR=`cat ~/.rpmmacros | grep "%_topdir" | grep -v grep | awk {'print $2'}`
+	if [ -z "$TOPDIR" ] ; then
+		echo "%_topdir ist nicht in ~/.rpmmacros vorhanden"
+		exit 1;
+	fi
+	if [ ! -d "$TOPDIR" ] ; then
+		echo "%_topdir ist nicht vorhanden: $TOPDIR"
+		exit 1
+	fi
+	if [ ! -d "$TOPDIR/SOURCES" ] ; then
+		echo "%_topdir/SOURCES ist nicht vorhanden: $TOPDIR/SOURCES"
+		exit 1
+	fi
+	cp $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 $TOPDIR/SOURCES
+	cd $WORK
+	rpmbuild -bs $PROGNAME.spec
+	if [ $? -ne 0 ] ; then
+		echo "Build fehlgeschlagen"
+		exit 1
+	fi
+	cp $TOPDIR/SRPMS/$PROGNAME-$VERSION-$REVISION.src.rpm $DISTFILES
+	
+	if [ -d "$TARGETPATH" ] ; then
+		cp $TOPDIR/SRPMS/$PROGNAME-$VERSION-$REVISION.src.rpm $TARGETPATH
+	fi 
+}
+
+
 
 
 #
@@ -560,23 +681,25 @@ fi
 
 create_dir $DISTFILES
 
+rm -rf tmp
 create_dir "tmp"
 
 if [ -f "OpenStopMotion.pro" ] ; then
 	cd $WORK
-	gather_sources
+	gather_sources $WORK
 	if [ "$1" = "source" ] ; then
 		rm -rf $PROGNAME-$VERSION
-		create_dir "$PROGNAME-$VERSION"
-		cd ppl7
-		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdm "$WORK/$PROGNAME-$VERSION/ppl7"
+		create_dir "$WORK/$PROGNAME-$VERSION"
+		gather_sources "$WORK/$PROGNAME-$VERSION"
 		cd $WORK
-		cd osm
-		find *.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$WORK/$PROGNAME-$VERSION/osm"
-		cd $WORK
-		cp ../build_debian.sh "$PROGNAME-$VERSION"
+		cp ../build_package.sh "$PROGNAME-$VERSION"
 		cp ../*.TXT "$PROGNAME-$VERSION"
-		tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 "$PROGNAME-$VERSION"
+		tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 --exclude .svn "$PROGNAME-$VERSION"
+		if [ -d "$TARGETPATH" ] ; then
+			cp $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 $TARGETPATH
+		fi 
+		build_srpm
+		exit 0
 	fi
 fi
 cd $WORK
