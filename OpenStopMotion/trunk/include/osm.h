@@ -1,10 +1,10 @@
 /*
  * This file is part of OpenStopMotion by Patrick Fedick
  *
- * $Author: pafe1234@gmail.com $
- * $Revision: 438 $
- * $Date: 2013-04-10 18:59:00 +0200 (Mi, 10 Apr 2013) $
- * $Id: stopmocap.h 438 2013-04-10 16:59:00Z pafe1234@gmail.com $
+ * $Author$
+ * $Revision$
+ * $Date$
+ * $Id$
  *
  *
  * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
