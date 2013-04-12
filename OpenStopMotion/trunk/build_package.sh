@@ -483,6 +483,7 @@ build_freebsd ()
 	cd $WORK
 	echo -n "Current Dir="
 	pwd
+	sleep 2
 	build_osm $WORK
 	cd $WORK
 	echo "INFO: Build FreeBSD-Packet for $DISTRIB_ID $DISTRIB_RELEASE"
@@ -733,8 +734,11 @@ elif [ "$DISTRIB_ID" = "RedHat" ] ; then
 else
 	echo "ERROR: no automated build for this system"
 	echo "INFO: DISTRIB_ID=$DISTRIB_ID"
+	exit 1
 fi
 
+
+exit 0
 
 
 
