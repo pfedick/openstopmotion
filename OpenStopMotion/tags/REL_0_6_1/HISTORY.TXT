@@ -1,0 +1,16 @@
+OpenStopMotion Changelog
+========================
+
+0.6.1 2013-04-12
+  - added clear-button in LED control
+  - removed edit-button on main screen
+  - wrote installation instructions
+  - refactured build-script
+  - extended build-script for building binary rpms on RedHat/Fedora/CentOS
+    and FreeBSD
+  - extended build-script to generate source-rpm
+  - removed dependency on libmcrypt
+
+0.6.0 2013-04-08
+  - First public release
+  - LED control with Arduino

@@ -1,0 +1,32 @@
+<RCC>
+  <qresource prefix="/translation"/>
+  <qresource prefix="/icons">
+    <file>resources/key_delete.png</file>
+    <file>resources/key_set.png</file>
+    <file>resources/weather-clear-night.png</file>
+    <file>resources/weather-clear.png</file>
+    <file>resources/color-line.png</file>
+    <file>resources/colorpicker.png</file>
+    <file>resources/gtk-color-picker.png</file>
+    <file>resources/ok.png</file>
+    <file>resources/camera-photo.png</file>
+    <file>resources/filenew.png</file>
+    <file>resources/icon48x48.png</file>
+    <file>resources/folder-open-20.png</file>
+    <file>resources/media-playback-pause.png</file>
+    <file>resources/media-playback-start.png</file>
+    <file>resources/media-playback-stop.png</file>
+    <file>resources/media-record.png</file>
+    <file>resources/media-seek-backward.png</file>
+    <file>resources/media-seek-forward.png</file>
+    <file>resources/media-skip-backward.png</file>
+    <file>resources/media-skip-forward.png</file>
+    <file>resources/trash-16.png</file>
+    <file>resources/filesave.png</file>
+    <file>resources/fileopen.png</file>
+    <file>resources/filesaveas.png</file>
+  </qresource>
+  <qresource prefix="/other">
+    <file>resources/arduino.png</file>
+  </qresource>
+</RCC>
