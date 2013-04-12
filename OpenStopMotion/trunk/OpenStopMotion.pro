@@ -26,6 +26,7 @@ HEADERS += include/osm.h \
     gui/ppl7imageviewer.h \
     src/device.h \
     src/config.h \
+    gui/arduinosketch.h \
     src/bluebox.h
 SOURCES += src/FrameBuffer.cpp \
 	src/arduino.cpp \
@@ -48,7 +49,8 @@ FORMS += gui/stopmocap.ui \
 	gui/ledcontrol.ui \
 	gui/framepaint.ui \
     gui/selectscene.ui \
-    gui/myslider.ui
+    gui/myslider.ui \
+    gui/arduinosketch.ui
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += gui

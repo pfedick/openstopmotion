@@ -104,6 +104,7 @@ public slots:
 	void on_frameBackButton_clicked();
 	void on_playButton_clicked();
 	void on_stopButton_clicked();
+	void on_arduinoButton_clicked();
 
 	void on_playbackTimer_fired();
 

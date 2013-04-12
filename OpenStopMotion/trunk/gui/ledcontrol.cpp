@@ -30,6 +30,7 @@
 #include <QImage>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "arduinosketch.h"
 
 
 LedControl::LedControl(QWidget *parent)
@@ -329,6 +330,15 @@ void LedControl::on_playbackTimer_fired()
 	frame++;
 	if (frame<ui.frameSlider->maximum()) ui.frameSlider->setValue(frame);
 }
+
+void LedControl::on_arduinoButton_clicked()
+{
+	ArduinoSketch sketch(this);
+	sketch.show();
+	sketch.exec();
+	//:/other/arduino_ledcontrol/arduino_ledcontrol.ino
+}
+
 
 void LedControl::remindSave()
 {

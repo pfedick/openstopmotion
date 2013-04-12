@@ -7,6 +7,9 @@ OpenStopMotion Changelog
   - when opening load or save dialog in led control, capture from
     webcam is suspended
   - last ledcontrol savefile is automatically loaded on next start
+  - added Arduino sketch for led control
+  - Arduino sketch is shown when pressing the Arduino-button on led
+    control page
   
 0.6.1 2013-04-12
   - added clear-button in LED control
