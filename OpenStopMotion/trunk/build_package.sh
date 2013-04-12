@@ -27,7 +27,7 @@
  
 
 PROGNAME="OpenStopMotion"
-VERSION="0.6.1"
+VERSION="0.6.2"
 REVISION="1"
 PPL7SOURCE=../../../ppl7
 OSMSOURCE=../
@@ -93,7 +93,7 @@ gather_sources()
 		echo "INFO: Ziel: $TARGET/osm"
 		create_dir "$TARGET/osm"
 		cd $OSMSOURCE
-		find *.TXT OpenStopMotion.pro gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
+		find *.TXT OpenStopMotion.pro include gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
         echo "INFO: done"
     else
 		echo "INFO: checkout OpenStopMotion-sources from svn repository..."

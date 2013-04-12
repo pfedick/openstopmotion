@@ -1,6 +1,9 @@
 OpenStopMotion Changelog
 ========================
 
+0.6.2 2013-04-12
+  - Fixed missing directory in source distribution 
+  
 0.6.1 2013-04-12
   - added clear-button in LED control
   - removed edit-button on main screen
