@@ -29,12 +29,13 @@
 PROGNAME="OpenStopMotion"
 VERSION="0.6.2"
 REVISION="1"
-PPL7SOURCE=../../../ppl7
-OSMSOURCE=../
+PPL7SOURCE=../../ppl7
+OSMSOURCE=./
 PPL7REPO="http://svn.code.sf.net/p/pplib/code/lib/trunk"
 OSMREPO="https://openstopmotion.googlecode.com/svn/OpenStopMotion/trunk"
 OSMDIR="$PROGNAME-$VERSION"
 WORK=`pwd`/tmp
+CUR=`pwd`
 DISTFILES=`pwd`/distfiles
 DESCRIPTION="Webcam capture program for creating stopmotion video"
 HOMEPAGE="http://www.pfp.de/"
@@ -68,9 +69,9 @@ check_debian_package()
 
 gather_sources()
 {
-	CUR=`pwd`
+	
 	TARGET=$1
-
+	cd $CUR
 	if [ -d "$PPL7SOURCE" ] ; then
 		echo "INFO: Copy PPL7-sources from local directory: $PPL7SOURCE..."
 		echo "INFO: Ziel: $TARGET/ppl7"
@@ -132,7 +133,9 @@ build_ppl7 ()
 		echo "ERROR: make install for ppl7 failed"
 		exit 1
 	fi
+	cd ..
 	echo "INFO: building ppl7 done"
+	sleep 2
 }
 
 build_osm ()
@@ -141,15 +144,16 @@ build_osm ()
 	create_dir $1/bin
 	PATH="$1/bin:$PATH"
 	export PATH
-	#
 	echo "PATH=$PATH"
 	cd osm
+	echo "INFO: calling $QMAKE"
 	$QMAKE
 	if [ $? -ne 0 ] ; then
                 echo "ERROR: qmake for $PROGNAME failed"
                 exit 1
         fi
-	$MAKE -j2 release
+    echo "INFO: calling $MAKE in `pwd`"
+	$MAKE
 	if [ $? -ne 0 ] ; then
                 echo "ERROR: make for $PROGNAME failed"
                 exit 1
@@ -215,13 +219,13 @@ build_debian ()
 	fi
 	echo "INFO: all required packages are installed"
 
-	CUR=`pwd`
-	CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
-	build_ppl7 $CUR
 	cd $CUR
-	build_osm $CUR
 
+	CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
+	build_ppl7 $WORK
 	cd $CUR
+	build_osm $WORK
+	cd $WORK
 
 	echo "INFO: Build Debian-Packet for $DISTRIB_ID $DISTRIB_RELEASE: $DISTRIB_CODENAME"
 	DISTNAME="$PROGNAME-$VERSION"
@@ -473,9 +477,12 @@ freebsd_dep ()
 
 build_freebsd ()
 {
-	CONFIGURE="--with-pcre=/usr/local --with-libiconv-prefix=/usr/local --with-nasm --with-jpeg --with-png --with-libtiff=/usr/local" 
+	CONFIGURE="--with-pcre=/usr/local --with-libiconv-prefix=/usr/local --with-nasm --with-jpeg --with-png --with-libtiff=/usr/local"
+	cd $WORK 
     build_ppl7 $WORK
 	cd $WORK
+	echo -n "Current Dir="
+	pwd
 	build_osm $WORK
 	cd $WORK
 	echo "INFO: Build FreeBSD-Packet for $DISTRIB_ID $DISTRIB_RELEASE"
@@ -681,11 +688,12 @@ fi
 
 create_dir $DISTFILES
 
-rm -rf tmp
-create_dir "tmp"
-
+	
 if [ -f "OpenStopMotion.pro" ] ; then
-	cd $WORK
+	cd $CUR
+	#rm -rf $WORK
+	create_dir $WORK
+	
 	gather_sources $WORK
 	if [ "$1" = "source" ] ; then
 		rm -rf $PROGNAME-$VERSION
@@ -702,6 +710,7 @@ if [ -f "OpenStopMotion.pro" ] ; then
 		exit 0
 	fi
 fi
+WORK=$CUR
 cd $WORK
 
 echo "Build $PROGNAME $VERSION for: $DISTRIB_ID $DISTRIB_RELEASE..."
@@ -713,6 +722,7 @@ if [ "$DISTRIB_ID" = "Ubuntu" ] ; then
 elif [ "$DISTRIB_ID" = "Debian" ] ; then
 	build_debian
 elif [ "$DISTRIB_ID" = "FreeBSD" ] ; then
+    WORK=$CUR/tmp
 	build_freebsd
 elif [ "$DISTRIB_ID" = "CentOS" ] ; then
 	build_redhat $1
