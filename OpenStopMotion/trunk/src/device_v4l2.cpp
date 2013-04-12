@@ -555,7 +555,7 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						/* fall through */
 
 					default:
-						throw ReadError();
+						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
 				}
 			}
 			processImage(buffers[0].start, buffers[0].length, img);
@@ -578,7 +578,7 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						/* fall through */
 
 					default:
-						throw ReadError();
+						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
 				}
 			}
 			if (buf.index>=n_buffers) throw BufferError();
@@ -605,7 +605,7 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						/* fall through */
 
 					default:
-						throw ReadError();
+						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
 				}
 			}
 
