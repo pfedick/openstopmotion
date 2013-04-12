@@ -109,7 +109,11 @@ bool LedControl::eventFilter(QObject *obj, QEvent *event)
 void LedControl::setConfig (Config &conf)
 {
 	this->conf=&conf;
-	if (conf.LedControlFile.notEmpty()) load (conf.LedControlFile);
+	if (conf.LedControlFile.notEmpty()) {
+		load (conf.LedControlFile);
+		Filename=conf.LedControlFile;
+		unsaved=false;
+	}
 }
 
 void LedControl::setArduino (Arduino &arduino)
