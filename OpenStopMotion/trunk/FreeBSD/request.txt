@@ -5,13 +5,15 @@ Release: 9.1-STABLE
 Environment: FreeBSD server.pfp.de 9.1-STABLE FreeBSD 9.1-STABLE #0 r248870: Sun Mar 31 08:45:15 CEST 2013     root@server.pfp.de:/usr/obj/usr/src/sys/GENERIC  amd64
 Full Description: 
 
-I'm author of the stop motion capture tool OpenStopMotion, which I developed on FreeBSD and Linux. I would like to add it to the FreeBSD ports collection.
+Hello,
+
+I'm author of the program OpenStopMotion, which I developed on FreeBSD and Linux. I would like to add it to the FreeBSD ports collection.
 
 OpenStopMotion is a capture program for creating stopmotion video clips. It
 runs on Linux and FreeBSD and it can capture from all webcams supported by
 the system. It's license is GPLv3.
 
-This is my first port, so I hope I have done everything right. At least it builds and portlint -A does not show me any errors :-)
+This is my first port, so I hope I have done everything right. At least it builds with all dependencies on my workstation and a fresh installed FreeBSD 9.1, and "portlint -A" does not show me any errors :-)
 
 Thanks and best regards,
 Patrick Fedick
