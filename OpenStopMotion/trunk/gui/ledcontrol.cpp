@@ -317,6 +317,56 @@ void LedControl::on_frameBackButton_clicked()
 
 }
 
+int LedControl::findNextKeyFrame(int led, int start)
+{
+	ppl7::AVLTree<int, int>::Iterator it;
+	keyframes[led].reset(it);
+	int nextframe;
+	while (keyframes[led].getNext(it)) {
+		nextframe=it.key();
+		if (nextframe>start) return nextframe;
+	}
+	return start;
+}
+
+int LedControl::findPreviousKeyFrame(int led, int start)
+{
+	ppl7::AVLTree<int, int>::Iterator it;
+	keyframes[led].reset(it);
+	int nextframe=start;
+	while (keyframes[led].getPrevious(it)) {
+		nextframe=it.key();
+		if (nextframe<start) return nextframe;
+	}
+	return start;
+}
+
+
+void LedControl::on_keyNextButton_clicked()
+{
+	PlaybackTimer->stop();
+	int frame=ui.frameSlider->value();
+	// find next keyframe
+	int nextframe=ui.frameSlider->maximum();
+	for (int i=0;i<12;i++) {
+		int f=findNextKeyFrame(i,frame);
+		if (f<nextframe && f>frame) nextframe=f;
+	}
+	if (nextframe<ui.frameSlider->maximum()) ui.frameSlider->setValue(nextframe);
+}
+
+void LedControl::on_keyBackButton_clicked()
+{
+	PlaybackTimer->stop();
+	int frame=ui.frameSlider->value();
+	int nextframe=0;
+	for (int i=0;i<12;i++) {
+		int f=findPreviousKeyFrame(i,frame);
+		if (f>nextframe && f<frame) nextframe=f;
+	}
+	if (nextframe>=0) ui.frameSlider->setValue(nextframe);
+}
+
 void LedControl::on_playButton_clicked()
 {
 	PlaybackTimer->start(1000/conf->frameRate);
@@ -463,8 +513,9 @@ void LedControl::recalcFrames(int id)
 		frame=nextframe;
 		value=nextvalue;
 	}
-
-
+	for (int i=frame+1;i<ui.maxFrame->text().toInt();i++) {
+		interpolatedframes[id].add(i,nextvalue);
+	}
 
 }
 

@@ -64,7 +64,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 	connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
 
-
+	//DeviceCheckTimer->start(5000);
 	ui.captureDir->setText(conf.CaptureDir);
 	ui.sceneName->setText(conf.Scene);
 	on_sceneName_editingFinished();
@@ -221,8 +221,8 @@ StopMoCap::~StopMoCap()
 	conf.save();
 	cam.close();
 	delete Timer;
-
 }
+
 
 
 void StopMoCap::on_deviceComboBox_currentIndexChanged(int index)
@@ -461,6 +461,11 @@ void StopMoCap::grabFrame()
 				grabImg.bltBlend(lastFrame,blendFactor);
 			}
 		}
+	} catch (Device::QueryBufFailed) {
+		cam.close();
+		stopCapture();
+	} catch (const ppl7::Exception &e) {
+		e.print();
 	} catch (...) {
 
 	}

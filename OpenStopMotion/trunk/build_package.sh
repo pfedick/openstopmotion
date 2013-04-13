@@ -27,7 +27,7 @@
  
 
 PROGNAME="OpenStopMotion"
-VERSION="0.6.2"
+VERSION="0.6.3"
 REVISION="1"
 PPL7SOURCE=../../ppl7
 OSMSOURCE=./
