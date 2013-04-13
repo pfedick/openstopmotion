@@ -706,7 +706,13 @@ if [ -f "OpenStopMotion.pro" ] ; then
 		tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 --exclude .svn "$PROGNAME-$VERSION"
 		if [ -d "$TARGETPATH" ] ; then
 			cp $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 $TARGETPATH
-		fi 
+		fi
+		if [ `uname` = "FreeBSD" ] ; then
+			cd $CUR
+			cd FreeBSD/openstopmotion; make clean; cd ..
+			shar `find openstopmotion | grep -v ".svn" `| sed "s/^XPORTVERSION=.*$/XPORTVERSION= $VERSION/" > $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar
+			cd $WORK
+		fi
 		build_srpm
 		exit 0
 	fi

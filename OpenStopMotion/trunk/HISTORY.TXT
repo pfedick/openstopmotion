@@ -4,6 +4,7 @@ OpenStopMotion Changelog
 0.6.3 2013-04-13
   - fixed initialisation of correct light value after the last keyframe
   - new control buttons in ledcontrol: next keyframe and previos keyframe
+  - "build_package source" now builds FreeBSD-Port
 
 0.6.2 2013-04-12
   - Fixed missing directory in source distribution 
