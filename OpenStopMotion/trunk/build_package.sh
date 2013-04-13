@@ -708,9 +708,15 @@ if [ -f "OpenStopMotion.pro" ] ; then
 			cp $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 $TARGETPATH
 		fi
 		if [ `uname` = "FreeBSD" ] ; then
-			cd $CUR
-			cd FreeBSD/openstopmotion; make clean; cd ..
+			cd $DISTFILES
+			sha256 $PROGNAME-$VERSION-src.tar.bz2 > $CUR/FreeBSD/openstopmotion/distinfo
+			echo "SIZE ($PROGNAME-$VERSION-src.tar.bz2) = `stat -f \"%z\" $PROGNAME-$VERSION-src.tar.bz2`" >> $CUR/FreeBSD/openstopmotion/distinfo
+			cd $CUR/FreeBSD/openstopmotion; make clean;
+			cd ..
 			shar `find openstopmotion | grep -v ".svn" `| sed "s/^XPORTVERSION=.*$/XPORTVERSION= $VERSION/" > $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar
+			if [ -d "$TARGETPATH" ] ; then
+				cp $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar $TARGETPATH
+			fi
 			cd $WORK
 		fi
 		build_srpm
