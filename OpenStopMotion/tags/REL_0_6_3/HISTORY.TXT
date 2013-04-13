@@ -1,0 +1,31 @@
+OpenStopMotion Changelog
+========================
+
+0.6.3 2013-04-13
+  - fixed initialisation of correct light value after the last keyframe
+  - new control buttons in ledcontrol: next keyframe and previos keyframe
+  - "build_package source" now builds FreeBSD-Port
+
+0.6.2 2013-04-12
+  - Fixed missing directory in source distribution 
+  - after clicking undo button, capture button gets focus
+  - when opening load or save dialog in led control, capture from
+    webcam is suspended
+  - last ledcontrol savefile is automatically loaded on next start
+  - added Arduino sketch for led control
+  - Arduino sketch is shown when pressing the Arduino-button on led
+    control page
+  
+0.6.1 2013-04-12
+  - added clear-button in LED control
+  - removed edit-button on main screen
+  - wrote installation instructions
+  - refactured build-script
+  - extended build-script for building binary rpms on RedHat/Fedora/CentOS
+    and FreeBSD
+  - extended build-script to generate source-rpm
+  - removed dependency on libmcrypt
+
+0.6.0 2013-04-08
+  - First public release
+  - LED control with Arduino
