@@ -27,7 +27,7 @@
  
 
 PROGNAME="OpenStopMotion"
-VERSION="0.6.3"
+VERSION="0.6.4"
 REVISION="1"
 PPL7SOURCE=../../ppl7
 OSMSOURCE=./
@@ -555,7 +555,7 @@ build_srpm() {
 	echo "Source:	$PROGNAME-%{version}-src.tar.bz2"
 	echo "BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)"
 	echo ""
-	echo "BuildRequires:	gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
+	echo "BuildRequires:	desktop-file-utils, gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
 	#echo "Requires: libgcc bzip2 zlib libjpeg libpng freetype libtiff libstdc++ qt glibc pcre"
 	echo ""	
 	echo "%description"
@@ -616,6 +616,8 @@ build_srpm() {
 	echo ""
 	) > $WORK/$PROGNAME.spec
 	
+	cp $WORK/$PROGNAME.spec $DISTFILES/$PROGNAME-$VERSION.spec
+	
 	
 	
 	TOPDIR=`cat ~/.rpmmacros | grep "%_topdir" | grep -v grep | awk {'print $2'}`
@@ -642,6 +644,7 @@ build_srpm() {
 	
 	if [ -d "$TARGETPATH" ] ; then
 		cp $TOPDIR/SRPMS/$PROGNAME-$VERSION-$REVISION.src.rpm $TARGETPATH
+		cp $DISTFILES/$PROGNAME-$VERSION.spec $TARGETPATH
 	fi 
 }
 

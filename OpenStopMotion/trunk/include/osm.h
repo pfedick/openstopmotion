@@ -31,7 +31,7 @@
 #define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
 #define STOPMOCAP_APPNAME		"OpenStopMotion"
 #define STOPMOCAP_COPYRIGHT		"(c) 2013 by Patrick Fedick"
-#define STOPMOCAP_VERSION		"0.6.3"
+#define STOPMOCAP_VERSION		"0.6.4"
 
 
 
