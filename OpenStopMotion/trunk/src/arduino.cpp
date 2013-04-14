@@ -26,6 +26,7 @@
 #include "arduino.h"
 #include <stdio.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <termios.h>  /* POSIX terminal control definitions */
 #include <errno.h>
 

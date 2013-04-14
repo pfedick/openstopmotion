@@ -1,5 +1,7 @@
 OpenStopMotion Changelog
 ========================
+0.6.4
+  - added missing header include in arduino.cpp
 
 0.6.3 2013-04-13
   - fixed initialisation of correct light value after the last keyframe
