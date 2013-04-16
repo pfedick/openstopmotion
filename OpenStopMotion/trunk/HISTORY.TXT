@@ -1,5 +1,8 @@
 OpenStopMotion Changelog
 ========================
+0.6.5
+  - build_package.sh works on openSUSE
+  
 0.6.4 2013-04-14
   - added missing header include in arduino.cpp, fixed compiler error on
     Fedora

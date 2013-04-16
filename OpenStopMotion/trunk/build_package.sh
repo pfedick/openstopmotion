@@ -72,6 +72,7 @@ gather_sources()
 	
 	TARGET=$1
 	cd $CUR
+	PPL7DIR=$TARGET/ppl7
 	if [ -d "$PPL7SOURCE" ] ; then
 		echo "INFO: Copy PPL7-sources from local directory: $PPL7SOURCE..."
 		echo "INFO: Ziel: $TARGET/ppl7"
@@ -89,6 +90,7 @@ gather_sources()
 		echo "INFO: done"
 	fi
 	cd $CUR
+	OSMDIR=$TARGET/osm
 	if [ -d "$OSMSOURCE" ] ; then
 		echo "INFO: Copy OpenStopMotion-sources from local directory: $OSMSOURCE..."
 		echo "INFO: Ziel: $TARGET/osm"
@@ -114,7 +116,7 @@ build_ppl7 ()
 	create_dir $1/bin
 	create_dir $1/lib
 	create_dir $1/include
-	cd ppl7
+	cd $PPL7DIR
 	if [ ! -f Makefile ] ; then
 		echo "INFO: Configuring ppl7..."
 		./configure --prefix=$1 $CONFIGURE
@@ -145,7 +147,7 @@ build_osm ()
 	PATH="$1/bin:$PATH"
 	export PATH
 	echo "PATH=$PATH"
-	cd osm
+	cd $OSMDIR
 	echo "INFO: calling $QMAKE"
 	$QMAKE
 	if [ $? -ne 0 ] ; then
@@ -298,6 +300,23 @@ check_rpm_package ()
 	fi
 }
 
+write_desktop_application ()
+{
+	PREFIX=$1
+	FILE=$2
+	(
+                echo "[Desktop Entry]"
+                echo "Encoding=UTF-8"
+                echo "Name=$PROGNAME"
+                echo "Comment=$DESCRIPTION"
+                echo "Exec=$PREFIX/bin/$PROGNAME"
+                echo "Terminal=false"
+                echo "Type=Application"
+                echo "Categories=GTK;GNOME;AudioVideo;"
+                echo "Icon=$PREFIX/share/pixmaps/$PROGNAME.png"
+        ) > $FILE
+}
+
 write_specfile ()
 {
 	(
@@ -426,18 +445,7 @@ build_redhat ()
 	create_dir package/usr/bin
 	create_dir package/usr/share/applications
 	create_dir package/usr/share/pixmaps
-
-	(
-                echo "[Desktop Entry]"
-                echo "Encoding=UTF-8"
-                echo "Name=$PROGNAME"
-                echo "Comment=$DESCRIPTION"
-                echo "Exec=/usr/bin/$PROGNAME"
-                echo "Terminal=false"
-                echo "Type=Application"
-                echo "Categories=GTK;GNOME;AudioVideo;"
-                echo "Icon=/usr/share/pixmaps/$PROGNAME.png"
-        ) > package/usr/share/applications/$PROGNAME.desktop
+	write_desktop_application "/usr" package/usr/share/applications/$PROGNAME.desktop
 
 	cp osm/resources/icon256x256.png package/usr/share/pixmaps/$PROGNAME.png
 	cp bin/$PROGNAME package/usr/bin
@@ -464,6 +472,64 @@ build_redhat ()
 		mv $ARCH/$PROGNAME* $DISTFILES
 	fi
 
+}
+
+build_suse ()
+{
+	if [ ! -f packages.checked ] ; then
+		#
+	        # Check Dependencies
+	        #
+	        MISSING=""
+	        echo "INFO: Checking dependency packages..."
+	        check_rpm_package "pcre-devel"
+	        check_rpm_package "libjpeg8-devel"
+	        check_rpm_package "libpng15-devel"
+	        check_rpm_package "libtiff-devel"
+	        check_rpm_package "freetype-devel"
+	        check_rpm_package "libbz2-devel"
+	        check_rpm_package "zlib-devel"
+	        check_rpm_package "libqt4-devel"
+	        check_rpm_package "nasm"
+	        check_rpm_package "subversion"
+	        check_rpm_package "rpm-devel"
+	        if [ "$MISSING" ] ; then
+	                echo "ERROR: Missing packages, please run the following command as root:"
+	                echo "   sudo zypper install $MISSING"
+			exit 1
+		fi
+		touch packages.checked
+	fi
+        echo "INFO: all required packages are installed"
+
+        cd $WORK
+	echo "WORK=$WORK"
+        CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
+        build_ppl7 $WORK
+        cd $WORK
+        build_osm $WORK
+        cd $WORK
+
+        echo "INFO: Build rpm for $DISTRIB_ID $DISTRIB_RELEASE: $DISTRIB_CODENAME"
+	create_dir package
+	create_dir package/usr/bin
+	create_dir package/usr/share/applications
+	create_dir package/usr/share/pixmaps
+	write_desktop_application "/usr" package/usr/share/applications/$PROGNAME.desktop
+	cp $OSMDIR/resources/icon256x256.png package/usr/share/pixmaps/$PROGNAME.png
+	cp bin/$PROGNAME package/usr/bin
+	create_dir build/BUILD
+	BUILD=`pwd`/build/BUILD
+	write_specfile
+	rpmbuild --buildroot=$BUILD --define "_rpmdir ."  -bb $PROGNAME.spec
+	if [ $? -ne 0 ] ; then
+		echo "ERROR: rpmbuild failed"
+		exit 1
+	fi
+	mv $ARCH/$PROGNAME-$VERSION-$REVISION.`uname -m`.rpm  $DISTFILES
+	if [ -d "$TARGETPATH" ] ; then
+		cp $DISTFILES/$PROGNAME-$VERSION-$REVISION.`uname -m`.rpm $TARGETPATH
+	fi
 }
 
 freebsd_dep ()
@@ -659,6 +725,10 @@ if [ -f /etc/lsb-release ] ; then
 elif [ -f /etc/system-release ] ; then
 	DISTRIB_ID=`cat /etc/system-release | awk '{print $1}'`
 	DISTRIB_RELEASE=`cat /etc/system-release | awk '{print $3}'`
+elif [ -f /etc/SuSE-release ] ; then
+	DISTRIB_ID=`head -n1 /etc/SuSE-release | awk '{print $1}'`
+	DISTRIB_RELEASE=`head -n1 /etc/SuSE-release | awk '{print $2}'`
+	QMAKE=qmake
 else
 	DISTRIB_ID=`uname -s`
 	DISTRIB_RELEASE=`uname -r`
@@ -726,8 +796,10 @@ if [ -f "OpenStopMotion.pro" ] ; then
 		exit 0
 	fi
 fi
-WORK=$CUR
-cd $WORK
+if [ ! -f $CUR/OpenStopMotion.pro ] ; then
+	WORK=$CUR
+	cd $WORK
+fi
 
 echo "Build $PROGNAME $VERSION for: $DISTRIB_ID $DISTRIB_RELEASE..."
 echo ""
@@ -746,6 +818,8 @@ elif [ "$DISTRIB_ID" = "Fedora" ] ; then
 	build_redhat $1
 elif [ "$DISTRIB_ID" = "RedHat" ] ; then
 	build_redhat $1
+elif [ "$DISTRIB_ID" = "openSUSE" ] ; then
+	build_suse $1
 else
 	echo "ERROR: no automated build for this system"
 	echo "INFO: DISTRIB_ID=$DISTRIB_ID"
