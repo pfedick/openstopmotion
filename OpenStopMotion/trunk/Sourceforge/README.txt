@@ -15,14 +15,15 @@ formats:
     dependency ppl7 in the format of a source rpm for linux. You
     can build a binary rpm for you system by calling
     
-       rpmbuild --rebuild OpenStopMotion-0.6.3-1.src.rpm
+       rpmbuild --rebuild OpenStopMotion-0.6.4-1.src.rpm
        
     After that, you will find the binary package here:
     
        cd ~/rpmbuild/RPMS/`uname -m`/
     
 
-There are also precomiled packages for Ubuntu and CentOS in the subdirectories.
+There are also precomiled packages for Ubuntu, CentOS, Fedora and openSUSE
+in the subdirectories.
 
 You can find a FreeBSD-Port in the FreeBSD subfolder. 
     

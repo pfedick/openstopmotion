@@ -595,19 +595,10 @@ build_freebsd ()
 
 
 
-
-build_srpm() {
-	if [ ! -d ~.rpmmacros ] ; then
-		echo "Bereite RPM-Buildsystem vor..."
-		mkdir -p ~/rpmbuild/BUILD ~/rpmbuild/RPMS ~/rpmbuild/SOURCES ~/rpmbuild/SPECS ~/rpmbuild/SRPMS
-		if [ $? -ne 0 ] ; then
-			echo "Konnte RPM-Verzeichnisse nicht anlegen: ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}"
-			exit 1
-		fi
-		echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros
-	fi
-	cd $WORK
-	COMMENT=`cat ../README.TXT| grep -v "^===.*" `
+write_source_specfile() {
+	FILE=$1
+	BUILDREQUIRES=$2
+	COMMENT=`cat $WORK/../README.TXT| grep -v "^===.*" `
 	(
 	echo "Name:		$PROGNAME"
 	echo "Version:	$VERSION"
@@ -621,8 +612,7 @@ build_srpm() {
 	echo "Source:	$PROGNAME-%{version}-src.tar.bz2"
 	echo "BuildRoot:	%(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)"
 	echo ""
-	echo "BuildRequires:	desktop-file-utils, gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
-	#echo "Requires: libgcc bzip2 zlib libjpeg libpng freetype libtiff libstdc++ qt glibc pcre"
+	echo "BuildRequires:	$BUILDREQUIRES"
 	echo ""	
 	echo "%description"
 	echo "$COMMENT"
@@ -680,9 +670,29 @@ build_srpm() {
 	echo ""
 	echo "%changelog"
 	echo ""
-	) > $WORK/$PROGNAME.spec
+	) > $FILE
+	
+}
+
+
+build_srpm() {
+	if [ ! -d ~.rpmmacros ] ; then
+		echo "Bereite RPM-Buildsystem vor..."
+		mkdir -p ~/rpmbuild/BUILD ~/rpmbuild/RPMS ~/rpmbuild/SOURCES ~/rpmbuild/SPECS ~/rpmbuild/SRPMS
+		if [ $? -ne 0 ] ; then
+			echo "Konnte RPM-Verzeichnisse nicht anlegen: ~/rpmbuild/{BUILD,RPMS,S{OURCE,PEC,RPM}S}"
+			exit 1
+		fi
+		echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros
+	fi
+	cd $WORK
+	BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
+	write_source_specfile "$WORK/$PROGNAME.spec" "$BUILDREQUIRES"
 	
 	cp $WORK/$PROGNAME.spec $DISTFILES/$PROGNAME-$VERSION.spec
+	
+	BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc_s1, libbz2-devel, zlib-devel, libjpeg8-devel, libpng15-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, libqt4-devel, glibc-devel, pcre-devel"
+	write_source_specfile "$DISTFILES/$PROGNAME-$VERSION-suse.spec" "$BUILDREQUIRES"
 	
 	
 	
