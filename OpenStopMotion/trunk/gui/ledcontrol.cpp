@@ -125,6 +125,7 @@ void LedControl::setCurrentFrame(int frame)
 {
 	int offset=ui.offsetFrame->text().toInt();
 	ui.frameSlider->setValue(frame+offset);
+	on_frameSlider_valueChanged(frame+offset);
 }
 
 void LedControl::setColorScheme(int scheme)
@@ -382,7 +383,8 @@ void LedControl::on_playbackTimer_fired()
 {
 	int frame=ui.frameSlider->value();
 	frame++;
-	if (frame<ui.frameSlider->maximum()) ui.frameSlider->setValue(frame);
+	if (frame>=ui.frameSlider->maximum()) frame=0;
+	ui.frameSlider->setValue(frame);
 }
 
 void LedControl::on_arduinoButton_clicked()
