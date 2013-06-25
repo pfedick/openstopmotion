@@ -29,7 +29,7 @@
 PROGNAME="OpenStopMotion"
 VERSION=${VERSION:=trunk}
 REVISION="1"
-PPL7SOURCE=${PPL6SOURCE:="../../ppl7"}
+PPL7SOURCE=${PPL7SOURCE:="../../ppl7"}
 OSMSOURCE=./
 PPL7REPO="http://svn.code.sf.net/p/pplib/code/lib/trunk"
 OSMREPO="https://openstopmotion.googlecode.com/svn/OpenStopMotion/trunk"
