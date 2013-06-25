@@ -686,16 +686,6 @@ build_srpm() {
 		echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros
 	fi
 	cd $WORK
-	BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
-	write_source_specfile "$WORK/$PROGNAME.spec" "$BUILDREQUIRES"
-	
-	cp $WORK/$PROGNAME.spec $DISTFILES/$PROGNAME-$VERSION.spec
-	
-	BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc_s1, libbz2-devel, zlib-devel, libjpeg8-devel, libpng15-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, libqt4-devel, glibc-devel, pcre-devel"
-	write_source_specfile "$DISTFILES/$PROGNAME-$VERSION-suse.spec" "$BUILDREQUIRES"
-	
-	
-	
 	TOPDIR=`cat ~/.rpmmacros | grep "%_topdir" | grep -v grep | awk {'print $2'}`
 	if [ -z "$TOPDIR" ] ; then
 		echo "%_topdir ist nicht in ~/.rpmmacros vorhanden"
@@ -802,7 +792,20 @@ if [ -f "OpenStopMotion.pro" ] ; then
 			fi
 			cd $WORK
 		fi
-		build_srpm
+		
+		cd $WORK
+		BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
+		write_source_specfile "$DISTFILES/$PROGNAME-$VERSION-el6.spec" "$BUILDREQUIRES"
+		cp $WORK/$PROGNAME.spec $DISTFILES/$PROGNAME-$VERSION.spec
+		
+		save_QMAKE=$QMAKE
+		QMAKE="qmake"
+		BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc_s1, libbz2-devel, zlib-devel, libjpeg8-devel, libpng15-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, libqt4-devel, glibc-devel, pcre-devel"
+		write_source_specfile "$DISTFILES/$PROGNAME-$VERSION-suse.spec" "$BUILDREQUIRES"
+		QMAKE=$saveQMAKE
+	
+		# RedHat Source-RPM erstellen
+		#build_srpm
 		exit 0
 	fi
 fi
