@@ -27,9 +27,9 @@
  
 
 PROGNAME="OpenStopMotion"
-VERSION="0.6.4"
+VERSION=${VERSION:=trunk}
 REVISION="1"
-PPL7SOURCE=../../ppl7
+PPL7SOURCE=${PPL6SOURCE:="../../ppl7"}
 OSMSOURCE=./
 PPL7REPO="http://svn.code.sf.net/p/pplib/code/lib/trunk"
 OSMREPO="https://openstopmotion.googlecode.com/svn/OpenStopMotion/trunk"
@@ -784,7 +784,7 @@ if [ -f "OpenStopMotion.pro" ] ; then
 		create_dir "$WORK/$PROGNAME-$VERSION"
 		gather_sources "$WORK/$PROGNAME-$VERSION"
 		cd $WORK
-		cp ../build_package.sh "$PROGNAME-$VERSION"
+		cat ../build_package.sh | sed -e "s/^VERSION=.*$/VERSION=$VERSION/" >$PROGNAME-$VERSION/build_package.sh
 		cp ../*.TXT "$PROGNAME-$VERSION"
 		tar -cjf $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 --exclude .svn "$PROGNAME-$VERSION"
 		if [ -d "$TARGETPATH" ] ; then
