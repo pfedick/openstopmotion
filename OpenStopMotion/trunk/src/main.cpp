@@ -38,7 +38,10 @@ int main(int argc, char *argv[])
 {
 #ifdef WIN32
 	HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	if (SUCCEEDED(hr)) {
+	if (!SUCCEEDED(hr)) {
+		// TODO: process error
+		return 1;
+	}
 #endif
 		ppl7::grafix::Grafix gfx;
 		QApplication a(argc, argv);
