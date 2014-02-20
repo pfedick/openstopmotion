@@ -26,8 +26,6 @@ BUILD_DEPENDS=		v4l_compat>=1.0.20100321:${PORTSDIR}/multimedia/v4l_compat \
 LIB_DEPENDS+=		v4l1:${PORTSDIR}/multimedia/libv4l \
 			cuse4bsd:${PORTSDIR}/multimedia/cuse4bsd-kmod
 
-MAKE_JOBS_SAFE=		yes
-
 USE_QT4=		corelib gui opengl qmake
 
 PLIST_FILES=		bin/OpenStopMotion \
