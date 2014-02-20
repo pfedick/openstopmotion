@@ -1,38 +1,38 @@
 # $FreeBSD$
 
-PORTNAME=			OpenStopMotion
+PORTNAME=		OpenStopMotion
 PORTVERSION=		0.6.4
-CATEGORIES=			multimedia
+CATEGORIES=		multimedia
 MASTER_SITES=		${MASTER_SITE_SOURCEFORGE}
 MASTER_SITE_SUBDIR=	openstopmotion
 EXTRACT_SUFX=		-src.tar.bz2
 
-MAINTAINER=			patrick@pfp.de
-COMMENT=			Webcam capture program for creating stopmotion video
+MAINTAINER=		patrick@pfp.de
+COMMENT=		Webcam capture program for creating stopmotion video
 
-LICENSE=			GPLv3
+LICENSE=		GPLv3
 
 LIB_DEPENDS=		jpeg:${PORTSDIR}/graphics/jpeg \
-					tiff:${PORTSDIR}/graphics/tiff \
-					png15:${PORTSDIR}/graphics/png \
-					freetype:${PORTSDIR}/print/freetype2 \
-					iconv:${PORTSDIR}/converters/libiconv \
-					pcre:${PORTSDIR}/devel/pcre \
+			tiff:${PORTSDIR}/graphics/tiff \
+			png15:${PORTSDIR}/graphics/png \
+			freetype:${PORTSDIR}/print/freetype2 \
+			iconv:${PORTSDIR}/converters/libiconv \
+			pcre:${PORTSDIR}/devel/pcre \
 
 BUILD_DEPENDS=		v4l_compat>=1.0.20100321:${PORTSDIR}/multimedia/v4l_compat \
-					cuse4bsd-kmod>=0.1.24:${PORTSDIR}/multimedia/cuse4bsd-kmod \
-					webcamd:${PORTSDIR}/multimedia/webcamd \
-					nasm:${PORTSDIR}/devel/nasm
+			cuse4bsd-kmod>=0.1.24:${PORTSDIR}/multimedia/cuse4bsd-kmod \
+			webcamd:${PORTSDIR}/multimedia/webcamd \
+			nasm:${PORTSDIR}/devel/nasm
 LIB_DEPENDS+=		v4l1:${PORTSDIR}/multimedia/libv4l \
-					cuse4bsd:${PORTSDIR}/multimedia/cuse4bsd-kmod
+			cuse4bsd:${PORTSDIR}/multimedia/cuse4bsd-kmod
 
 MAKE_JOBS_SAFE=		yes
 
-USE_QT4=			corelib gui opengl qmake
+USE_QT4=		corelib gui opengl qmake
 
 PLIST_FILES=		bin/OpenStopMotion \
-					share/pixmaps/OpenStopMotion.png \
-					share/applications/OpenStopMotion.desktop
+			share/pixmaps/OpenStopMotion.png \
+			share/applications/OpenStopMotion.desktop
 
 .include <bsd.port.pre.mk>
 
