@@ -78,7 +78,7 @@ gather_sources()
 		echo "INFO: Ziel: $TARGET/ppl7"
 		create_dir "$TARGET/ppl7"
 		cd $PPL7SOURCE
-		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests | cpio -pdm "$TARGET/ppl7" > /dev/null 2>&1
+		find *.m4 autoconf configure docs Doxyfile HISTORY.TXT include LICENSE.TXT Makefile.in ppl7-config.in README.TXT resource src tests/gcovr tests/Makefile.in tests/ppl7-tests.h tests/src tests/testdata | cpio -pdm "$TARGET/ppl7" > /dev/null 2>&1
 		echo "INFO: done"
 	else
 		echo "INFO: checkout PPL7-sources from svn repository..."
@@ -765,7 +765,7 @@ create_dir $DISTFILES
 	
 if [ -f "OpenStopMotion.pro" ] ; then
 	cd $CUR
-	#rm -rf $WORK
+	rm -rf $WORK
 	create_dir $WORK
 	
 	gather_sources $WORK
@@ -780,24 +780,10 @@ if [ -f "OpenStopMotion.pro" ] ; then
 		if [ -d "$TARGETPATH" ] ; then
 			cp $DISTFILES/$PROGNAME-$VERSION-src.tar.bz2 $TARGETPATH
 		fi
-		if [ `uname` = "FreeBSD" ] ; then
-			cd $DISTFILES
-			sha256 $PROGNAME-$VERSION-src.tar.bz2 > $CUR/FreeBSD/openstopmotion/distinfo
-			echo "SIZE ($PROGNAME-$VERSION-src.tar.bz2) = `stat -f \"%z\" $PROGNAME-$VERSION-src.tar.bz2`" >> $CUR/FreeBSD/openstopmotion/distinfo
-			cd $CUR/FreeBSD/openstopmotion; make clean;
-			cd ..
-			shar `find openstopmotion | grep -v ".svn" `| sed "s/^XPORTVERSION=.*$/XPORTVERSION=	$VERSION/" > $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar
-			if [ -d "$TARGETPATH" ] ; then
-				cp $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar $TARGETPATH
-			fi
-			cd $WORK
-		fi
 		
 		cd $WORK
 		BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc, bzip2-devel, zlib-devel, libjpeg-devel, libpng-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, qt-devel, glibc-devel, pcre-devel"
 		write_source_specfile "$DISTFILES/$PROGNAME-$VERSION-el6.spec" "$BUILDREQUIRES"
-		cp $WORK/$PROGNAME.spec $DISTFILES/$PROGNAME-$VERSION.spec
-		
 		save_QMAKE=$QMAKE
 		QMAKE="qmake"
 		BUILDREQUIRES="desktop-file-utils, gcc, gcc-c++, libgcc_s1, libbz2-devel, zlib-devel, libjpeg8-devel, libpng15-devel, nasm, freetype-devel, libtiff-devel, libstdc++-devel, libqt4-devel, glibc-devel, pcre-devel"
