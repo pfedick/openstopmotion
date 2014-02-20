@@ -211,7 +211,7 @@ void LedControl::on_maxFrame_textChanged(const QString & text)
 	unsaved=true;
 }
 
-void LedControl::on_offsetFrame_textChanged(const QString & text)
+void LedControl::on_offsetFrame_textChanged(const QString & )
 {
 	unsaved=true;
 }
@@ -490,7 +490,7 @@ void LedControl::recalcFrames(int id)
 {
 	interpolatedframes[id].clear();
 	int frame=0;
-	int maxf=ui.maxFrame->text().toInt();
+	//int maxf=ui.maxFrame->text().toInt();
 	int value=0;
 	int nextframe;
 	int nextvalue;
@@ -553,7 +553,7 @@ void LedControl::updateFrameView()
 	int middle=w/3;
 	int offset=frame*5;
 
-	int x=ui.frameSlider->value();
+	//int x=ui.frameSlider->value();
 	img.line(middle+5,0,middle+5,h,framepointer);
 
 

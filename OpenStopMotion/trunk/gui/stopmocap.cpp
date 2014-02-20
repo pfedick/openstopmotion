@@ -1137,19 +1137,19 @@ void StopMoCap::on_chromaBackgroundSelect_clicked()
 }
 
 
-void StopMoCap::on_replaceChromaWithColor_toggled(bool checked)
+void StopMoCap::on_replaceChromaWithColor_toggled(bool)
 {
 	bluebox.setReplaceMode(1);
 	conf.chromaReplaceMode=1;
 }
 
-void StopMoCap::on_replaceChromaWithImage_toggled(bool checked)
+void StopMoCap::on_replaceChromaWithImage_toggled(bool)
 {
 	bluebox.setReplaceMode(0);
 	conf.chromaReplaceMode=0;
 }
 
-void StopMoCap::on_replaceChromaWithTransparent_toggled(bool checked)
+void StopMoCap::on_replaceChromaWithTransparent_toggled(bool)
 {
 	bluebox.setReplaceMode(2);
 	conf.chromaReplaceMode=2;
