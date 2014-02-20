@@ -19,12 +19,12 @@ LIB_DEPENDS=		libjpeg.so:${PORTSDIR}/graphics/jpeg \
 			libiconv.so:${PORTSDIR}/converters/libiconv \
 			libpcre.so:${PORTSDIR}/devel/pcre \
 
-BUILD_DEPENDS=		v4l_compat>=1.0.20100321:${PORTSDIR}/multimedia/v4l_compat \
-			cuse4bsd-kmod>=0.1.24:${PORTSDIR}/multimedia/cuse4bsd-kmod \
+BUILD_DEPENDS=		v4l_compat>=1.0.20120501:${PORTSDIR}/multimedia/v4l_compat \
+			cuse4bsd-kmod>=0.1.30:${PORTSDIR}/multimedia/cuse4bsd-kmod \
 			webcamd:${PORTSDIR}/multimedia/webcamd \
 			nasm:${PORTSDIR}/devel/nasm
-LIB_DEPENDS+=		v4l1:${PORTSDIR}/multimedia/libv4l \
-			cuse4bsd:${PORTSDIR}/multimedia/cuse4bsd-kmod
+LIB_DEPENDS+=		libv4l2.so:${PORTSDIR}/multimedia/libv4l \
+			libcuse4bsd.so:${PORTSDIR}/multimedia/cuse4bsd-kmod
 
 USE_QT4=		corelib gui opengl qmake
 
