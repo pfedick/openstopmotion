@@ -12,12 +12,12 @@ COMMENT=		Webcam capture program for creating stopmotion video
 
 LICENSE=		GPLv3
 
-LIB_DEPENDS=		jpeg:${PORTSDIR}/graphics/jpeg \
-			tiff:${PORTSDIR}/graphics/tiff \
-			png15:${PORTSDIR}/graphics/png \
-			freetype:${PORTSDIR}/print/freetype2 \
-			iconv:${PORTSDIR}/converters/libiconv \
-			pcre:${PORTSDIR}/devel/pcre \
+LIB_DEPENDS=		libjpeg.so:${PORTSDIR}/graphics/jpeg \
+			libtiff.so:${PORTSDIR}/graphics/tiff \
+			libpng15.so:${PORTSDIR}/graphics/png \
+			libfreetype.so:${PORTSDIR}/print/freetype2 \
+			libiconv.so:${PORTSDIR}/converters/libiconv \
+			libpcre.so:${PORTSDIR}/devel/pcre \
 
 BUILD_DEPENDS=		v4l_compat>=1.0.20100321:${PORTSDIR}/multimedia/v4l_compat \
 			cuse4bsd-kmod>=0.1.24:${PORTSDIR}/multimedia/cuse4bsd-kmod \
