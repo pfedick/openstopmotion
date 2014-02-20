@@ -63,9 +63,9 @@ do-build:
 	fi)
 
 do-install:
-	${MKDIR} ${PREFIX}/bin ${PREFIX}/share/pixmaps ${PREFIX}/share/applications
-	${INSTALL_PROGRAM} ${WRKSRC}/osm/release/${PORTNAME} ${PREFIX}/bin
-	${INSTALL_DATA} ${WRKSRC}/osm/resources/icon256x256.png ${PREFIX}/share/pixmaps/${PORTNAME}.png
-	${INSTALL_DATA} ${FILESDIR}/OpenStopMotion.desktop ${PREFIX}/share/applications/${PORTNAME}.desktop
+	${MKDIR} ${STAGEDIR}${PREFIX}/bin ${STAGEDIR}${PREFIX}/share/pixmaps ${STAGEDIR}${PREFIX}/share/applications
+	${INSTALL_PROGRAM} ${WRKSRC}/osm/release/${PORTNAME} ${STAGEDIR}${PREFIX}/bin
+	${INSTALL_DATA} ${WRKSRC}/osm/resources/icon256x256.png ${STAGEDIR}${PREFIX}/share/pixmaps/${PORTNAME}.png
+	${INSTALL_DATA} ${FILESDIR}/OpenStopMotion.desktop ${STAGEDIR}${PREFIX}/share/applications/${PORTNAME}.desktop
 
 .include <bsd.port.post.mk>
