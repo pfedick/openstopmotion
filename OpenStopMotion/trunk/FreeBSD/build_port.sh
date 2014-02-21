@@ -26,6 +26,8 @@
 #
 PROGNAME="OpenStopMotion"
 VERSION=${VERSION:=trunk}
+TARGETPATH=/ftp/build
+
 
 WORK=`pwd`/tmp
 CUR=`pwd`
