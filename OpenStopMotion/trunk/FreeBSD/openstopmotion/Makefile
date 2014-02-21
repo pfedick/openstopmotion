@@ -16,11 +16,10 @@ LIB_DEPENDS=		libjpeg.so:${PORTSDIR}/graphics/jpeg \
 			libtiff.so:${PORTSDIR}/graphics/tiff \
 			libpng15.so:${PORTSDIR}/graphics/png \
 			libfreetype.so:${PORTSDIR}/print/freetype2 \
-			libiconv.so:${PORTSDIR}/converters/libiconv \
 			libpcre.so:${PORTSDIR}/devel/pcre \
 
 BUILD_DEPENDS=		v4l_compat>=1.0.20120501:${PORTSDIR}/multimedia/v4l_compat \
-			cuse4bsd-kmod>=0.1.30:${PORTSDIR}/multimedia/cuse4bsd-kmod \
+			cuse4bsd-kmod>=0.1.27:${PORTSDIR}/multimedia/cuse4bsd-kmod \
 			webcamd:${PORTSDIR}/multimedia/webcamd \
 			nasm:${PORTSDIR}/devel/nasm
 LIB_DEPENDS+=		libv4l2.so:${PORTSDIR}/multimedia/libv4l \
@@ -31,6 +30,8 @@ USE_QT4=		corelib gui opengl qmake
 PLIST_FILES=		bin/OpenStopMotion \
 			share/pixmaps/OpenStopMotion.png \
 			share/applications/OpenStopMotion.desktop
+
+USES=			iconv
 
 .include <bsd.port.pre.mk>
 
