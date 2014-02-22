@@ -25,7 +25,7 @@ HEADERS += include/osm.h \
     gui/myslider.h \
     gui/ppl7imageviewer.h \
     src/device.h \
-    src/config.h \
+    include/config.h \
     gui/arduinosketch.h \
     src/bluebox.h
 SOURCES += src/FrameBuffer.cpp \
@@ -55,8 +55,8 @@ RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += gui
 INCLUDEPATH += src
-unix:INCLUDEPATH += ../include
-unix:INCLUDEPATH += include
+unix:INCLUDEPATH += ../tmp/include
+unix:INCLUDEPATH += ./include
 unix:INCLUDEPATH += /usr/local/include
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib

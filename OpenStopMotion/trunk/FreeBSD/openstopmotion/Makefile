@@ -36,26 +36,11 @@ USES=			iconv
 .include <bsd.port.pre.mk>
 
 do-configure:
-	cd ${WRKSRC}; ${MKDIR} bin include lib; cd  ${WRKSRC}/ppl7; \
-	./configure --with-pcre=${LOCALBASE} --with-libiconv-prefix=${LOCALBASE} \
-		--with-nasm --with-jpeg --with-png --with-libtiff=${LOCALBASE} \
-		--prefix=${WRKSRC} \
-		--without-libmicrohttpd --without-libmcrypt-prefix --without-libmhash \
-		--without-libidn --without-libcurl --without-mpg123 --without-lame \
-		--without-ogg --without-sdl-prefix --without-imlib \
-		--without-mysql --without-postgresql --without-freetds --without-libldns
-
+	cd ${WRKSRC}; \
+	./configure --prefix=${STAGEDIR}${WRKSRC} --with-nasm
+	
 do-build:
-	@(cd ${WRKSRC}/ppl7; if ! ${SETENV} ${MAKE_ENV} ${MAKE} ${MAKE_FLAGS} ${MAKEFILE} ${_MAKE_JOBS} ${MAKE_ARGS} ${ALL_TARGET}; then \
-		if [ x != x${BUILD_FAIL_MESSAGE} ] ; then \
-			${ECHO_MSG} "===> Compilation failed unexpectedly."; \
-			(${ECHO_CMD} ${BUILD_FAIL_MESSAGE}) | ${FMT} 75 79 ; \
-		fi; \
-		${FALSE}; \
-	fi)
-	@(PATH="${WRKSRC}/bin:${PATH}"; export PATH; cd ${WRKSRC}/osm; \
-	qmake-qt4; \
-	if ! ${SETENV} ${MAKE_ENV} ${MAKE} ${MAKE_FLAGS} ${MAKEFILE} ${_MAKE_JOBS} ${MAKE_ARGS} ${ALL_TARGET}; then \
+	@(cd ${WRKSRC}; if ! ${SETENV} ${MAKE_ENV} ${MAKE} ${MAKE_FLAGS} ${MAKEFILE} ${_MAKE_JOBS} ${MAKE_ARGS} ; then \
 		if [ x != x${BUILD_FAIL_MESSAGE} ] ; then \
 			${ECHO_MSG} "===> Compilation failed unexpectedly."; \
 			(${ECHO_CMD} ${BUILD_FAIL_MESSAGE}) | ${FMT} 75 79 ; \

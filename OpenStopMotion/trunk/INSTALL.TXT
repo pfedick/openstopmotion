@@ -9,7 +9,6 @@ Contents:
   2. FreeBSD
   3. Ubuntu / Debian
   4. RedHat / CentOS
-  5. Automated compilation
 
 
 1. General
@@ -20,7 +19,7 @@ can find here:
 
     https://sourceforge.net/projects/openstopmotion/files/
     
-The source distribution fille is called OpenStopMotion-0.6.3-src.tar.bz2
+The source distribution fille is called OpenStopMotion-0.6.5-src.tar.bz2
 
 
 
@@ -32,7 +31,20 @@ platform for OpenStopMotion. It requires the webcamd daemon, which provides
 USB device drivers for hundreds of different USB based webcam and DVB USB
 devices. It is actualy a port of "Video4Linux" into userspace on FreeBSD.
 
-Install the following ports from the ports-collection:
+
+2.1 Installation from ports
+===========================
+
+You can find OpenStopMotion in the ports collection:
+
+cd /usr/ports/multimedia/openstopmotion
+make install
+
+
+2.2 Manual installation
+=======================
+
+Install the following ports from the ports collection:
 
    multimedia/webcamd
    lang/nasm
@@ -41,45 +53,33 @@ Install the following ports from the ports-collection:
    graphics/jpeg
    graphics/tiff
    print/freetype
-   converters/libiconv
+   converters/libiconv	(FreeBSD 9.x only!)
    devel/qt4
    
-Edit /etc/rc.conf to enable the webcamd daemon and start it:
-
-   echo "webcamd_enable=\"YES\"" >> /etc/rc.conf
-   /usr/local/etc/rc.d/webcamd start   
-
-
 Untar the source distribution:
 
-   tar -xjf OpenStopMotion-0.6.3-src.tar.bz2
+   tar -xjf OpenStopMotion-0.6.5-src.tar.bz2
 
-Build the ppl7-library:
+Configure and build the sources:
 
-   cd OpenStopMotion-0.6.3
-   mkdir -p bin include lib
-   WORK=`pwd`
-   cd ppl7
-   ./configure --with-pcre=/usr/local --with-libiconv-prefix=/usr/local \
-               --with-nasm --with-jpeg --with-png --with-libtiff=/usr/local \
-               --prefix=$WORK
+   cd OpenStopMotion-0.6.5
+   ./configure --with-nasm
    make install
    cd ..
    
-Build OpenStopMotion
+After that, you can find the compiled binary in /usr/local/bin.
+You should also find an icon in your start menue below multimedia.
 
-   PATH="$WORK/bin:$PATH"
-   export PATH
-   cd osm
-   qmake-qt4
-   make
+
+2.3 Enable webcamd
+==================
+
+If you never used a webcam on FreeBSD before, you need to enable the webcam
+daemon, which was installed in the above procedure:
+
+   echo "webcamd_enable=\"YES\"" >> /etc/rc.conf
+   /usr/local/etc/rc.d/webcamd start   
    
-After that, you can find the compiled binary in the release subdirectory,
-which is all you need. You could copy it to /usr/local/bin:
-
-  cp release/OpenStopMotion /usr/local/bin
-  
-
 
 3. Ubuntu / Debian
 ==================
@@ -96,31 +96,18 @@ Install the following packages:
         
 Untar the source distribution:
 
-   tar -xjf OpenStopMotion-0.6.3-src.tar.bz2
+   tar -xjf OpenStopMotion-0.6.5-src.tar.bz2
 
-Build the ppl7-library:
+Configure and build the sources:
 
-   cd OpenStopMotion-0.6.3
-   mkdir -p bin include lib
-   WORK=`pwd`
-   cd ppl7
+   cd OpenStopMotion-0.6.5
    ./configure --with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr \
-               --with-nasm --prefix=$WORK
+               --with-nasm --prefix=/usr
    make install
-   cd ..
-   
-Build OpenStopMotion
 
-   PATH="$WORK/bin:$PATH"
-   export PATH
-   cd osm
-   qmake-qt4
-   make
    
-After that, you can find the compiled binary in the release subdirectory,
-which is all you need. You could copy it to /usr/bin:
-
-  cp release/OpenStopMotion /usr/bin 
+After that, you can find the compiled binary in /usr/bin. 
+You should also find an icon in your start menue below multimedia.
    
    
 4. RedHat / CentOS
@@ -132,47 +119,18 @@ TODO!!!
 
 Untar the source distribution:
 
-   tar -xjf OpenStopMotion-0.6.3-src.tar.bz2
+   tar -xjf OpenStopMotion-0.6.5-src.tar.bz2
 
-Build the ppl7-library:
+Configure and build the sources:
 
-   cd OpenStopMotion-0.6.3
-   mkdir -p bin include lib
-   WORK=`pwd`
-   cd ppl7
+   cd OpenStopMotion-0.6.5
    ./configure --with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr \
-               --with-nasm --prefix=$WORK
+               --with-nasm --prefix=/usr
    make install
-   cd ..
    
-Build OpenStopMotion
+After that, you can find the compiled binary in /usr/bin. 
+You should also find an icon in your start menue below multimedia.
 
-   PATH="$WORK/bin:$PATH"
-   export PATH
-   cd osm
-   qmake-qt4
-   make
-   
-After that, you can find the compiled binary in the release subdirectory,
-which is all you need. You could copy it to /usr/bin:
-
-  cp release/OpenStopMotion /usr/bin 
-
-
-5. Automated compilation
-========================
-
-For generating binary packages for different platforms in an automated way,
-I have written a script, which does all the work. The script is released
-in the source distribution. In theory, you unpack the sources and start
-the build script. It will detect your platform, and if all goes well, you
-will find a binary package in the subfolder "distfiles".
-
-At this time, the script supports Debian/Ubuntu, RedHat/CentOS and
-FreeBSD.
-
-The script is in the root directory of the source distribution and is
-called build_package.sh
 
 
 

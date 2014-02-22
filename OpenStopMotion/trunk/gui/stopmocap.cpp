@@ -26,6 +26,7 @@
 #define WITH_QT
 #include <ppl7.h>
 #include "osm.h"
+#include "version.h"
 #include "stopmocap.h"
 #include "device.h"
 #include <QImage>
