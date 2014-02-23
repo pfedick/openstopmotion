@@ -28,10 +28,23 @@ PROGNAME="OpenStopMotion"
 VERSION=${VERSION:=trunk}
 TARGETPATH=/ftp/build
 
-
-WORK=`pwd`/tmp
 CUR=`pwd`
-DISTFILES=`pwd`/distfiles
+
+if [ -f "OpenStopMotion.pro" ] ; then
+	CUR=`pwd`
+elif [ -f "build_source.sh" ] ; then
+	cd ..
+	CUR=`pwd`
+elif [ -f "build_port.sh" ] ; then
+	cd ../..
+	CUR=`pwd`
+else
+	echo "ERROR: Wrong directory, did not found sources"
+	exit 1
+fi
+
+WORK=$CUR/tmp
+DISTFILES=$CUR/distfiles
 
 SOURCES="$DISTFILES/$PROGNAME-$VERSION-src.tar.bz2"
 
