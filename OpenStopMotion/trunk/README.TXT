@@ -1,7 +1,7 @@
 OpenStopMotion is a capture program for creating stopmotion video clips. It
 runs on Linux and FreeBSD and it can capture from all webcams supported by
-the kernel. OpenStopMotion is written by Patrick Fedick <patrick@pfp.de>.
-For more information, please visit http://www.pfp.de/osm.
+the system. OpenStopMotion is written by Patrick Fedick <patrick@pfp.de>.
+For more information, please visit http://www.pfp.de/osm/
 
 Features:
   - control your webcam from inside the application, eg. focus,
