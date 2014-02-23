@@ -38,6 +38,7 @@ AC_CONFIG_SRCDIR([ppl7/include/ppl7.h])
 AC_CONFIG_SRCDIR([ppl7/include/config.h.in])
 
 AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([osm/OpenStopMotion.desktop])
 AC_CONFIG_FILES([ppl7/Makefile])
 AC_CONFIG_FILES([ppl7/tests/Makefile])
 AC_CONFIG_FILES([ppl7/ppl7-config])
@@ -219,9 +220,27 @@ AC_CHECK_SIZEOF(fpos_t)
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
-# AX_HAVE_QT scheint unter FreeBSD nicht kompatibel zu sein. Der produzierte Code
-# läuft zwar unter FreeBSD, aber nicht unter Linux oder MinGW 
-dnl AX_HAVE_QT
+# find qmake
+AC_MSG_CHECKING([for qmake])
+AC_ARG_WITH([qmake],
+	[  --with-qmake=PATH       Path and name of the qmake program (optional)],
+	[QMAKE="$withval"],
+	[QMAKE="no"])
+
+if test "$QMAKE" = "no" -o -n "$QMAKE" ; then
+	AC_CHECK_PROGS(qmake,[qmake-qt4 qmake],no)
+	if test "$qmake" = "no" ; then
+		AC_MSG_ERROR(qmake not found)
+	fi
+	QMAKE=$qmake
+else
+	if test ! -x "$QMAKE"  ; then
+		AC_MSG_ERROR(qmake not found)
+	fi
+	AC_MSG_RESULT($QMAKE)
+fi
+AC_SUBST(QMAKE)
+
 
 AX_PROG_NASM
 

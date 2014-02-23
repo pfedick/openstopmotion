@@ -37,7 +37,7 @@ USES=			iconv
 
 do-configure:
 	cd ${WRKSRC}; \
-	./configure --prefix=${STAGEDIR}${WRKSRC} --with-nasm
+	./configure --prefix=${LOCALBASE} --with-nasm
 	
 do-build:
 	@(cd ${WRKSRC}; if ! ${SETENV} ${MAKE_ENV} ${MAKE} ${MAKE_FLAGS} ${MAKEFILE} ${_MAKE_JOBS} ${MAKE_ARGS} ; then \
@@ -49,9 +49,7 @@ do-build:
 	fi)
 
 do-install:
-	${MKDIR} ${STAGEDIR}${PREFIX}/bin ${STAGEDIR}${PREFIX}/share/pixmaps ${STAGEDIR}${PREFIX}/share/applications
-	${INSTALL_PROGRAM} ${WRKSRC}/osm/release/${PORTNAME} ${STAGEDIR}${PREFIX}/bin
-	${INSTALL_DATA} ${WRKSRC}/osm/resources/icon256x256.png ${STAGEDIR}${PREFIX}/share/pixmaps/${PORTNAME}.png
-	${INSTALL_DATA} ${FILESDIR}/OpenStopMotion.desktop ${STAGEDIR}${PREFIX}/share/applications/${PORTNAME}.desktop
+	cd ${WRKSRC}; \
+	PREFIX=${STAGEDIR}${LOCALBASE} make install
 
 .include <bsd.port.post.mk>

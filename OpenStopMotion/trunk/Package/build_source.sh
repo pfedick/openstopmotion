@@ -87,7 +87,7 @@ gather_sources()
 		echo "INFO: Ziel: $TARGET/osm"
 		create_dir "$TARGET/osm"
 		cd $OSMSOURCE
-		find *.TXT arduino* OpenStopMotion.pro include gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
+		find *.TXT arduino* OpenStopMotion.pro OpenStopMotion.desktop.in include gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
 		echo "INFO: done"
     else
 		echo "INFO: checkout OpenStopMotion-sources from svn repository..."

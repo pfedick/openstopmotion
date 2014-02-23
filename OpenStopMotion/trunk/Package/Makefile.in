@@ -31,12 +31,13 @@
 ### Global Options
 ###############################################################################
 
-PREFIX		= @prefix@
+PREFIX		?= @prefix@
 CC		= @CC@
 CXX		= @CXX@
 CFLAGS		= @CFLAGS@
 CPPFLAGS	= @CPPFLAGS@
 LDFLAGS		= @LDFLAGS@
+QMAKE		= @QMAKE@
 LIBS		= @LIBS@ @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ @ZLIB_LIBS@ @BZ2_LIBS@ @PCRE_LIBS@ @FT2_LIBS@ @ICONV_LIBS@
 
 
@@ -49,6 +50,8 @@ release: tmp/lib/libppl7.a osm/release/OpenStopMotion
 install: osm/release/OpenStopMotion
 	mkdir -p $(PREFIX)/bin $(PREFIX)/share/pixmaps $(PREFIX)/share/applications
 	cp osm/release/OpenStopMotion $(PREFIX)/bin
+	cp osm/resources/icon256x256.png $(PREFIX)/share/pixmaps
+	cp osm/OpenStopMotion.desktop $(PREFIX)/share/applications
 
 clean:
 	cd ppl7; make clean
@@ -56,7 +59,7 @@ clean:
 	rm -rf osm/release osm/debug
 
 osm/release/OpenStopMotion: tmp/lib/libppl7.a
-	cd osm; qmake-qt4 INCLUDEPATH+=../tmp/include OpenStopMotion.pro; make -f Makefile.Release
+	cd osm; $(QMAKE) INCLUDEPATH+=../tmp/include OpenStopMotion.pro; make -f Makefile.Release
 
 tmp/lib/libppl7.a: ppl7/Makefile
 	cd ppl7; make install TARGETLIB=../tmp/lib TARGETINCLUDE=../tmp/include TARGETBIN=../tmp/bin
