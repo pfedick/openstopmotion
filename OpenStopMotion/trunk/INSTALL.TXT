@@ -35,7 +35,8 @@ devices. It is actualy a port of "Video4Linux" into userspace on FreeBSD.
 2.1 Installation from ports
 ===========================
 
-You can find OpenStopMotion in the ports collection:
+I'm working on getting OpenStopMortion into the FreeBSD Ports-Collection.
+When it's done, you can simply install it the same way as every other port:
 
 cd /usr/ports/multimedia/openstopmotion
 make install
