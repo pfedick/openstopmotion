@@ -64,10 +64,6 @@ gather_sources()
 	TARGET=$1
 	cd $CUR
 	PPL7DIR=$TARGET/ppl7
-	# Started within Jenkins, the path is different
-	if [ -f "$PPL7SOURCE/workspace/ppl7-config.in" ] ; then
-		PPL7DIR=$TARGET/ppl7/workspace
-	fi
 	if [ -d "$PPL7SOURCE" ] ; then
 		echo "INFO: Copy PPL7-sources from local directory: $PPL7SOURCE..."
 		echo "INFO: Ziel: $TARGET/ppl7"
