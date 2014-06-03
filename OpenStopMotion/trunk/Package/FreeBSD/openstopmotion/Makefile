@@ -52,6 +52,6 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/bin ${STAGEDIR}${PREFIX}/share/pixmaps ${STAGEDIR}${PREFIX}/share/applications
 	${INSTALL_PROGRAM} ${WRKSRC}/osm/release/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/${PORTNAME}
 	${INSTALL_DATA} ${WRKSRC}/osm/resources/icon256x256.png ${STAGEDIR}${PREFIX}/share/pixmaps/${PORTNAME}.png
-	${INSTALL_DATA} ${WRKSRC}/osm/OpenStopMotion.desktop ${STAGEDIR}${PREFIX}/share/applications/${PORTNAME}.desktop
+	${INSTALL_DATA} ${WRKSRC}/OpenStopMotion.desktop ${STAGEDIR}${PREFIX}/share/applications/${PORTNAME}.desktop
 
 .include <bsd.port.post.mk>
