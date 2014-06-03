@@ -87,7 +87,7 @@ gather_sources()
 		echo "INFO: Ziel: $TARGET/osm"
 		create_dir "$TARGET/osm"
 		cd $OSMSOURCE
-		find *.TXT arduino* OpenStopMotion.pro OpenStopMotion.desktop.in include gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
+		find *.TXT arduino* OpenStopMotion.pro include gui resource.rc resources resources.qrc src | cpio -pdm "$TARGET/osm" > /dev/null 2>&1
 		echo "INFO: done"
     else
 		echo "INFO: checkout OpenStopMotion-sources from svn repository..."
@@ -114,10 +114,9 @@ create_configure()
 {
 	TARGET=$1
 	cd $WORK/$PROGNAME-$VERSION
-	mv ppl7/autoconf ./
 	cp $CUR/Package/configure.ac configure.ac
 	aclocal
-	automake --add-missing
+	automake --add-missing --copy
 	autoconf
 	
 }
@@ -135,6 +134,7 @@ create_configure "$WORK/$PROGNAME-$VERSION"
 
 cd $CUR
 cp Package/Makefile.in $WORK/$PROGNAME-$VERSION
+cp Package/OpenStopMotion.desktop.in $WORK/$PROGNAME-$VERSION
 
 ####cat build_package.sh | sed -e "s/^VERSION=.*$/VERSION=$VERSION/" >$WORK/$PROGNAME-$VERSION/build_package.sh
 cp *.TXT $WORK/$PROGNAME-$VERSION

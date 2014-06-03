@@ -50,9 +50,14 @@ release: tmp/lib/libppl7.a osm/release/OpenStopMotion
 install: osm/release/OpenStopMotion
 	mkdir -p $(PREFIX)/bin $(PREFIX)/share/pixmaps $(PREFIX)/share/applications
 	cp osm/release/OpenStopMotion $(PREFIX)/bin
-	cp osm/resources/icon256x256.png $(PREFIX)/share/pixmaps
-	cp osm/OpenStopMotion.desktop $(PREFIX)/share/applications
+	cp osm/resources/icon256x256.png $(PREFIX)/share/pixmaps/OpenStopMotion.png
+	cp OpenStopMotion.desktop $(PREFIX)/share/applications
 
+deinstall:
+	rm -rf $(PREFIX)/bin/OpenStopMotion
+	rm -rf $(PREFIX)/share/pixmaps/OpenStopMotion.png
+	rm -rf $(PREFIX)/share/applications/OpenStopMotion.desktop
+	
 clean:
 	cd ppl7; make clean
 	rm -rf tmp
@@ -65,6 +70,4 @@ tmp/lib/libppl7.a: ppl7/Makefile
 	cd ppl7; make install TARGETLIB=../tmp/lib TARGETINCLUDE=../tmp/include TARGETBIN=../tmp/bin
 
 
-tmp/lib/libppl7-debug.a: ppl7/Makefile
-	cd ppl7; make debug
 
