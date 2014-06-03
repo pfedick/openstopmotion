@@ -26,7 +26,6 @@
 #
 PROGNAME="OpenStopMotion"
 VERSION=${VERSION:=trunk}
-TARGETPATH=/ftp/build
 
 CUR=`pwd`
 
@@ -60,16 +59,13 @@ fi
 
 rm -rf $WORK/FreeBSD
 mkdir -p $WORK/FreeBSD
-cd $CUR/FreeBSD
+cd $CUR/Package/FreeBSD
 find openstopmotion | cpio -pdm $WORK/FreeBSD
 cd $DISTFILES
 sha256 $PROGNAME-$VERSION-src.tar.bz2 > $WORK/FreeBSD/openstopmotion/distinfo
 echo "SIZE ($PROGNAME-$VERSION-src.tar.bz2) = `stat -f \"%z\" $PROGNAME-$VERSION-src.tar.bz2`" >> $WORK/FreeBSD/openstopmotion/distinfo
-cat $CUR/FreeBSD/openstopmotion/Makefile | sed "s/^PORTVERSION=.*$/PORTVERSION=		$VERSION/" > $WORK/FreeBSD/openstopmotion/Makefile
+cat $CUR/Package/FreeBSD/openstopmotion/Makefile | sed "s/^PORTVERSION=.*$/PORTVERSION=		$VERSION/" > $WORK/FreeBSD/openstopmotion/Makefile
 cd $WORK/FreeBSD/openstopmotion; make clean;
-cd ..
+cd $WORK/FreeBSD
 shar `find openstopmotion | grep -v ".svn" `> $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar
-if [ -d "$TARGETPATH" ] ; then
-	cp $DISTFILES/$PROGNAME-$VERSION-FreeBSD-Port.shar $TARGETPATH
-fi
 

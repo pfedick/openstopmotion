@@ -27,9 +27,9 @@ BUILD_DEPENDS=		v4l_compat>=1.0.20120501:${PORTSDIR}/multimedia/v4l_compat \
 
 USE_QT4=		corelib gui opengl qmake
 
-PLIST_FILES=		bin/OpenStopMotion \
-			share/pixmaps/OpenStopMotion.png \
-			share/applications/OpenStopMotion.desktop
+PLIST_FILES=		bin/${PORTNAME} \
+			share/pixmaps/${PORTNAME}.png \
+			share/applications/${PORTNAME}.desktop
 
 USES=			iconv
 
@@ -50,8 +50,8 @@ do-build:
 
 do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/bin ${STAGEDIR}${PREFIX}/share/pixmaps ${STAGEDIR}${PREFIX}/share/applications
-	${INSTALL_PROGRAM} ${WRKSRC}/osm/release/${PORTNAME} ${STAGEDIR}${PREFIX}/bin
+	${INSTALL_PROGRAM} ${WRKSRC}/osm/release/${PORTNAME} ${STAGEDIR}${PREFIX}/bin/${PORTNAME}
 	${INSTALL_DATA} ${WRKSRC}/osm/resources/icon256x256.png ${STAGEDIR}${PREFIX}/share/pixmaps/${PORTNAME}.png
-	${INSTALL_DATA} ${FILESDIR}/OpenStopMotion.desktop ${STAGEDIR}${PREFIX}/share/applications/${PORTNAME}.desktop
+	${INSTALL_DATA} ${WRKSRC}/osm/OpenStopMotion.desktop ${STAGEDIR}${PREFIX}/share/applications/${PORTNAME}.desktop
 
 .include <bsd.port.post.mk>
