@@ -58,9 +58,9 @@ if [ ! -f "$SOURCES" ] ; then
 fi
 
 rm -rf $WORK/FreeBSD
-mkdir -p $WORK/FreeBSD
+mkdir -p $WORK/FreeBSD/openstopmotion
 cd $CUR/Package/FreeBSD
-find openstopmotion | cpio -pdm $WORK/FreeBSD
+cp openstopmotion/* $WORK/FreeBSD/openstopmotion
 cd $DISTFILES
 sha256 $PROGNAME-$VERSION-src.tar.bz2 > $WORK/FreeBSD/openstopmotion/distinfo
 echo "SIZE ($PROGNAME-$VERSION-src.tar.bz2) = `stat -f \"%z\" $PROGNAME-$VERSION-src.tar.bz2`" >> $WORK/FreeBSD/openstopmotion/distinfo
