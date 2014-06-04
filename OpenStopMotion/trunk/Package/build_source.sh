@@ -25,30 +25,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
  
-
-PROGNAME="OpenStopMotion"
-VERSION=${VERSION:=trunk}
-PPL7SOURCE=${PPL7SOURCE:="../../ppl7"}
-PPL7REPO="http://svn.code.sf.net/p/pplib/code/lib/trunk"
-OSMREPO="https://openstopmotion.googlecode.com/svn/OpenStopMotion/trunk"
-OSMDIR="$PROGNAME-$VERSION"
-TARGETPATH=/ftp/build
-
 CUR=`pwd`
 
 if [ -f "OpenStopMotion.pro" ] ; then
-	CUR=`pwd`
+    CUR=`pwd`
 elif [ -f "build_source.sh" ] ; then
-	cd ..
-	CUR=`pwd`
+    cd ..
+    CUR=`pwd`
 else
-	echo "ERROR: Wrong directory, did not found sources"
-	exit 1
+    echo "ERROR: Wrong directory, did not found sources"
+    exit 1
 fi
+. $CUR/Package/config.sh
 
-OSMSOURCE=$CUR
-WORK=$CUR/tmp
-DISTFILES=$CUR/distfiles
 
 create_dir ()
 {
