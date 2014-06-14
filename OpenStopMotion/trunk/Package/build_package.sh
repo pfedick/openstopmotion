@@ -198,6 +198,39 @@ build_debian ()
 	MISSING=""
 	echo "INFO: Checking dependency packages..."
 	check_debian_package "libpcre3-dev"
+	check_debian_package "libjpeg8-dev"
+	check_debian_package "libpng12-dev"
+	check_debian_package "libtiff4-dev"
+	check_debian_package "libfreetype6-dev"
+	check_debian_package "libbz2-dev"
+	check_debian_package "zlib1g-dev"
+	check_debian_package "libqt4-dev"
+	check_debian_package "qt4-dev-tools"
+	check_debian_package "qt4-qmake"
+	check_debian_package "libqt4-opengl-dev"
+	check_debian_package "nasm"
+	check_debian_package "subversion"
+	check_debian_package "dpkg-dev"
+	
+	if [ "$MISSING" ] ; then
+		echo "ERROR: Missing packages, please run the following command:"
+		echo ""
+		echo "   sudo apt-get install $MISSING"
+		echo ""
+		exit 1
+	fi
+	echo "INFO: all required packages are installed"
+	build_debian_common
+}
+
+build_ubuntu ()
+{
+	#
+	# Check Dependencies
+	#
+	MISSING=""
+	echo "INFO: Checking dependency packages..."
+	check_debian_package "libpcre3-dev"
 	check_debian_package "libjpeg-dev"
 	check_debian_package "libpng12-dev"
 	check_debian_package "libtiff4-dev"
@@ -220,7 +253,11 @@ build_debian ()
 		exit 1
 	fi
 	echo "INFO: all required packages are installed"
+	build_debian_common
+}
 
+build_debian_common()
+{
 	cd $CUR
 
 	CONFIGURE="--with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
@@ -534,7 +571,7 @@ build_suse ()
 
 freebsd_dep ()
 {
-	NAME=`pkg_info | grep "^$1-" | awk '{print $1}'`
+	NAME=`pkg info | grep "^$1-" | awk '{print $1}'`
 	if [ $? -ne 0 ] ; then
 		exit 1
 	fi
@@ -623,14 +660,8 @@ write_source_specfile() {
 	echo "%build"
 	echo "WORK=\`pwd\`"
 	echo "mkdir -p bin lib include"
-	echo "cd ppl7"
 	echo "./configure --prefix=\$WORK --with-pcre=/usr --with-jpeg --with-png --with-libtiff=/usr --with-nasm --without-libmcrypt-prefix"
 	echo "make install"
-	echo "cd ../osm"
-	echo "PATH=\"\$WORK/bin:\$PATH\""
-	echo "$QMAKE"
-	echo "make -j2 release"
-	echo "cp release/OpenStopMotion \$WORK/bin/$PROGNAME"
 	echo ""
 	echo "%install"
 	echo "rm -rf \$RPM_BUILD_ROOT"
@@ -805,11 +836,11 @@ echo ""
 
 
 if [ "$DISTRIB_ID" = "Ubuntu" ] ; then
-	build_debian
+	build_ubuntu
 elif [ "$DISTRIB_ID" = "Debian" ] ; then
 	build_debian
 elif [ "$DISTRIB_ID" = "FreeBSD" ] ; then
-    WORK=$CUR/tmp
+	WORK=$CUR/tmp
 	build_freebsd
 elif [ "$DISTRIB_ID" = "CentOS" ] ; then
 	build_redhat $1
