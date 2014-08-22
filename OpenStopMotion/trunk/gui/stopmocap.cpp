@@ -1328,7 +1328,12 @@ void StopMoCap::on_arduinoButton_clicked()
 		ledcontrol->setMainCapture(this);
 		ledcontrol->setWindowFlags(Qt::Window);
 		ledcontrol->setArduino(arduino);
-		ledcontrol->setConfig(conf);
+		try {
+			ledcontrol->setConfig(conf);
+		} catch (...) {
+
+		}
+
 		if (ui.lightAndDarkButton->isChecked()) ledcontrol->setColorScheme(1);
 		else ledcontrol->setColorScheme(0);
 	}
