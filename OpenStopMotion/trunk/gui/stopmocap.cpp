@@ -1070,6 +1070,7 @@ void StopMoCap::UpdateColorKeyBG(ppl7::grafix::Color c)
 {
 	bluebox.setColorKey(c);
 	conf.chromaKey=c;
+	conf.save();
 	ppl7::String Tmp;
 	Tmp.setf("%i, %i, %i",c.red(),c.green(),c.blue());
 	ui.keyColor->setText(Tmp);
@@ -1083,6 +1084,7 @@ void StopMoCap::UpdateColorKeyFG(ppl7::grafix::Color c)
 {
 	bluebox.setColorKeyFG(c);
 	conf.chromaKeyFG=c;
+	conf.save();
 	ppl7::String Tmp;
 	Tmp.setf("%i, %i, %i",c.red(),c.green(),c.blue());
 	ui.keyColorFG->setText(Tmp);
@@ -1228,6 +1230,38 @@ void StopMoCap::on_bgColorSelect_clicked()
 		conf.replaceColor.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
 		bluebox.setReplaceColor(conf.replaceColor);
 		//printf ("color alpha=%i\n",qc.alpha());
+	}
+
+	Timer->start(10);
+}
+
+void StopMoCap::on_chromaKeyColorSelect_clicked()
+{
+	Timer->stop();
+	QColorDialog dialog(this);
+	ppl7::grafix::Color c=bluebox.colorKey();
+	dialog.setOption(QColorDialog::ShowAlphaChannel,false);
+	dialog.setCurrentColor(QColor(c.red(),c.green(),c.blue(),c.alpha()));
+	if (dialog.exec()==1) {
+		QColor qc=dialog.selectedColor();
+		c.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
+		UpdateColorKeyBG(c);
+	}
+
+	Timer->start(10);
+}
+
+void StopMoCap::on_chromaKeyFGColorSelect_clicked()
+{
+	Timer->stop();
+	QColorDialog dialog(this);
+	ppl7::grafix::Color c=bluebox.colorKeyFG();
+	dialog.setOption(QColorDialog::ShowAlphaChannel,false);
+	dialog.setCurrentColor(QColor(c.red(),c.green(),c.blue(),c.alpha()));
+	if (dialog.exec()==1) {
+		QColor qc=dialog.selectedColor();
+		c.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
+		UpdateColorKeyFG(c);
 	}
 
 	Timer->start(10);

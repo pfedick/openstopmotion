@@ -169,6 +169,7 @@ public slots:
 
 
     void on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c);
+    void on_chromaKeyColorSelect_clicked();
     void on_tolNearSlider_valueChanged ( int value );
     void on_tolFarSlider_valueChanged ( int value );
     void on_spillSlider_valueChanged ( int value );
@@ -177,6 +178,7 @@ public slots:
 
 
     void on_foregroundEnabled_toggled(bool checked);
+    void on_chromaKeyFGColorSelect_clicked();
     void on_tolNearSliderFG_valueChanged ( int value );
     void on_tolFarSliderFG_valueChanged ( int value );
     void on_spillSliderFG_valueChanged ( int value );
