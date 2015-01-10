@@ -443,6 +443,22 @@ void StopMoCap::closeEvent(QCloseEvent *event)
     }
 }
 
+
+static void rotate180(ppl7::grafix::Drawable &img)
+{
+	int width=img.width();
+	int height=img.height();
+	ppl7::grafix::Color p1,p2;
+	for (int y=0;y<height/2;y++) {
+		for (int x=0;x<width;x++) {
+			p1=img.getPixel(x,y);
+			p2=img.getPixel(width-x-1,height-y-1);
+			img.putPixel(x,y,p2);
+			img.putPixel(width-x-1,height-y-1,p1);
+		}
+	}
+}
+
 void StopMoCap::grabFrame()
 {
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
@@ -451,6 +467,9 @@ void StopMoCap::grabFrame()
 			capture(grabImg);
 		} else {
 			cam.readFrame(grabImg);
+		}
+		if (ui.rotate180->isChecked()) {
+			rotate180(grabImg);
 		}
 		if (ui.pickChromaKeyFG->isChecked()) {
 			grabImg.blt(bluebox.getFGImage());
@@ -531,6 +550,9 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 	for (int i=0;i<mergeFrames;i++) {
 		//printf ("Capture %i\n",i);
 		cam.readFrame(tmp[i]);
+		if (ui.rotate180->isChecked()) {
+			rotate180(tmp[i]);
+		}
 		for (int skip=0;skip<skipFrames;skip++) {
 			cam.readFrame(img);
 		}

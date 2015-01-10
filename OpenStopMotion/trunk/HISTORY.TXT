@@ -10,6 +10,7 @@ OpenStopMotion Changelog
     openstopmotion has its own configure and makefile, ppl7 acts as
     an autoconf subproject
   - Color selection for chromakey background and foreground by dialog
+  - New function to rotate the image by 180 degrees
 
 0.6.4 2013-04-18
   - added missing header include in arduino.cpp, fixed compiler error on
