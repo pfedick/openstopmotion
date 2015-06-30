@@ -14,7 +14,7 @@ LICENSE=		GPLv3
 
 LIB_DEPENDS=		libjpeg.so:${PORTSDIR}/graphics/jpeg \
 			libtiff.so:${PORTSDIR}/graphics/tiff \
-			libpng15.so:${PORTSDIR}/graphics/png \
+			libpng16.so:${PORTSDIR}/graphics/png \
 			libfreetype.so:${PORTSDIR}/print/freetype2 \
 			libpcre.so:${PORTSDIR}/devel/pcre \
 			libv4l2.so:${PORTSDIR}/multimedia/libv4l \
