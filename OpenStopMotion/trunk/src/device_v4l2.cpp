@@ -542,10 +542,11 @@ void Device::waitForNextFrame()
 int Device::readFrame(ppl7::grafix::Image &img)
 {
 	if (myff<1) throw DeviceNotOpen();
+	double start_time=ppl7::GetMicrotime();
 	waitForNextFrame();
 	struct v4l2_buffer buf;
 	unsigned int i;
-	double start_time=ppl7::GetMicrotime();
+
 
 	switch (iomethod) {
 		case IO_METHOD_READ:
