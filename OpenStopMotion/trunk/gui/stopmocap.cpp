@@ -565,7 +565,6 @@ void StopMoCap::on_timer_fired()
 		Tmp.setf("%i",fpsCounter);
 		fpsTimer=now;
 		statusbar_fps->setText(Tmp);
-		ui.captureFPS->setText(Tmp);
 		fpsCounter=0;
 	}
 #ifdef USERENDERTHREAD

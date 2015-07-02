@@ -28,7 +28,7 @@
 
 #define WITH_QT
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QSlider>
 #include <QTimer>
 #include <QSizePolicy>

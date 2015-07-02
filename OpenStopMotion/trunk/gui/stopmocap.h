@@ -28,7 +28,7 @@
 #define WITH_QT
 
 #include <vector>
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QVBoxLayout>
 #include <QSlider>
 #include <QCheckBox>

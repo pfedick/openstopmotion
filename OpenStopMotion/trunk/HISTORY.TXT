@@ -1,7 +1,7 @@
 OpenStopMotion Changelog
 ========================
 
-0.7.0
+0.7.0 2015-07-02
   - Fixed ioctl sign-extension warnings
   - Fixed some compiler warnings about unused variables
   - FreeBSD-Port: fixed some issues, updated to new policies, tested on
@@ -12,6 +12,7 @@ OpenStopMotion Changelog
   - Color selection for chromakey background and foreground by dialog
   - New function to rotate the image by 180 degrees
   - StatusBar with FPS and performance timer
+  - added compatibility with Qt4 and Qt5
 
 0.6.4 2013-04-18
   - added missing header include in arduino.cpp, fixed compiler error on

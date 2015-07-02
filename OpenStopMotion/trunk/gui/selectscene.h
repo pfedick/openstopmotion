@@ -26,7 +26,7 @@
 #ifndef SELECTSCENE_H
 #define SELECTSCENE_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 #define WITH_QT
 #include <ppl7.h>
 #include <ppl7-grafix.h>

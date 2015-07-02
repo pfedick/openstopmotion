@@ -28,7 +28,7 @@
 #define PPL7IMAGEVIEWER_H_
 
 #include <QWidget>
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 #include <ppl7.h>
 #include <ppl7-grafix.h>
 
