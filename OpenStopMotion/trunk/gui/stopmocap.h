@@ -35,6 +35,7 @@
 #include <QComboBox>
 #include <QPainter>
 #include <QTimer>
+#include <QStatusBar>
 #include "ui_stopmocap.h"
 #include "device.h"
 #include "config.h"
@@ -105,6 +106,12 @@ private:
     Arduino arduino;
     LedControl *ledcontrol;
 
+    QStatusBar *statusBar;
+    QLabel *statusbar_fps;
+    QLabel *statusbar_time_grab;
+    QLabel *statusbar_time_decode;
+    QLabel *statusbar_time_total;
+
     void grabFrame();
     int highestSceneFrame();
     bool eventFilter(QObject *target, QEvent *event);
@@ -113,6 +120,8 @@ private:
     void UpdateColorKeyBG(ppl7::grafix::Color c);
     void UpdateColorKeyFG(ppl7::grafix::Color c);
     void getSceneList(ppl7::Array &scenes);
+    void createStatusBar();
+    void updateStatusBar();
 
 public:
     void stopCapture();

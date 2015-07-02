@@ -41,6 +41,7 @@
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
+	statusBar=NULL;
 	fpaint=NULL;
 	ledcontrol=NULL;
 	interpolateSequence=0;
@@ -64,6 +65,10 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 	connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
+
+
+
+
 
 	//DeviceCheckTimer->start(5000);
 	ui.captureDir->setText(conf.CaptureDir);
@@ -176,6 +181,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.frameSlider->setMinimum(1);
 	ui.lightAndDarkButton->setChecked(conf.darkLayout);
 	on_lightAndDarkButton_toggled(conf.darkLayout);
+
+	createStatusBar();
+
 	this->restoreGeometry(conf.ScreenGeometry);
 }
 
@@ -224,7 +232,59 @@ StopMoCap::~StopMoCap()
 	delete Timer;
 }
 
+void StopMoCap::createStatusBar()
+{
+	statusBar=new QStatusBar;
+	this->layout()->addWidget(statusBar);
+	QLabel *label= new QLabel(tr("Capture FPS:"));
+	//locationLabel->setAlignment(Qt::AlignHCenter);
+	//locationLabel->setMinimumSize(locationLabel->sizeHint());
 
+	statusBar->addWidget(label);
+	statusbar_fps=new QLabel(tr("0"));
+	statusbar_fps->setMinimumWidth(40);
+	statusbar_fps->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+	statusBar->addWidget(statusbar_fps);
+
+	label= new QLabel(tr("time grab: "));
+	statusBar->addWidget(label);
+	statusbar_time_grab=new QLabel(tr("0"));
+	statusbar_time_grab->setMinimumWidth(40);
+	statusbar_time_grab->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+	statusBar->addWidget(statusbar_time_grab);
+
+
+	label= new QLabel(tr("time decode: "));
+	statusBar->addWidget(label);
+	statusbar_time_decode=new QLabel(tr("0"));
+	statusbar_time_decode->setMinimumWidth(40);
+	statusbar_time_decode->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+	statusBar->addWidget(statusbar_time_decode);
+
+	label= new QLabel(tr("time total: "));
+	statusBar->addWidget(label);
+	statusbar_time_total=new QLabel(tr("0"));
+	statusbar_time_total->setMinimumWidth(40);
+	statusbar_time_total->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+	statusBar->addWidget(statusbar_time_total);
+
+}
+
+void StopMoCap::updateStatusBar()
+{
+	ppl7::String Tmp;
+
+	Tmp.setf("%0.6f s",cam.time_readFrame);
+	statusbar_time_grab->setText(Tmp);
+
+	Tmp.setf("%0.6f s",cam.time_decompress);
+	statusbar_time_decode->setText(Tmp);
+
+	Tmp.setf("%0.6f s",cam.time_total);
+	statusbar_time_total->setText(Tmp);
+
+
+}
 
 void StopMoCap::on_deviceComboBox_currentIndexChanged(int index)
 {
@@ -481,6 +541,7 @@ void StopMoCap::grabFrame()
 				grabImg.bltBlend(lastFrame,blendFactor);
 			}
 		}
+		updateStatusBar();
 	} catch (Device::QueryBufFailed) {
 		cam.close();
 		stopCapture();
@@ -503,6 +564,7 @@ void StopMoCap::on_timer_fired()
 		ppl7::String Tmp;
 		Tmp.setf("%i",fpsCounter);
 		fpsTimer=now;
+		statusbar_fps->setText(Tmp);
 		ui.captureFPS->setText(Tmp);
 		fpsCounter=0;
 	}
