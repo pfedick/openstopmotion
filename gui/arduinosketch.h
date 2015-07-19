@@ -28,7 +28,7 @@
 
 #define WITH_QT
 
-#include <QDialog>
+#include <QtGui/QDialog>
 #include <QFile>
 #include <QTextStream>
 #include <ppl7.h>

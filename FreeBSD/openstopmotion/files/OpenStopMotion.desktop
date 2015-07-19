@@ -2,8 +2,8 @@
 Encoding=UTF-8
 Name=OpenStopMotion
 Comment=Webcam capture program for creating stopmotion video
-Exec=@prefix@/bin/OpenStopMotion
+Exec=/usr/local/bin/OpenStopMotion
 Terminal=false
 Type=Application
 Categories=GTK;GNOME;AudioVideo;
-Icon=@prefix@/share/pixmaps/OpenStopMotion.png
+Icon=/usr/local/share/pixmaps/OpenStopMotion.png

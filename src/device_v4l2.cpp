@@ -28,7 +28,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
@@ -38,7 +37,7 @@
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
-static int xioctl(int fh, unsigned long request, void *arg)
+static int xioctl(int fh, int request, void *arg)
 {
         int r;
 
@@ -56,9 +55,6 @@ Device::Device()
 	buffers=NULL;
 	n_buffers=0;
 	captureRunning=false;
-	time_readFrame=0.0;
-	time_decompress=0.0;
-	time_total=0.0;
 }
 
 Device::~Device()
@@ -542,11 +538,9 @@ void Device::waitForNextFrame()
 int Device::readFrame(ppl7::grafix::Image &img)
 {
 	if (myff<1) throw DeviceNotOpen();
-	double start_time=ppl7::GetMicrotime();
 	waitForNextFrame();
 	struct v4l2_buffer buf;
 	unsigned int i;
-
 
 	switch (iomethod) {
 		case IO_METHOD_READ:
@@ -564,7 +558,6 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
 				}
 			}
-			time_readFrame=ppl7::GetMicrotime()-start_time;
 			processImage(buffers[0].start, buffers[0].length, img);
 			break;
 
@@ -589,7 +582,7 @@ int Device::readFrame(ppl7::grafix::Image &img)
 				}
 			}
 			if (buf.index>=n_buffers) throw BufferError();
-			time_readFrame=ppl7::GetMicrotime()-start_time;
+
 			processImage(buffers[buf.index].start, buf.bytesused, img);
 
 			if (-1 == xioctl(myff, VIDIOC_QBUF, &buf)) throw QueryBufFailed();
@@ -622,13 +615,12 @@ int Device::readFrame(ppl7::grafix::Image &img)
 					break;
 
 			if (i>=n_buffers) throw BufferError();
-			time_readFrame=ppl7::GetMicrotime()-start_time;
+
 			processImage((void *)buf.m.userptr, buf.bytesused, img);
 
 			if (-1 == xioctl(myff, VIDIOC_QBUF, &buf)) throw QueryBufFailed();
 			break;
 	}
-	time_total=ppl7::GetMicrotime()-start_time;
 
 	return 1;
 }
@@ -674,8 +666,6 @@ void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 	//printf ("Frame captured mit %i Bytes. ",size);
 	//printf ("Format: %i\n",fmt.pixelformat);
 	//ppl7::HexDump(&fmt.pixelformat,4);
-	double start_time=ppl7::GetMicrotime();
-
 	if (fmt.pixelformat==V4L2_PIX_FMT_JPEG || fmt.pixelformat==V4L2_PIX_FMT_MJPEG) {
 		ppl7::MemFile File;
 		File.open(buffer,size);
@@ -712,7 +702,7 @@ void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 		}
 
 	}
-	time_decompress=ppl7::GetMicrotime()-start_time;
+
 	//ppl7::HexDump(buffer,256);
 }
 

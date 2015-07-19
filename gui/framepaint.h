@@ -26,7 +26,7 @@
 #ifndef FRAMEPAINT_H
 #define FRAMEPAINT_H
 
-#include <QDialog>
+#include <QtGui/QDialog>
 #define WITH_QT
 #include <ppl7.h>
 #include <ppl7-grafix.h>
