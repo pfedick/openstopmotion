@@ -1,34 +1,8 @@
-/*
- * This file is part of OpenStopMotion by Patrick Fedick
- *
- * $Author$
- * $Revision$
- * $Date$
- * $Id$
- *
- *
- * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #ifndef WIN32
 #include "device.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 #include <linux/videodev2.h>
 #include <sys/ioctl.h>
@@ -38,7 +12,7 @@
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
-static int xioctl(int fh, unsigned long request, void *arg)
+static int xioctl(int fh, int request, void *arg)
 {
         int r;
 
@@ -56,9 +30,6 @@ Device::Device()
 	buffers=NULL;
 	n_buffers=0;
 	captureRunning=false;
-	time_readFrame=0.0;
-	time_decompress=0.0;
-	time_total=0.0;
 }
 
 Device::~Device()
@@ -78,7 +49,7 @@ void Device::enumerateDevices(std::list<VideoDevice> &list)
 				VideoDevice d;
 				enumerateDevice(DeviceName,i,d);
 				list.push_back(d);
-			} catch (const ppl7::FileNotFoundException &e) {
+			} catch (const ppl7::FileObject::FileNotFoundException &e) {
 			} catch (const Device::InvalidDevice &e) {
 
 			} catch (...) {
@@ -92,7 +63,7 @@ void Device::enumerateDevices(std::list<VideoDevice> &list)
 void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDevice &d)
 {
 	int ff=::open((const char*)DeviceName, O_RDONLY);
-	if (ff==-1) ppl7::throwExceptionFromErrno(errno,DeviceName);
+	if (ff==-1) ppl7::File::throwErrno(errno,DeviceName);
 	struct v4l2_input argp;
 	CLEAR(argp);
 	argp.index=index;
@@ -125,34 +96,20 @@ void Device::enumerateDevice(const ppl7::String &DeviceName, int index, VideoDev
 void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevice &device)
 {
 	int ff=::open((const char*)device.DeviceName, O_RDONLY);
-	if (ff==-1) ppl7::throwExceptionFromErrno(errno,device.DeviceName);
+	if (ff==-1) ppl7::File::throwErrno(errno,device.DeviceName);
 
 	struct v4l2_fmtdesc fmt;
 	memset (&fmt, 0, sizeof (fmt));
 	fmt.type=V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
 	while (0 == xioctl (ff, VIDIOC_ENUM_FMT, &fmt)) {
-		printf ("Standardname: %s\n", fmt.description);
+		//printf ("Standardname: %s\n", fmt.description);
 		if (fmt.pixelformat==V4L2_PIX_FMT_JPEG || fmt.pixelformat==V4L2_PIX_FMT_MJPEG) {
 			VideoFormat f;
 			f.Description.set((const char*)fmt.description);
 			f.pixelformat=fmt.pixelformat;
 			f.flags=fmt.flags;
 			list.push_back(f);
-		} else if (fmt.pixelformat==V4L2_PIX_FMT_YUYV) {
-			VideoFormat f;
-			f.Description.set((const char*)fmt.description);
-			f.pixelformat=fmt.pixelformat;
-			f.flags=fmt.flags;
-			list.push_back(f);
-			/*
-		} else if (fmt.pixelformat==V4L2_PIX_FMT_H264) {
-			VideoFormat f;
-			f.Description.set((const char*)fmt.description);
-			f.pixelformat=fmt.pixelformat;
-			f.flags=fmt.flags;
-			list.push_back(f);
-			*/
 		}
 		fmt.index++;
 	}
@@ -162,7 +119,7 @@ void Device::enumerateImageFormats(std::list<VideoFormat> &list, const VideoDevi
 void Device::enumerateFrameSizes(std::list<ppl7::grafix::Size> &list, const VideoDevice &device, const VideoFormat &fmt)
 {
 	int ff=::open((const char*)device.DeviceName, O_RDONLY);
-	if (ff==-1) ppl7::throwExceptionFromErrno(errno,device.DeviceName);
+	if (ff==-1) ppl7::File::throwErrno(errno,device.DeviceName);
 	struct v4l2_frmsizeenum s;
 	memset (&s, 0, sizeof (s));
 	s.pixel_format=fmt.pixelformat;
@@ -183,7 +140,7 @@ void Device::open(const VideoDevice &dev)
 	close();
 	if (!(dev.caps&VideoDevice::CAP_VIDEO_CAPTURE)) throw DeviceDoesNotSupportCapture();
 	myff=::open((const char*)dev.DeviceName, O_RDWR /* required */ | O_NONBLOCK,0);
-	if (myff==-1) ppl7::throwExceptionFromErrno(errno,dev.DeviceName);
+	if (myff==-1) ppl7::File::throwErrno(errno,dev.DeviceName);
 	this->dev=dev;
 }
 
@@ -326,8 +283,6 @@ void Device::startCapture(const VideoFormat &fmt, int width, int height)
 	if (myff<1) throw DeviceNotOpen();
 	if (captureRunning) stopCapturing();
 	this->fmt=fmt;
-	this->size.width=width;
-	this->size.height=height;
 
 	struct v4l2_cropcap cropcap;
 	struct v4l2_crop crop;
@@ -542,11 +497,9 @@ void Device::waitForNextFrame()
 int Device::readFrame(ppl7::grafix::Image &img)
 {
 	if (myff<1) throw DeviceNotOpen();
-	double start_time=ppl7::GetMicrotime();
 	waitForNextFrame();
 	struct v4l2_buffer buf;
 	unsigned int i;
-
 
 	switch (iomethod) {
 		case IO_METHOD_READ:
@@ -561,10 +514,9 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						/* fall through */
 
 					default:
-						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
+						throw ReadError();
 				}
 			}
-			time_readFrame=ppl7::GetMicrotime()-start_time;
 			processImage(buffers[0].start, buffers[0].length, img);
 			break;
 
@@ -585,11 +537,11 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						/* fall through */
 
 					default:
-						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
+						throw ReadError();
 				}
 			}
 			if (buf.index>=n_buffers) throw BufferError();
-			time_readFrame=ppl7::GetMicrotime()-start_time;
+
 			processImage(buffers[buf.index].start, buf.bytesused, img);
 
 			if (-1 == xioctl(myff, VIDIOC_QBUF, &buf)) throw QueryBufFailed();
@@ -612,7 +564,7 @@ int Device::readFrame(ppl7::grafix::Image &img)
 						/* fall through */
 
 					default:
-						ppl7::throwExceptionFromErrno(errno,"Device::readFrame");
+						throw ReadError();
 				}
 			}
 
@@ -622,13 +574,12 @@ int Device::readFrame(ppl7::grafix::Image &img)
 					break;
 
 			if (i>=n_buffers) throw BufferError();
-			time_readFrame=ppl7::GetMicrotime()-start_time;
+
 			processImage((void *)buf.m.userptr, buf.bytesused, img);
 
 			if (-1 == xioctl(myff, VIDIOC_QBUF, &buf)) throw QueryBufFailed();
 			break;
 	}
-	time_total=ppl7::GetMicrotime()-start_time;
 
 	return 1;
 }
@@ -664,55 +615,20 @@ int Device::getControlValue(const CameraControl &ctl)
 	return c.value;
 }
 
-static int clamp(int value)
-{
-	if (value<=255) return value;
-	return 255;
-}
+
 void Device::processImage(void *buffer, size_t size, ppl7::grafix::Image &img)
 {
 	//printf ("Frame captured mit %i Bytes. ",size);
 	//printf ("Format: %i\n",fmt.pixelformat);
 	//ppl7::HexDump(&fmt.pixelformat,4);
-	double start_time=ppl7::GetMicrotime();
-
 	if (fmt.pixelformat==V4L2_PIX_FMT_JPEG || fmt.pixelformat==V4L2_PIX_FMT_MJPEG) {
 		ppl7::MemFile File;
 		File.open(buffer,size);
-		img.load(File,ppl7::grafix::RGBFormat::A8R8G8B8);
-	} else if (fmt.pixelformat==V4L2_PIX_FMT_YUYV) {
-		//printf ("size: %i x %i\n",this->size.width, this->size.height);
-		if (img.width()!=this->size.width || img.height()!=this->size.height) {
-			//printf ("create Image\n");
-			img.create(this->size.width, this->size.height, ppl7::grafix::RGBFormat::A8R8G8B8);
-		}
-		//printf ("Size=%zi\n",size);
-		typedef struct {
-			unsigned char y1;
-			unsigned char cb;
-			unsigned char y2;
-			unsigned char cr;
-		} DPIXEL;
+		img.load(File,ppl7::grafix::RGBFormat::X8R8G8B8);
 
-		DPIXEL *ptr=(DPIXEL*)buffer;
-		ppl7::grafix::Color c;
-		for (int y=0;y<this->size.height;y++) {
-			for (int x=0;x<this->size.width;x+=2) {
-				c.setColor(clamp(ptr->y1+1.402 * (ptr->cr-128)),
-						clamp(ptr->y1-0.34414 * (ptr->cb-128)-0.71414*(ptr->cr-128)),
-						clamp(ptr->y1+1.772 * (ptr->cb-128)));
-
-				img.putPixel(x,y,c);
-				c.setColor(clamp(ptr->y2+1.402 * (ptr->cr-128)),
-						clamp(ptr->y2-0.34414 * (ptr->cb-128)-0.71414*(ptr->cr-128)),
-						clamp(ptr->y2+1.772 * (ptr->cb-128)));
-				img.putPixel(x+1,y,c);
-				ptr++;
-			}
-		}
 
 	}
-	time_decompress=ppl7::GetMicrotime()-start_time;
+
 	//ppl7::HexDump(buffer,256);
 }
 

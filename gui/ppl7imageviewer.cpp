@@ -1,26 +1,8 @@
 /*
- * This file is part of OpenStopMotion by Patrick Fedick
+ * ppl7imageviewer.cpp
  *
- * $Author$
- * $Revision$
- * $Date$
- * $Id$
- *
- *
- * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Created on: 09.06.2012
+ *      Author: patrick
  */
 
 #include "ppl7imageviewer.h"
@@ -43,9 +25,6 @@ void PPL7ImageViewer::setDrawable(ppl7::grafix::Drawable *draw)
 void PPL7ImageViewer::setScaling(ScalingMode mode)
 {
 	smode=mode;
-	QPainter painter(this);
-	QRect r=painter.window();
-	painter.eraseRect(r);
 }
 
 PPL7ImageViewer::ScalingMode PPL7ImageViewer::scalingMode() const
@@ -153,10 +132,3 @@ void PPL7ImageViewer::mousePressEvent(QMouseEvent *event)
 	QWidget::mousePressEvent(event);
 }
 
-void PPL7ImageViewer::setBackground(const QColor &c)
-{
-	QPainter painter(this);
-	QRect r=painter.window();
-	painter.setBackground(c);
-	painter.eraseRect(r);
-}

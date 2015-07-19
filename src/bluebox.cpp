@@ -1,30 +1,50 @@
 /*
- * This file is part of OpenStopMotion by Patrick Fedick
+ * bluebox.cpp
  *
- * $Author$
- * $Revision$
- * $Date$
- * $Id$
- *
- *
- * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Created on: 29.06.2012
+ *      Author: patrick
  */
 
 #include "bluebox.h"
 #include <math.h>
+
+
+typedef struct {
+union  {
+	struct { ppluint8 b,g,r,a; };
+	ppluint32 c;
+};
+} PIXEL;
+
+static inline int max(int a, int b)
+{
+   if (a>b) {return (a);}
+   return (b);
+}
+
+static inline double colorclose(int Cb_p,int Cr_p,int Cb_key,int Cr_key,int tola,int tolb)
+{
+   /*decides if a color is close to the specified hue*/
+   double temp = sqrt((Cb_key-Cb_p)*(Cb_key-Cb_p)+(Cr_key-Cr_p)*(Cr_key-Cr_p));
+   // SSE: sqrtss für float, SSE2: sqrtsd für double
+   // Man könnte Cb und Cr in ein MME-Register packen, die Subtraktionen und Multiplikationen
+   // parallel berechnen, das Ergebnis addieren und dann die Wurzel ziehen
+   if (temp < tola) {return (0.0);}
+   if (temp < tolb) {return ((temp-tola)/(tolb-tola));}
+   return (1.0);
+}
+
+
+static inline int getYCb(int r, int g, int b)
+{
+	return (int) (128 + -0.168736*r - 0.331264*g + 0.5*b);
+}
+
+static inline int getYCr(int r, int g, int b)
+{
+	return (int) (128 + 0.5*r - 0.418688*g - 0.081312*b);
+}
+
 
 BlueBox::BlueBox()
 {
@@ -67,18 +87,11 @@ void BlueBox::setColorKeyFG(const ppl7::grafix::Color &key)
 void BlueBox::setReplaceColor(const ppl7::grafix::Color &color)
 {
 	Replace=color;
-	UpdateReplaceColor();
 }
 
 void BlueBox::setReplaceMode(int mode)
 {
-	if (mode==1) {
-		this->mode=1;
-		UpdateReplaceColor();
-	} else if (mode==2) {
-		this->mode=2;
-		UpdateReplaceColor();
-	}
+	if (mode==1) this->mode=1;
 	else this->mode=0;
 }
 
@@ -193,57 +206,141 @@ ppl7::grafix::Color BlueBox::replaceColor() const
 	return Replace;
 }
 
+/*
+void BlueBox::process(ppl7::grafix::Image &img)
+{
+	double mask;
+	int cb,cr;
+	int cb_key=Key.getYCb();
+	int cr_key=Key.getYCr();
+	int r_key = Key.red();
+	int g_key = Key.green();
+	int b_key = Key.blue();
+
+	ppl7::grafix::Color c,t,bg;
+
+	for (int y=0;y<img.height();y++) {
+		for (int x=0;x<img.width();x++) {
+			c=img.getPixel(x,y);
+			cb=c.getYCb();
+			cr=c.getYCr();
+			bg=bgImage.getPixel(x,y);
+
+			mask = 1-colorclose(cb, cr, cb_key, cr_key,tola,tolb);
+			if (mask==0.0) {
+				continue;
+			} else if (mask==1.0) {
+				img.putPixel(x,y,bg);
+			} else {
+				t.set(max(c.red()-mask*r_key,0)+mask*bg.red(),
+						max(c.green()-mask*g_key,0)+mask*bg.green(),
+						max(c.blue()-mask*b_key,0)+mask*bg.blue()
+				);
+				img.putPixel(x,y,t);
+			}
+		}
+	}
+}
+ */
+
 
 void BlueBox::UpdateForeground()
 {
 	if (fgChromaEnabled==false) return;
-	if (fgImage.isEmpty()) return;
+	double mask;
+	int cb,cr;
+	int cb_key=KeyFG.getYCb();
+	int cr_key=KeyFG.getYCr();
+	int r_key = KeyFG.red();
+	int g_key = KeyFG.green();
+	int b_key = KeyFG.blue();
+
+	PIXEL c,bg,t;
+
+	bg.r=Replace.red();
+	bg.g=Replace.green();
+	bg.b=Replace.blue();
+
 	fgImageAlpha.create(fgImage.width(),fgImage.height(),fgImage.rgbformat());
-	fgImageAlpha.bltChromaKey(fgImage,KeyFG,tolaFG,tolbFG);
-}
+
+	ppluint32 *sadr=(ppluint32*)fgImage.adr();
+	ppluint32 spitch=fgImage.pitch()/4;
+
+	ppluint32 *zadr=(ppluint32*)fgImageAlpha.adr();
+	ppluint32 zpitch=fgImageAlpha.pitch()/4;
 
 
-void BlueBox::UpdateReplaceColor()
-{
-	if (repImage.isEmpty()) return;
-	if (mode==2) {
-		ppl7::grafix::Color c[2];
-		c[0].set(255,255,255,0);
-		c[1].set(230,230,230,0);
-		int n;
-		int z=0;
-		for (int y=0;y<repImage.height();y+=8) {
-			n=z&1;
-			z++;
-			for (int x=0;x<repImage.width();x+=8) {
-				repImage.fillRect(x,y,x+8,y+8,c[n]);
-				n=!n;
+	for (int y=0;y<fgImage.height();y++) {
+		for (int x=0;x<fgImage.width();x++) {
+			c.c=sadr[x];
+			cb=getYCb(c.r,c.g,c.b);
+			cr=getYCr(c.r,c.g,c.b);
+
+			mask = colorclose(cb, cr, cb_key, cr_key,tolaFG,tolbFG);
+			if (mask==1.0) {
+				zadr[x]=c.c;
+				//zadr[x]=0;
+			} else if (mask==0.0) {
+				zadr[x]=0;
+			} else {
+				c.a=mask*255;
+				zadr[x]=c.c;
 			}
-
 		}
+		sadr+=spitch;
+		zadr+=zpitch;
 	}
-	else repImage.cls(Replace);
 }
-
 
 void BlueBox::process(ppl7::grafix::Image &img)
 {
 	if (bgChromaEnabled) {
+		double mask;
+		int cb,cr;
+		int cb_key=Key.getYCb();
+		int cr_key=Key.getYCr();
+		int r_key = Key.red();
+		int g_key = Key.green();
+		int b_key = Key.blue();
 
-		if (mode==0) {
-			img.bltBackgroundOnChromaKey(bgImage,Key,tola,tolb);
-		} else {
-			if (repImage.isEmpty()==true || repImage.width()!=img.width()
-					|| repImage.height()!=img.height()) {
-				repImage.create(img.width(),img.height(),ppl7::grafix::RGBFormat::A8R8G8B8);
-				UpdateReplaceColor();
+		PIXEL c,bg,t;
+
+		bg.r=Replace.red();
+		bg.g=Replace.green();
+		bg.b=Replace.blue();
+
+
+		ppluint32 *sadr=(ppluint32*)img.adr();
+		ppluint32 spitch=img.pitch()/4;
+
+		ppluint32 *bgadr=(ppluint32*)bgImage.adr();
+		ppluint32 bgpitch=bgImage.pitch()/4;
+
+
+		for (int y=0;y<img.height();y++) {
+			for (int x=0;x<img.width();x++) {
+				c.c=sadr[x];
+				cb=getYCb(c.r,c.g,c.b);
+				cr=getYCr(c.r,c.g,c.b);
+				if (mode==0) bg.c=bgadr[x];
+
+				mask = 1-colorclose(cb, cr, cb_key, cr_key,tola,tolb);
+				if (mask==0.0) {
+					continue;
+				} else if (mask==1.0) {
+					sadr[x]=bg.c;
+				} else {
+					t.r=max(c.r-mask*r_key,0)+mask*bg.r;
+					t.g=max(c.g-mask*g_key,0)+mask*bg.g;
+					t.b=max(c.b-mask*b_key,0)+mask*bg.b;
+					sadr[x]=t.c;
+				}
 			}
-			img.bltBackgroundOnChromaKey(repImage,Key,tola,tolb);
+			sadr+=spitch;
+			bgadr+=bgpitch;
 		}
-
-
 	}
-	if (fgChromaEnabled==true && fgImageAlpha.isEmpty()==false) {
+	if (fgChromaEnabled) {
 		img.bltAlpha(fgImageAlpha);
 	}
 }

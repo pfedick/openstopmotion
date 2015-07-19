@@ -1,35 +1,9 @@
-/*
- * This file is part of OpenStopMotion by Patrick Fedick
- *
- * $Author$
- * $Revision$
- * $Date$
- * $Id$
- *
- *
- * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 #define WITH_QT
 
 #include <ppl7.h>
 #include <ppl7-grafix.h>
 #include <QSettings>
 #include <QDesktopServices>
-#include "osm.h"
 #include "stopmocap.h"
 
 
@@ -42,10 +16,6 @@ Config::Config()
 	scalingMode=PPL7ImageViewer::Smooth;
 	saveCamShot=true;
 	saveComposited=false;
-	frameRate=30;
-	interpolate=false;
-	overblendFactor=50;
-	darkLayout=false;
 }
 
 Config::~Config()
@@ -56,10 +26,6 @@ Config::~Config()
 void Config::load()
 {
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, STOPMOCAP_ORGANISATION,STOPMOCAP_CONFIGKEY);
-	settings.beginGroup("window");
-	ScreenGeometry=settings.value("geometry").toByteArray();
-	settings.endGroup();
-
 	settings.beginGroup("common");
 	CaptureDir=settings.value("CaptureDir").toString();
 	Scene=settings.value("Scene").toString();
@@ -71,10 +37,6 @@ void Config::load()
 	onionValue=settings.value("onionValue",0).toInt();
 	jpegQuality=settings.value("jpegQuality",90).toInt();
 	pictureFormat=settings.value("pictureFormat",0).toInt();
-	frameRate=settings.value("frameRate",30).toInt();
-	interpolate=settings.value("interpolate",false).toBool();
-	darkLayout=settings.value("darkLayout",false).toBool();
-	overblendFactor=settings.value("overblendFactor",50).toInt();
 
 	jpegQualityComp=settings.value("jpegQualityComp",90).toInt();
 	pictureFormatComp=settings.value("pictureFormatComp",0).toInt();
@@ -90,7 +52,7 @@ void Config::load()
 	chromaBGImage=settings.value("chromaBGImage","").toString();
 	chromaToleranceFar=settings.value("chromaToleranceFar",0).toInt();
 	chromaToleranceNear=settings.value("chromaToleranceNear",0).toInt();
-	chromaKey.setColor((ppluint32)settings.value("chromaKconfey",0x00ff0000).toInt());
+	chromaKey.setColor((ppluint32)settings.value("chromaKey",0x00ff0000).toInt());
 	replaceColor.setColor((ppluint32)settings.value("replaceColor",0x00ff0000).toInt());
 	chromaReplaceMode=settings.value("chromaReplaceMode",0).toInt();
 
@@ -101,24 +63,11 @@ void Config::load()
 	chromaKeyFG.setColor((ppluint32)settings.value("chromaKeyFG",0x00ff0000).toInt());
 
 	settings.endGroup();
-
-	settings.beginGroup("ledcontrol");
-	LedControlFile=settings.value("LedControlFile").toString();
-	ArduinoDevice=settings.value("ArduinoDevice","/dev/cuaU0").toString();
-	ArduinoBaudRate=settings.value("ArduinoBaudRate",57600).toInt();
-	settings.endGroup();
-
-
-
 }
 
 void Config::save()
 {
 	QSettings settings(QSettings::IniFormat, QSettings::UserScope, STOPMOCAP_ORGANISATION,STOPMOCAP_CONFIGKEY);
-	settings.beginGroup("window");
-	settings.setValue("geometry",ScreenGeometry);
-	settings.endGroup();
-
 	settings.beginGroup("common");
 	settings.setValue("CaptureDir",CaptureDir);
 	settings.setValue("Scene",Scene);
@@ -135,10 +84,6 @@ void Config::save()
 	settings.setValue("pictureFormatComp",pictureFormatComp);
 	settings.setValue("saveCamShot",saveCamShot);
 	settings.setValue("saveComposited",saveComposited);
-	settings.setValue("frameRate",frameRate);
-	settings.setValue("interpolate",interpolate);
-	settings.setValue("overblendFactor",overblendFactor);
-	settings.setValue("darkLayout",darkLayout);
 	settings.endGroup();
 
 	settings.beginGroup("chromaKeying");
@@ -157,11 +102,6 @@ void Config::save()
 	settings.setValue("chromaToleranceNearFG",chromaToleranceNearFG);
 	settings.setValue("chromaSpillRemoveFG",chromaSpillRemoveFG);
 	settings.setValue("chromaKeyFG",chromaKeyFG.rgb());
-	settings.endGroup();
 
-	settings.beginGroup("ledcontrol");
-	settings.setValue("LedControlFile",LedControlFile);
-	settings.setValue("ArduinoDevice",ArduinoDevice);
-	settings.setValue("ArduinoBaudRate",ArduinoBaudRate);
 	settings.endGroup();
 }

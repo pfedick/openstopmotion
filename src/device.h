@@ -1,28 +1,9 @@
 /*
- * This file is part of OpenStopMotion by Patrick Fedick
+ * device.h
  *
- * $Author$
- * $Revision$
- * $Date$
- * $Id$
- *
- *
- * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  Created on: 17.12.2011
+ *      Author: patrickf
  */
-
 
 #ifndef DEVICE_H_
 #define DEVICE_H_
@@ -130,10 +111,6 @@ class Device
 		bool captureRunning;
 	public:
 
-		double time_readFrame;
-		double time_decompress;
-		double time_total;
-
 
 		Device();
 		~Device();
@@ -154,26 +131,26 @@ class Device
 
 		void close();
 
-		PPLEXCEPTION(InvalidDevice, Exception);
-		PPLEXCEPTION(InvalidFormat, Exception);
-		PPLEXCEPTION(DeviceNotOpen, Exception);
-		PPLEXCEPTION(SelectError, Exception);
-		PPLEXCEPTION(Timeout, Exception);
-		PPLEXCEPTION(ReadError, Exception);
-		PPLEXCEPTION(StreamingUnsupported, Exception);
-		PPLEXCEPTION(StreamOffFailed, Exception);
-		PPLEXCEPTION(StreamOnFailed, Exception);
-		PPLEXCEPTION(StreamBufferError, Exception);
-		PPLEXCEPTION(DeviceDoesNotSupportCapture, Exception);
-		PPLEXCEPTION(MMapUnsupported, Exception);
-		PPLEXCEPTION(UserpUnsupported, Exception);
-		PPLEXCEPTION(InsufficientBufferMemory, Exception);
-		PPLEXCEPTION(QueryBufFailed, Exception);
-		PPLEXCEPTION(MMapFailed, Exception);
-		PPLEXCEPTION(MUnmapFailed, Exception);
-		PPLEXCEPTION(BufferError, Exception);
-		PPLEXCEPTION(SetControlValueFailed, Exception);
-		PPLEXCEPTION(GetControlValueFailed, Exception);
+		PPLNORMALEXCEPTION(InvalidDevice);
+		PPLNORMALEXCEPTION(InvalidFormat);
+		PPLNORMALEXCEPTION(DeviceNotOpen);
+		PPLNORMALEXCEPTION(SelectError);
+		PPLNORMALEXCEPTION(Timeout);
+		PPLNORMALEXCEPTION(ReadError);
+		PPLNORMALEXCEPTION(StreamingUnsupported);
+		PPLNORMALEXCEPTION(StreamOffFailed);
+		PPLNORMALEXCEPTION(StreamOnFailed);
+		PPLNORMALEXCEPTION(StreamBufferError);
+		PPLNORMALEXCEPTION(DeviceDoesNotSupportCapture);
+		PPLNORMALEXCEPTION(MMapUnsupported);
+		PPLNORMALEXCEPTION(UserpUnsupported);
+		PPLNORMALEXCEPTION(InsufficientBufferMemory);
+		PPLNORMALEXCEPTION(QueryBufFailed);
+		PPLNORMALEXCEPTION(MMapFailed);
+		PPLNORMALEXCEPTION(MUnmapFailed);
+		PPLNORMALEXCEPTION(BufferError);
+		PPLNORMALEXCEPTION(SetControlValueFailed);
+		PPLNORMALEXCEPTION(GetControlValueFailed);
 
 };
 
