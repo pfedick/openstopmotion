@@ -1,0 +1,54 @@
+OpenStopMotion Changelog
+========================
+
+0.7.0 2015-07-02
+  - Fixed ioctl sign-extension warnings
+  - Fixed some compiler warnings about unused variables
+  - FreeBSD-Port: fixed some issues, updated to new policies, tested on
+    FreeBSD 9 and 10
+  - Restructured and simplified the build process:
+    openstopmotion has its own configure and makefile, ppl7 acts as
+    an autoconf subproject
+  - Color selection for chromakey background and foreground by dialog
+  - New function to rotate the image by 180 degrees
+  - StatusBar with FPS and performance timer
+  - added compatibility with Qt4 and Qt5
+
+0.6.4 2013-04-18
+  - added missing header include in arduino.cpp, fixed compiler error on
+    Fedora
+  - added missing header include in device_v4l2.cpp
+  - added missing dependency in source rpm specfile
+  - "build_package.sh source" generates a specfile in subdirectory distfiles
+  - build_package.sh works on openSUSE
+  - fixed: update of light values in ledcontrol when pressing capture button,
+    could be too late
+  
+0.6.3 2013-04-13
+  - fixed initialisation of correct light value after the last keyframe
+  - new control buttons in ledcontrol: next keyframe and previos keyframe
+  - "build_package source" now builds FreeBSD-Port
+
+0.6.2 2013-04-12
+  - Fixed missing directory in source distribution 
+  - after clicking undo button, capture button gets focus
+  - when opening load or save dialog in led control, capture from
+    webcam is suspended
+  - last ledcontrol savefile is automatically loaded on next start
+  - added Arduino sketch for led control
+  - Arduino sketch is shown when pressing the Arduino-button on led
+    control page
+  
+0.6.1 2013-04-12
+  - added clear-button in LED control
+  - removed edit-button on main screen
+  - wrote installation instructions
+  - refactured build-script
+  - extended build-script for building binary rpms on RedHat/Fedora/CentOS
+    and FreeBSD
+  - extended build-script to generate source-rpm
+  - removed dependency on libmcrypt
+
+0.6.0 2013-04-08
+  - First public release
+  - LED control with Arduino
