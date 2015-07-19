@@ -109,11 +109,7 @@ bool LedControl::eventFilter(QObject *obj, QEvent *event)
 void LedControl::setConfig (Config &conf)
 {
 	this->conf=&conf;
-	if (conf.LedControlFile.notEmpty()) {
-		load (conf.LedControlFile);
-		Filename=conf.LedControlFile;
-		unsaved=false;
-	}
+	if (conf.LedControlFile.notEmpty()) load (conf.LedControlFile);
 }
 
 void LedControl::setArduino (Arduino &arduino)
@@ -125,7 +121,6 @@ void LedControl::setCurrentFrame(int frame)
 {
 	int offset=ui.offsetFrame->text().toInt();
 	ui.frameSlider->setValue(frame+offset);
-	on_frameSlider_valueChanged(frame+offset);
 }
 
 void LedControl::setColorScheme(int scheme)
@@ -211,7 +206,7 @@ void LedControl::on_maxFrame_textChanged(const QString & text)
 	unsaved=true;
 }
 
-void LedControl::on_offsetFrame_textChanged(const QString & )
+void LedControl::on_offsetFrame_textChanged(const QString & text)
 {
 	unsaved=true;
 }
@@ -318,56 +313,6 @@ void LedControl::on_frameBackButton_clicked()
 
 }
 
-int LedControl::findNextKeyFrame(int led, int start)
-{
-	ppl7::AVLTree<int, int>::Iterator it;
-	keyframes[led].reset(it);
-	int nextframe;
-	while (keyframes[led].getNext(it)) {
-		nextframe=it.key();
-		if (nextframe>start) return nextframe;
-	}
-	return start;
-}
-
-int LedControl::findPreviousKeyFrame(int led, int start)
-{
-	ppl7::AVLTree<int, int>::Iterator it;
-	keyframes[led].reset(it);
-	int nextframe=start;
-	while (keyframes[led].getPrevious(it)) {
-		nextframe=it.key();
-		if (nextframe<start) return nextframe;
-	}
-	return start;
-}
-
-
-void LedControl::on_keyNextButton_clicked()
-{
-	PlaybackTimer->stop();
-	int frame=ui.frameSlider->value();
-	// find next keyframe
-	int nextframe=ui.frameSlider->maximum();
-	for (int i=0;i<12;i++) {
-		int f=findNextKeyFrame(i,frame);
-		if (f<nextframe && f>frame) nextframe=f;
-	}
-	if (nextframe<ui.frameSlider->maximum()) ui.frameSlider->setValue(nextframe);
-}
-
-void LedControl::on_keyBackButton_clicked()
-{
-	PlaybackTimer->stop();
-	int frame=ui.frameSlider->value();
-	int nextframe=0;
-	for (int i=0;i<12;i++) {
-		int f=findPreviousKeyFrame(i,frame);
-		if (f>nextframe && f<frame) nextframe=f;
-	}
-	if (nextframe>=0) ui.frameSlider->setValue(nextframe);
-}
-
 void LedControl::on_playButton_clicked()
 {
 	PlaybackTimer->start(1000/conf->frameRate);
@@ -383,8 +328,7 @@ void LedControl::on_playbackTimer_fired()
 {
 	int frame=ui.frameSlider->value();
 	frame++;
-	if (frame>=ui.frameSlider->maximum()) frame=0;
-	ui.frameSlider->setValue(frame);
+	if (frame<ui.frameSlider->maximum()) ui.frameSlider->setValue(frame);
 }
 
 void LedControl::on_arduinoButton_clicked()
@@ -490,7 +434,7 @@ void LedControl::recalcFrames(int id)
 {
 	interpolatedframes[id].clear();
 	int frame=0;
-	//int maxf=ui.maxFrame->text().toInt();
+	int maxf=ui.maxFrame->text().toInt();
 	int value=0;
 	int nextframe;
 	int nextvalue;
@@ -515,9 +459,8 @@ void LedControl::recalcFrames(int id)
 		frame=nextframe;
 		value=nextvalue;
 	}
-	for (int i=frame+1;i<ui.maxFrame->text().toInt();i++) {
-		interpolatedframes[id].add(i,nextvalue);
-	}
+
+
 
 }
 
@@ -553,7 +496,7 @@ void LedControl::updateFrameView()
 	int middle=w/3;
 	int offset=frame*5;
 
-	//int x=ui.frameSlider->value();
+	int x=ui.frameSlider->value();
 	img.line(middle+5,0,middle+5,h,framepointer);
 
 

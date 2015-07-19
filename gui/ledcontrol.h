@@ -28,7 +28,7 @@
 
 #define WITH_QT
 
-#include <QWidget>
+#include <QtGui/QWidget>
 #include <QSlider>
 #include <QTimer>
 #include <QSizePolicy>
@@ -81,8 +81,6 @@ private:
     void updateFrameView();
     void recalcFrames(int id);
     bool unsaved;
-    int  findNextKeyFrame(int led, int start);
-    int  findPreviousKeyFrame(int led, int start);
 
     void remindSave();
 
@@ -104,9 +102,6 @@ public slots:
 
 	void on_frameNextButton_clicked();
 	void on_frameBackButton_clicked();
-	void on_keyNextButton_clicked();
-	void on_keyBackButton_clicked();
-
 	void on_playButton_clicked();
 	void on_stopButton_clicked();
 	void on_arduinoButton_clicked();

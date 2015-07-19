@@ -28,7 +28,6 @@
 
 #include <QtGui>
 #include <QApplication>
-#include <QMessageBox>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -39,18 +38,12 @@ int main(int argc, char *argv[])
 {
 #ifdef WIN32
 	HRESULT hr = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	if (!SUCCEEDED(hr)) {
-		// TODO: process error
-		return 1;
-	}
+	if (SUCCEEDED(hr)) {
 #endif
 		ppl7::grafix::Grafix gfx;
 		QApplication a(argc, argv);
-	    // Deprecated in Qt5, Qt5 geht davon aus, dass der Sourcecode UTF-8 kodiert ist
-#if QT_VERSION < 0x050000
 		QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 		QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-#endif
 
 
 #ifdef CATCH
