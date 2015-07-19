@@ -30,13 +30,11 @@
 #include <QImage>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "arduinosketch.h"
 
 
 LedControl::LedControl(QWidget *parent)
     : QWidget(parent)
 {
-	cap=NULL;
 	unsaved=false;
 	PlaybackTimer=new QTimer(this);
 	myColorScheme=0;
@@ -109,11 +107,6 @@ bool LedControl::eventFilter(QObject *obj, QEvent *event)
 void LedControl::setConfig (Config &conf)
 {
 	this->conf=&conf;
-	if (conf.LedControlFile.notEmpty()) {
-		load (conf.LedControlFile);
-		Filename=conf.LedControlFile;
-		unsaved=false;
-	}
 }
 
 void LedControl::setArduino (Arduino &arduino)
@@ -125,7 +118,6 @@ void LedControl::setCurrentFrame(int frame)
 {
 	int offset=ui.offsetFrame->text().toInt();
 	ui.frameSlider->setValue(frame+offset);
-	on_frameSlider_valueChanged(frame+offset);
 }
 
 void LedControl::setColorScheme(int scheme)
@@ -141,10 +133,6 @@ void LedControl::setColorScheme(int scheme)
 	}
 }
 
-void LedControl::setMainCapture(StopMoCap *cap)
-{
-	this->cap=cap;
-}
 
 
 void LedControl::on_connectButton_clicked()
@@ -211,7 +199,7 @@ void LedControl::on_maxFrame_textChanged(const QString & text)
 	unsaved=true;
 }
 
-void LedControl::on_offsetFrame_textChanged(const QString & )
+void LedControl::on_offsetFrame_textChanged(const QString & text)
 {
 	unsaved=true;
 }
@@ -242,11 +230,6 @@ void LedControl::on_clearButton_clicked()
 void LedControl::on_loadButton_clicked()
 {
 	if (unsaved) remindSave();
-	bool active=false;
-	if (cap) active=cap->isCaptureActive();
-	if (active) cap->stopCapture();
-
-
 	ppl7::String Path=Filename;
 	if (Path.isEmpty()) Path=conf->LedControlFile;
 	if (Path.isEmpty()) Path=ppl7::Dir::currentPath();
@@ -262,7 +245,6 @@ void LedControl::on_loadButton_clicked()
 			DisplayException(e);
 		}
 	}
-	if (active) cap->startCapture();
 	unsaved=false;
 }
 
@@ -280,10 +262,6 @@ void LedControl::on_saveButton_clicked()
 
 void LedControl::on_saveAsButton_clicked()
 {
-	bool active=false;
-	if (cap) active=cap->isCaptureActive();
-	if (active) cap->stopCapture();
-
 	ppl7::String Path=Filename;
 	if (Path.isEmpty()) Path=ppl7::Dir::currentPath();
 	ppl7::String newfile = QFileDialog::getSaveFileName(this, tr("Save LED-Control data"),
@@ -298,7 +276,6 @@ void LedControl::on_saveAsButton_clicked()
 			DisplayException(e);
 		}
 	}
-	if (active) cap->startCapture();
 }
 
 void LedControl::on_frameNextButton_clicked()
@@ -318,56 +295,6 @@ void LedControl::on_frameBackButton_clicked()
 
 }
 
-int LedControl::findNextKeyFrame(int led, int start)
-{
-	ppl7::AVLTree<int, int>::Iterator it;
-	keyframes[led].reset(it);
-	int nextframe;
-	while (keyframes[led].getNext(it)) {
-		nextframe=it.key();
-		if (nextframe>start) return nextframe;
-	}
-	return start;
-}
-
-int LedControl::findPreviousKeyFrame(int led, int start)
-{
-	ppl7::AVLTree<int, int>::Iterator it;
-	keyframes[led].reset(it);
-	int nextframe=start;
-	while (keyframes[led].getPrevious(it)) {
-		nextframe=it.key();
-		if (nextframe<start) return nextframe;
-	}
-	return start;
-}
-
-
-void LedControl::on_keyNextButton_clicked()
-{
-	PlaybackTimer->stop();
-	int frame=ui.frameSlider->value();
-	// find next keyframe
-	int nextframe=ui.frameSlider->maximum();
-	for (int i=0;i<12;i++) {
-		int f=findNextKeyFrame(i,frame);
-		if (f<nextframe && f>frame) nextframe=f;
-	}
-	if (nextframe<ui.frameSlider->maximum()) ui.frameSlider->setValue(nextframe);
-}
-
-void LedControl::on_keyBackButton_clicked()
-{
-	PlaybackTimer->stop();
-	int frame=ui.frameSlider->value();
-	int nextframe=0;
-	for (int i=0;i<12;i++) {
-		int f=findPreviousKeyFrame(i,frame);
-		if (f>nextframe && f<frame) nextframe=f;
-	}
-	if (nextframe>=0) ui.frameSlider->setValue(nextframe);
-}
-
 void LedControl::on_playButton_clicked()
 {
 	PlaybackTimer->start(1000/conf->frameRate);
@@ -383,24 +310,11 @@ void LedControl::on_playbackTimer_fired()
 {
 	int frame=ui.frameSlider->value();
 	frame++;
-	if (frame>=ui.frameSlider->maximum()) frame=0;
-	ui.frameSlider->setValue(frame);
+	if (frame<ui.frameSlider->maximum()) ui.frameSlider->setValue(frame);
 }
-
-void LedControl::on_arduinoButton_clicked()
-{
-	ArduinoSketch sketch(this);
-	sketch.show();
-	sketch.exec();
-	//:/other/arduino_ledcontrol/arduino_ledcontrol.ino
-}
-
 
 void LedControl::remindSave()
 {
-	bool active=false;
-	if (cap) active=cap->isCaptureActive();
-	if (active) cap->stopCapture();
 	int ret = QMessageBox::warning(NULL, tr("OpenStopMotion: LED-Control"),
 	                                tr("Light-values or keyframes have been modified.\n"
 	                                   "Do you want to save your changes?"),
@@ -408,7 +322,6 @@ void LedControl::remindSave()
 	                                | QMessageBox::Cancel,
 	                                QMessageBox::Cancel);
 	if (ret==QMessageBox::Save) on_saveButton_clicked();
-	if (active) cap->startCapture();
 }
 
 void LedControl::load(const ppl7::String &filename)
@@ -490,7 +403,7 @@ void LedControl::recalcFrames(int id)
 {
 	interpolatedframes[id].clear();
 	int frame=0;
-	//int maxf=ui.maxFrame->text().toInt();
+	int maxf=ui.maxFrame->text().toInt();
 	int value=0;
 	int nextframe;
 	int nextvalue;
@@ -515,9 +428,8 @@ void LedControl::recalcFrames(int id)
 		frame=nextframe;
 		value=nextvalue;
 	}
-	for (int i=frame+1;i<ui.maxFrame->text().toInt();i++) {
-		interpolatedframes[id].add(i,nextvalue);
-	}
+
+
 
 }
 
@@ -553,7 +465,7 @@ void LedControl::updateFrameView()
 	int middle=w/3;
 	int offset=frame*5;
 
-	//int x=ui.frameSlider->value();
+	int x=ui.frameSlider->value();
 	img.line(middle+5,0,middle+5,h,framepointer);
 
 

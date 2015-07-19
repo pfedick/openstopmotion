@@ -26,7 +26,7 @@
 #ifndef LEDSLIDER_H
 #define LEDSLIDER_H
 #define WITH_QT
-#include <QWidget>
+#include <QtGui/QWidget>
 #include <QSlider>
 #include <QSizePolicy>
 #include "device.h"

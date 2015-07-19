@@ -1,10 +1,10 @@
 /*
  * This file is part of OpenStopMotion by Patrick Fedick
  *
- * $Author$
- * $Revision$
- * $Date$
- * $Id$
+ * $Author: pafe1234@gmail.com $
+ * $Revision: 438 $
+ * $Date: 2013-04-10 18:59:00 +0200 (Mi, 10 Apr 2013) $
+ * $Id: stopmocap.h 438 2013-04-10 16:59:00Z pafe1234@gmail.com $
  *
  *
  * Copyright (c) 2013 Patrick Fedick <patrick@pfp.de>
@@ -30,7 +30,8 @@
 #define STOPMOCAP_ORGANISATION	"Patrick F.-Productions"
 #define STOPMOCAP_CONFIGKEY		"OpenStopMotion"
 #define STOPMOCAP_APPNAME		"OpenStopMotion"
-#define STOPMOCAP_COPYRIGHT		"(c) 2015 by Patrick Fedick"
+#define STOPMOCAP_COPYRIGHT		"(c) 2013 by Patrick Fedick"
+#define STOPMOCAP_VERSION		"0.6.1"
 
 
 

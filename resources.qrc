@@ -27,7 +27,6 @@
     <file>resources/filesaveas.png</file>
   </qresource>
   <qresource prefix="/other">
-    <file>arduino_ledcontrol/arduino_ledcontrol.ino</file>
     <file>resources/arduino.png</file>
   </qresource>
 </RCC>

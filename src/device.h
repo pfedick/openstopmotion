@@ -130,10 +130,6 @@ class Device
 		bool captureRunning;
 	public:
 
-		double time_readFrame;
-		double time_decompress;
-		double time_total;
-
 
 		Device();
 		~Device();
@@ -154,26 +150,26 @@ class Device
 
 		void close();
 
-		PPLEXCEPTION(InvalidDevice, Exception);
-		PPLEXCEPTION(InvalidFormat, Exception);
-		PPLEXCEPTION(DeviceNotOpen, Exception);
-		PPLEXCEPTION(SelectError, Exception);
-		PPLEXCEPTION(Timeout, Exception);
-		PPLEXCEPTION(ReadError, Exception);
-		PPLEXCEPTION(StreamingUnsupported, Exception);
-		PPLEXCEPTION(StreamOffFailed, Exception);
-		PPLEXCEPTION(StreamOnFailed, Exception);
-		PPLEXCEPTION(StreamBufferError, Exception);
-		PPLEXCEPTION(DeviceDoesNotSupportCapture, Exception);
-		PPLEXCEPTION(MMapUnsupported, Exception);
-		PPLEXCEPTION(UserpUnsupported, Exception);
-		PPLEXCEPTION(InsufficientBufferMemory, Exception);
-		PPLEXCEPTION(QueryBufFailed, Exception);
-		PPLEXCEPTION(MMapFailed, Exception);
-		PPLEXCEPTION(MUnmapFailed, Exception);
-		PPLEXCEPTION(BufferError, Exception);
-		PPLEXCEPTION(SetControlValueFailed, Exception);
-		PPLEXCEPTION(GetControlValueFailed, Exception);
+		PPLNORMALEXCEPTION(InvalidDevice);
+		PPLNORMALEXCEPTION(InvalidFormat);
+		PPLNORMALEXCEPTION(DeviceNotOpen);
+		PPLNORMALEXCEPTION(SelectError);
+		PPLNORMALEXCEPTION(Timeout);
+		PPLNORMALEXCEPTION(ReadError);
+		PPLNORMALEXCEPTION(StreamingUnsupported);
+		PPLNORMALEXCEPTION(StreamOffFailed);
+		PPLNORMALEXCEPTION(StreamOnFailed);
+		PPLNORMALEXCEPTION(StreamBufferError);
+		PPLNORMALEXCEPTION(DeviceDoesNotSupportCapture);
+		PPLNORMALEXCEPTION(MMapUnsupported);
+		PPLNORMALEXCEPTION(UserpUnsupported);
+		PPLNORMALEXCEPTION(InsufficientBufferMemory);
+		PPLNORMALEXCEPTION(QueryBufFailed);
+		PPLNORMALEXCEPTION(MMapFailed);
+		PPLNORMALEXCEPTION(MUnmapFailed);
+		PPLNORMALEXCEPTION(BufferError);
+		PPLNORMALEXCEPTION(SetControlValueFailed);
+		PPLNORMALEXCEPTION(GetControlValueFailed);
 
 };
 

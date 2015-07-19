@@ -28,14 +28,13 @@
 #define WITH_QT
 
 #include <vector>
-#include <QWidget>
+#include <QtGui/QWidget>
 #include <QVBoxLayout>
 #include <QSlider>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QPainter>
 #include <QTimer>
-#include <QStatusBar>
 #include "ui_stopmocap.h"
 #include "device.h"
 #include "config.h"
@@ -106,12 +105,6 @@ private:
     Arduino arduino;
     LedControl *ledcontrol;
 
-    QStatusBar *statusBar;
-    QLabel *statusbar_fps;
-    QLabel *statusbar_time_grab;
-    QLabel *statusbar_time_decode;
-    QLabel *statusbar_time_total;
-
     void grabFrame();
     int highestSceneFrame();
     bool eventFilter(QObject *target, QEvent *event);
@@ -120,13 +113,6 @@ private:
     void UpdateColorKeyBG(ppl7::grafix::Color c);
     void UpdateColorKeyFG(ppl7::grafix::Color c);
     void getSceneList(ppl7::Array &scenes);
-    void createStatusBar();
-    void updateStatusBar();
-
-public:
-    void stopCapture();
-    void startCapture();
-    bool isCaptureActive();
 
 protected:
     void resizeEvent ( QResizeEvent * event );
@@ -178,7 +164,6 @@ public slots:
 
 
     void on_viewer_mouseClicked(int x, int y, ppl7::grafix::Color c);
-    void on_chromaKeyColorSelect_clicked();
     void on_tolNearSlider_valueChanged ( int value );
     void on_tolFarSlider_valueChanged ( int value );
     void on_spillSlider_valueChanged ( int value );
@@ -187,7 +172,6 @@ public slots:
 
 
     void on_foregroundEnabled_toggled(bool checked);
-    void on_chromaKeyFGColorSelect_clicked();
     void on_tolNearSliderFG_valueChanged ( int value );
     void on_tolFarSliderFG_valueChanged ( int value );
     void on_spillSliderFG_valueChanged ( int value );

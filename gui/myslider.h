@@ -26,7 +26,7 @@
 #ifndef MYSLIDER_H
 #define MYSLIDER_H
 
-#include <QWidget>
+#include <QtGui/QWidget>
 #include <QSlider>
 #include <QSizePolicy>
 #include "device.h"

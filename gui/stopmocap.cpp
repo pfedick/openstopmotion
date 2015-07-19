@@ -26,7 +26,6 @@
 #define WITH_QT
 #include <ppl7.h>
 #include "osm.h"
-#include "version.h"
 #include "stopmocap.h"
 #include "device.h"
 #include <QImage>
@@ -41,7 +40,6 @@
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
 {
-	statusBar=NULL;
 	fpaint=NULL;
 	ledcontrol=NULL;
 	interpolateSequence=0;
@@ -67,10 +65,6 @@ StopMoCap::StopMoCap(QWidget *parent)
 	connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
 
 
-
-
-
-	//DeviceCheckTimer->start(5000);
 	ui.captureDir->setText(conf.CaptureDir);
 	ui.sceneName->setText(conf.Scene);
 	on_sceneName_editingFinished();
@@ -181,9 +175,6 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.frameSlider->setMinimum(1);
 	ui.lightAndDarkButton->setChecked(conf.darkLayout);
 	on_lightAndDarkButton_toggled(conf.darkLayout);
-
-	createStatusBar();
-
 	this->restoreGeometry(conf.ScreenGeometry);
 }
 
@@ -230,61 +221,9 @@ StopMoCap::~StopMoCap()
 	conf.save();
 	cam.close();
 	delete Timer;
-}
-
-void StopMoCap::createStatusBar()
-{
-	statusBar=new QStatusBar;
-	this->layout()->addWidget(statusBar);
-	QLabel *label= new QLabel(tr("Capture FPS:"));
-	//locationLabel->setAlignment(Qt::AlignHCenter);
-	//locationLabel->setMinimumSize(locationLabel->sizeHint());
-
-	statusBar->addWidget(label);
-	statusbar_fps=new QLabel(tr("0"));
-	statusbar_fps->setMinimumWidth(40);
-	statusbar_fps->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	statusBar->addWidget(statusbar_fps);
-
-	label= new QLabel(tr("time grab: "));
-	statusBar->addWidget(label);
-	statusbar_time_grab=new QLabel(tr("0"));
-	statusbar_time_grab->setMinimumWidth(40);
-	statusbar_time_grab->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	statusBar->addWidget(statusbar_time_grab);
-
-
-	label= new QLabel(tr("time decode: "));
-	statusBar->addWidget(label);
-	statusbar_time_decode=new QLabel(tr("0"));
-	statusbar_time_decode->setMinimumWidth(40);
-	statusbar_time_decode->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	statusBar->addWidget(statusbar_time_decode);
-
-	label= new QLabel(tr("time total: "));
-	statusBar->addWidget(label);
-	statusbar_time_total=new QLabel(tr("0"));
-	statusbar_time_total->setMinimumWidth(40);
-	statusbar_time_total->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-	statusBar->addWidget(statusbar_time_total);
 
 }
 
-void StopMoCap::updateStatusBar()
-{
-	ppl7::String Tmp;
-
-	Tmp.setf("%0.6f s",cam.time_readFrame);
-	statusbar_time_grab->setText(Tmp);
-
-	Tmp.setf("%0.6f s",cam.time_decompress);
-	statusbar_time_decode->setText(Tmp);
-
-	Tmp.setf("%0.6f s",cam.time_total);
-	statusbar_time_total->setText(Tmp);
-
-
-}
 
 void StopMoCap::on_deviceComboBox_currentIndexChanged(int index)
 {
@@ -404,28 +343,12 @@ void StopMoCap::on_useDevice_clicked()
 
 	ui.captureButton->setFocus();
 	//grabFrame();
-	startCapture();
+	Timer->start(10);
 #ifdef USERENDERTHREAD
 	rthread.setImageSize(ui.viewer->width(),ui.viewer->height());
 	rthread.start();
 #endif
 }
-
-void StopMoCap::stopCapture()
-{
-	if (Timer->isActive()) Timer->stop();
-}
-
-void StopMoCap::startCapture()
-{
-	Timer->start(10);
-}
-
-bool StopMoCap::isCaptureActive()
-{
-	return Timer->isActive();
-}
-
 
 bool StopMoCap::eventFilter(QObject *target, QEvent *event)
 {
@@ -503,22 +426,6 @@ void StopMoCap::closeEvent(QCloseEvent *event)
     }
 }
 
-
-static void rotate180(ppl7::grafix::Drawable &img)
-{
-	int width=img.width();
-	int height=img.height();
-	ppl7::grafix::Color p1,p2;
-	for (int y=0;y<height/2;y++) {
-		for (int x=0;x<width;x++) {
-			p1=img.getPixel(x,y);
-			p2=img.getPixel(width-x-1,height-y-1);
-			img.putPixel(x,y,p2);
-			img.putPixel(width-x-1,height-y-1,p1);
-		}
-	}
-}
-
 void StopMoCap::grabFrame()
 {
 	float blendFactor=(float)ui.onionSkinning->value()/99.0f;
@@ -527,9 +434,6 @@ void StopMoCap::grabFrame()
 			capture(grabImg);
 		} else {
 			cam.readFrame(grabImg);
-		}
-		if (ui.rotate180->isChecked()) {
-			rotate180(grabImg);
 		}
 		if (ui.pickChromaKeyFG->isChecked()) {
 			grabImg.blt(bluebox.getFGImage());
@@ -541,12 +445,6 @@ void StopMoCap::grabFrame()
 				grabImg.bltBlend(lastFrame,blendFactor);
 			}
 		}
-		updateStatusBar();
-	} catch (Device::QueryBufFailed) {
-		cam.close();
-		stopCapture();
-	} catch (const ppl7::Exception &e) {
-		e.print();
 	} catch (...) {
 
 	}
@@ -564,7 +462,7 @@ void StopMoCap::on_timer_fired()
 		ppl7::String Tmp;
 		Tmp.setf("%i",fpsCounter);
 		fpsTimer=now;
-		statusbar_fps->setText(Tmp);
+		ui.captureFPS->setText(Tmp);
 		fpsCounter=0;
 	}
 #ifdef USERENDERTHREAD
@@ -611,9 +509,6 @@ void StopMoCap::capture(ppl7::grafix::Image &img)
 	for (int i=0;i<mergeFrames;i++) {
 		//printf ("Capture %i\n",i);
 		cam.readFrame(tmp[i]);
-		if (ui.rotate180->isChecked()) {
-			rotate180(tmp[i]);
-		}
 		for (int skip=0;skip<skipFrames;skip++) {
 			cam.readFrame(img);
 		}
@@ -876,7 +771,6 @@ int StopMoCap::highestSceneFrame()
 
 void StopMoCap::on_undoButton_clicked()
 {
-	ui.captureButton->setFocus();
 	ppl7::String Tmp;
 	if (lastFrameNum==0) lastFrameNum=highestSceneFrame();
 	ppl7::String Filename=conf.CaptureDir+"/"+conf.Scene;
@@ -1153,7 +1047,6 @@ void StopMoCap::UpdateColorKeyBG(ppl7::grafix::Color c)
 {
 	bluebox.setColorKey(c);
 	conf.chromaKey=c;
-	conf.save();
 	ppl7::String Tmp;
 	Tmp.setf("%i, %i, %i",c.red(),c.green(),c.blue());
 	ui.keyColor->setText(Tmp);
@@ -1167,7 +1060,6 @@ void StopMoCap::UpdateColorKeyFG(ppl7::grafix::Color c)
 {
 	bluebox.setColorKeyFG(c);
 	conf.chromaKeyFG=c;
-	conf.save();
 	ppl7::String Tmp;
 	Tmp.setf("%i, %i, %i",c.red(),c.green(),c.blue());
 	ui.keyColorFG->setText(Tmp);
@@ -1223,19 +1115,19 @@ void StopMoCap::on_chromaBackgroundSelect_clicked()
 }
 
 
-void StopMoCap::on_replaceChromaWithColor_toggled(bool)
+void StopMoCap::on_replaceChromaWithColor_toggled(bool checked)
 {
 	bluebox.setReplaceMode(1);
 	conf.chromaReplaceMode=1;
 }
 
-void StopMoCap::on_replaceChromaWithImage_toggled(bool)
+void StopMoCap::on_replaceChromaWithImage_toggled(bool checked)
 {
 	bluebox.setReplaceMode(0);
 	conf.chromaReplaceMode=0;
 }
 
-void StopMoCap::on_replaceChromaWithTransparent_toggled(bool)
+void StopMoCap::on_replaceChromaWithTransparent_toggled(bool checked)
 {
 	bluebox.setReplaceMode(2);
 	conf.chromaReplaceMode=2;
@@ -1313,38 +1205,6 @@ void StopMoCap::on_bgColorSelect_clicked()
 		conf.replaceColor.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
 		bluebox.setReplaceColor(conf.replaceColor);
 		//printf ("color alpha=%i\n",qc.alpha());
-	}
-
-	Timer->start(10);
-}
-
-void StopMoCap::on_chromaKeyColorSelect_clicked()
-{
-	Timer->stop();
-	QColorDialog dialog(this);
-	ppl7::grafix::Color c=bluebox.colorKey();
-	dialog.setOption(QColorDialog::ShowAlphaChannel,false);
-	dialog.setCurrentColor(QColor(c.red(),c.green(),c.blue(),c.alpha()));
-	if (dialog.exec()==1) {
-		QColor qc=dialog.selectedColor();
-		c.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
-		UpdateColorKeyBG(c);
-	}
-
-	Timer->start(10);
-}
-
-void StopMoCap::on_chromaKeyFGColorSelect_clicked()
-{
-	Timer->stop();
-	QColorDialog dialog(this);
-	ppl7::grafix::Color c=bluebox.colorKeyFG();
-	dialog.setOption(QColorDialog::ShowAlphaChannel,false);
-	dialog.setCurrentColor(QColor(c.red(),c.green(),c.blue(),c.alpha()));
-	if (dialog.exec()==1) {
-		QColor qc=dialog.selectedColor();
-		c.set(qc.red(),qc.green(),qc.blue(),qc.alpha());
-		UpdateColorKeyFG(c);
 	}
 
 	Timer->start(10);
@@ -1442,15 +1302,9 @@ void StopMoCap::on_arduinoButton_clicked()
 {
 	if (!ledcontrol) {
 		ledcontrol=new LedControl();
-		ledcontrol->setMainCapture(this);
 		ledcontrol->setWindowFlags(Qt::Window);
+		ledcontrol->setConfig(conf);
 		ledcontrol->setArduino(arduino);
-		try {
-			ledcontrol->setConfig(conf);
-		} catch (...) {
-
-		}
-
 		if (ui.lightAndDarkButton->isChecked()) ledcontrol->setColorScheme(1);
 		else ledcontrol->setColorScheme(0);
 	}
