@@ -85,6 +85,16 @@ void Config::load()
 	scalingMode=settings.value("scalingMode",PPL7ImageViewer::Smooth).toInt();
 	settings.endGroup();
 
+	settings.beginGroup("release");
+	ReleaseDir=settings.value("ReleaseDir").toString();
+	ReleaseCommand=settings.value("ReleaseCommand").toString();
+
+	if (ReleaseDir.isEmpty()) ReleaseDir="%captureDir/../Video";
+	if (ReleaseCommand.isEmpty()) ReleaseCommand="ffmpeg -f rawvideo -pix_fmt bgra -s %widthx%height -r %frameRate -i - -vcodec mpeg2video -r 30 "
+			"-pix_fmt yuv422p -q:v 1 -qscale 1 -qmin 1 -intra -vb 100M  -b 100M -b:v 100M  -an";
+
+	settings.endGroup();
+
 	settings.beginGroup("chromaKeying");
 	chromaKeyEnabled=settings.value("chromaKeyEnabled",false).toBool();
 	chromaBGImage=settings.value("chromaBGImage","").toString();
@@ -140,6 +150,12 @@ void Config::save()
 	settings.setValue("overblendFactor",overblendFactor);
 	settings.setValue("darkLayout",darkLayout);
 	settings.endGroup();
+
+	settings.beginGroup("release");
+	settings.setValue("ReleaseDir",ReleaseDir);
+	settings.setValue("ReleaseCommand",ReleaseCommand);
+	settings.endGroup();
+
 
 	settings.beginGroup("chromaKeying");
 	settings.setValue("chromaKeyEnabled",chromaKeyEnabled);

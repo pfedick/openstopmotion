@@ -37,6 +37,8 @@ class Config
 
 		QByteArray ScreenGeometry;
 		ppl7::String	CaptureDir;
+		ppl7::String	ReleaseDir;
+		ppl7::String	ReleaseCommand;
 		ppl7::String	Scene;
 		ppl7::String	DeviceName;
 		ppl7::String	ImageFormat;
