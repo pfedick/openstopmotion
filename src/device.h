@@ -129,7 +129,6 @@ class Device
 
 		bool captureRunning;
 	public:
-
 		double time_readFrame;
 		double time_decompress;
 		double time_total;

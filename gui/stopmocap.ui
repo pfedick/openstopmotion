@@ -428,6 +428,20 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="releaseButton">
+           <property name="text">
+            <string>Release</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="configRelease">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
