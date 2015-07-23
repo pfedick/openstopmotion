@@ -89,9 +89,10 @@ void Config::load()
 	ReleaseDir=settings.value("ReleaseDir").toString();
 	ReleaseCommand=settings.value("ReleaseCommand").toString();
 
-	if (ReleaseDir.isEmpty()) ReleaseDir="%captureDir/../Video";
+	if (ReleaseDir.isEmpty()) ReleaseDir="%captureDir%/../Video";
 	if (ReleaseCommand.isEmpty()) ReleaseCommand="ffmpeg -f rawvideo -pix_fmt bgra -s %widthx%height -r %frameRate -i - -vcodec mpeg2video -r 30 "
-			"-pix_fmt yuv422p -q:v 1 -qscale 1 -qmin 1 -intra -vb 100M  -b 100M -b:v 100M  -an";
+			"-pix_fmt yuv422p -q:v 1 -qscale 1 -qmin 1 -intra -vb 100M  -b 100M -b:v 100M  -an -y "
+			"\"%releasedir/%scenename.m2v\"";
 
 	settings.endGroup();
 

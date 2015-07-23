@@ -27,7 +27,8 @@ HEADERS += include/osm.h \
     src/device.h \
     include/config.h \
     gui/arduinosketch.h \
-    src/bluebox.h
+    src/bluebox.h \
+    gui/release.h
 SOURCES += src/FrameBuffer.cpp \
 	src/arduino.cpp \
 	gui/ledslider.cpp \
@@ -43,14 +44,16 @@ SOURCES += src/FrameBuffer.cpp \
     src/device_win32.cpp \
     src/main.cpp \
     src/config.cpp \
-    src/bluebox.cpp
+    src/bluebox.cpp \
+    gui/release.cpp
 FORMS += gui/stopmocap.ui \
 	gui/ledslider.ui \
 	gui/ledcontrol.ui \
 	gui/framepaint.ui \
     gui/selectscene.ui \
     gui/myslider.ui \
-    gui/arduinosketch.ui
+    gui/arduinosketch.ui \
+    gui/release.ui
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += gui

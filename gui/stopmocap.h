@@ -199,6 +199,8 @@ public slots:
     void on_replaceChromaWithTransparent_toggled(bool checked);
 
     void on_lightAndDarkButton_toggled(bool checked);
+
+    void on_releaseButton_clicked();
     //void on_editScene_clicked();
 
 
