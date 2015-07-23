@@ -37,6 +37,7 @@
 #include <QMessageBox>
 #include <QColorDialog>
 #include "selectscene.h"
+#include "release.h"
 
 StopMoCap::StopMoCap(QWidget *parent)
     : QWidget(parent)
@@ -185,6 +186,8 @@ StopMoCap::StopMoCap(QWidget *parent)
 	createStatusBar();
 
 	this->restoreGeometry(conf.ScreenGeometry);
+	fBuffer.loadAsync(conf.CaptureDir+"/"+conf.Scene);
+
 }
 
 StopMoCap::~StopMoCap()
@@ -1001,7 +1004,7 @@ void StopMoCap::on_frameSlider_valueChanged ( int value )
 		return;
 	}
 	*/
-	if (ui.chromaKeyingEnabled->isChecked()) bluebox.process(grabImg);
+	if (ui.chromaKeyingEnabled->isChecked()==true || ui.foregroundEnabled->isChecked()==true) bluebox.process(grabImg);
 	ui.viewer->update();
 }
 
@@ -1455,4 +1458,31 @@ void StopMoCap::on_arduinoButton_clicked()
 		else ledcontrol->setColorScheme(0);
 	}
 	ledcontrol->show();
+}
+
+
+void StopMoCap::on_releaseButton_clicked()
+{
+	//conf.ReleaseCommand;
+	//conf.ReleaseDir;
+	if (highestSceneFrame()<1) {
+		 QMessageBox::critical(this, STOPMOCAP_APPNAME,
+		                                tr("No frames captured yet, export not possible"));
+		return;
+	}
+	if (highestSceneFrame()!=fBuffer.size()) {
+		 QMessageBox::critical(this, STOPMOCAP_APPNAME,
+		                                tr("Scene is not complete in cache, please wait a few seconds"));
+		return;
+	}
+	on_stopButton_clicked();
+	ReleaseVideo release;
+	ppl7::String Tmp=conf.ReleaseDir;
+	Tmp.replace("%captureDir",conf.CaptureDir);
+	release.setReleaseDir(Tmp);
+	release.setReleaseCommand(conf.ReleaseCommand);
+	release.setScene(ui.sceneName->text());
+	release.setSourceFrameRate(ui.frameRate->value());
+	release.exportVideo(fBuffer);
+
 }
