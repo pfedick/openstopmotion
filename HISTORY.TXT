@@ -1,7 +1,7 @@
 OpenStopMotion Changelog
 ========================
 
-0.7.0 2015-07-02
+0.7.0 2015-07-23
   - Fixed ioctl sign-extension warnings
   - Fixed some compiler warnings about unused variables
   - FreeBSD-Port: fixed some issues, updated to new policies, tested on
