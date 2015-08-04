@@ -3,6 +3,7 @@ import os
 import web
 import sys
 import time
+import signal
 
 try:
     import RPi.GPIO as GPIO
@@ -11,9 +12,9 @@ except ImportError:
     have_rpi_gpio = False
     
     
-  
+StatusRGBPins = [8,10,12]
 
-StepPins = [10,12,16,18]
+StepPins = [16,18,22,24]
 StepSeq = [[1,0,0,0],
        [1,1,0,0],
        [0,1,0,0],
@@ -28,8 +29,29 @@ SequencePosition=0
 
 if have_rpi_gpio:
     GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(StatusRGBPins,GPIO.OUT)
+    GPIO.output(StatusRGBPins, GPIO.HIGH)
+    
     GPIO.setup(StepPins,GPIO.OUT)
     GPIO.output(StepPins, GPIO.LOW)
+    
+    
+    
+def setStatus(red, green, blue):
+    global StatusRGBPins
+    if not have_rpi_gpio:
+        return
+    GPIO.output(StatusRGBPins, GPIO.LOW)
+    if red:
+        GPIO.output(StatusRGBPins[0],GPIO.HIGH)
+    if green:
+        GPIO.output(StatusRGBPins[1],GPIO.HIGH)
+    if blue:
+        GPIO.output(StatusRGBPins[2],GPIO.HIGH)
+
+def signalHandler(signum, frame):
+    pass
+    
     
 def showform(steps):
     output = "<form method=GET url=/form>"
@@ -47,8 +69,10 @@ class ShowHelp(object):
     
     @staticmethod
     def GET():      # pylint: disable=C0103
+        setStatus(0,0,1)
         output ="<html><b>Interface:</b><br>\n"
         output +="</html>\n"
+        setStatus(0,1,0)
         return output
     
 class Reset(object):
@@ -57,8 +81,10 @@ class Reset(object):
     
     @staticmethod
     def GET():      # pylint: disable=C0103
+        setStatus(0,0,1)
         SequencePosition=0
-        return ""
+        setStatus(0,1,0)
+        return "Step Sequence resetted"
     
 class HandleFormular(object):
     def __init__(self):
@@ -76,6 +102,7 @@ class StepMove(object):
     @staticmethod
     def GET(direction, steps):      # pylint: disable=C0103
         global SequencePosition
+        setStatus(0,0,1)
         if direction == "forward":
             for count in range (0,int(steps)):
                 #print StepSeq[SequencePosition]
@@ -104,8 +131,9 @@ class StepMove(object):
                 time.sleep(0.010)
         if have_rpi_gpio:
             GPIO.output(StepPins, GPIO.LOW)
+        setStatus(0,1,0)
         return "OK. Steps "+str(direction)+": "+str(steps)
-    
+
 
 
 if __name__ == "__main__":
@@ -116,6 +144,10 @@ if __name__ == "__main__":
             '/form', 'HandleFormular'
             )
     web.config.debug = False
+    setStatus(0,1,0)
     app=web.application(urls, globals())
     app.run()
+    setStatus(0,0,0)
+    if have_rpi_gpio:
+        GPIO.cleanup()
             
