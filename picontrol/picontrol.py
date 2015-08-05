@@ -8,6 +8,8 @@ import signal
 try:
     import RPi.GPIO as GPIO
     have_rpi_gpio = True
+    from Adafruit_PWM_Servo_Driver import PWM
+    pwm=PWM()
 except ImportError:
     have_rpi_gpio = False
     
@@ -34,6 +36,8 @@ if have_rpi_gpio:
     
     GPIO.setup(StepPins,GPIO.OUT)
     GPIO.output(StepPins, GPIO.LOW)
+    
+    
     
     
     
@@ -145,6 +149,8 @@ if __name__ == "__main__":
             )
     web.config.debug = False
     setStatus(0,1,0)
+    pwm.setPWMFreq(1000)
+    pwm.setAllPWM(4096,0)
     app=web.application(urls, globals())
     app.run()
     setStatus(0,0,0)
