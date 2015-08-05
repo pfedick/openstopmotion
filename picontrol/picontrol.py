@@ -98,6 +98,20 @@ class HandleFormular(object):
     def GET():      # pylint: disable=C0103
         return ""
     
+class SetPwm(object):
+    def __init__(self):
+        pass
+    @staticmethod
+    def GET(channel, value):      # pylint: disable=C0103
+        global pwm
+        setStatus(0,0,1)
+        if have_rpi_gpio:
+            if (int(value)==0):
+                pwm.setPWM(int(channel),4096,0)
+            pwm.setPWM(int(channel),0,int(value))
+        
+        setStatus(0,1,0)
+        return "OK"
     
 class StepMove(object):
     def __init__(self):
@@ -144,13 +158,16 @@ if __name__ == "__main__":
     urls = (
             '/', 'ShowHelp',
             '/step/(.*)/(.*)', 'StepMove',
-            '/reset', 'Reset'
-            '/form', 'HandleFormular'
+            '/reset', 'Reset',
+            '/form', 'HandleFormular',
+            '/pwm/(.*)/(.*)', 'SetPwm'
             )
     web.config.debug = False
     setStatus(0,1,0)
-    pwm.setPWMFreq(1000)
-    pwm.setAllPWM(4096,0)
+    if have_rpi_gpio:
+        pwm.setPWMFreq(1000)
+        for channel in range (0,15):
+            pwm.setPWM(channel,0,0)
     app=web.application(urls, globals())
     app.run()
     setStatus(0,0,0)
