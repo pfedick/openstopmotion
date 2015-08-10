@@ -119,10 +119,11 @@ void Config::load()
 	ArduinoBaudRate=settings.value("ArduinoBaudRate",57600).toInt();
 	settings.endGroup();
 
-	settings.beginGroup("webcontrol");
-	WebControlBaseUri=settings.value("WebControlBaseUri").toString();
-	WebControlMoveSteps=settings.value("WebControlMoveSteps",100).toInt();
-	WebControlTurnSteps=settings.value("WebControlTurnSteps",100).toInt();
+	settings.beginGroup("motioncontrol");
+	MotionControlBaseUri=settings.value("MotionControlBaseUri").toString();
+	MotionControlFile=settings.value("MotionControlFile").toString();
+	MotionControlMoveSteps=settings.value("MotionControlMoveSteps",100).toInt();
+	MotionControlTurnSteps=settings.value("MotionControlTurnSteps",100).toInt();
 	settings.endGroup();
 
 
@@ -189,10 +190,11 @@ void Config::save()
 	settings.setValue("ArduinoBaudRate",ArduinoBaudRate);
 	settings.endGroup();
 
-	settings.beginGroup("webcontrol");
-	settings.setValue("WebControlBaseUri",WebControlBaseUri);
-	settings.setValue("WebControlMoveSteps",WebControlMoveSteps);
-	settings.setValue("WebControlTurnSteps",WebControlTurnSteps);
+	settings.beginGroup("motioncontrol");
+	settings.setValue("MotionControlBaseUri",MotionControlBaseUri);
+	settings.setValue("MotionControlFile",MotionControlFile);
+	settings.setValue("MotionControlMoveSteps",MotionControlMoveSteps);
+	settings.setValue("MotionControlTurnSteps",MotionControlTurnSteps);
 	settings.endGroup();
 
 }

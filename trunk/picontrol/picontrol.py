@@ -79,6 +79,23 @@ class ShowHelp(object):
         setStatus(0,1,0)
         return output
     
+class Enumerate(object):
+    def __init__(self):
+        pass
+    
+    @staticmethod
+    def GET():      # pylint: disable=C0103
+        web.header('Content-Type', 'text/xml')
+        output="<motioncontrol><enumerate>\n";
+        for counter in range (0,16):
+            output+="   <device><uri>/lights/pwm/"+str(counter)+"/</uri>" + \
+                "<id>light"+str(counter)+"</id>" + \
+                "<name>Light "+str(counter+1)+"</name><type>led</type><pwm><min>0</min><max>4095</max></pwm></device>\n"
+        output+="<device><uri>/camera/move/</uri><type>stepmotor</type><name>Camera Move</name><id>motor0</id>" + \
+            "</device>\n";    
+        output+="</enumerate></motioncontrol>\n";
+        return output
+    
 class Reset(object):
     def __init__(self):
         pass
@@ -160,7 +177,8 @@ if __name__ == "__main__":
             '/camera/move/(.*)/(.*)', 'StepMove',
             '/reset', 'Reset',
             '/form', 'HandleFormular',
-            '/lights/pwm/(.*)/(.*)', 'SetPwm'
+            '/lights/pwm/(.*)/(.*)', 'SetPwm',
+            '/enumerate','Enumerate'
             )
     web.config.debug = False
     setStatus(0,1,0)

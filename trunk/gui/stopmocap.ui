@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1135</width>
-    <height>945</height>
+    <width>1125</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -107,6 +107,19 @@
            <property name="icon">
             <iconset resource="../resources.qrc">
              <normaloff>:/other/resources/arduino.png</normaloff>:/other/resources/arduino.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>31</width>
+             <height>16</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="motionControlButton">
+           <property name="text">
+            <string>MotionControl</string>
            </property>
            <property name="iconSize">
             <size>
@@ -804,7 +817,7 @@
         </size>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="camaraControlTab">
         <attribute name="title">

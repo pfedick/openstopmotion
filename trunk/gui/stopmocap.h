@@ -48,6 +48,7 @@
 #include "framepaint.h"
 #include "arduino.h"
 #include "ledcontrol.h"
+#include "motioncontrol.h"
 
 
 //#define USE_SCENEMANAGER
@@ -125,6 +126,7 @@ private:
     FramePaint *fpaint;
     Arduino arduino;
     LedControl *ledcontrol;
+    MotionControl *motioncontrol;
     MotorThread *motorThread;
 
     QStatusBar *statusBar;
@@ -159,6 +161,7 @@ public slots:
     void on_formatComboBox_currentIndexChanged(int index);
     void on_useDevice_clicked();
     void on_arduinoButton_clicked();
+    void on_motionControlButton_clicked();
     void on_timer_fired();
     void on_playbackTimer_fired();
     void on_captureButton_clicked();
