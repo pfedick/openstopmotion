@@ -36,6 +36,7 @@
 #include <QPainter>
 #include <QTimer>
 #include <QStatusBar>
+#include <QThread>
 #include "ui_stopmocap.h"
 #include "device.h"
 #include "config.h"
@@ -54,7 +55,26 @@
 void DisplayException(const ppl7::Exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());
 void DisplayException(const std::exception &e, QWidget *object=NULL, const ppl7::String &msg=ppl7::String());
 
+class StopMoCap;
 
+
+class MotorThread : public QThread
+{
+	Q_OBJECT
+		 signals:
+		 	void motorStarted();
+		 	void motorStopped();
+
+	private:
+		StopMoCap *gui;
+		ppl7::String Uri;
+
+	public:
+		MotorThread(StopMoCap *gui);
+		void getUri(const ppl7::String &Uri);
+		void run();
+
+};
 
 class MyQCheckBox : public QCheckBox
 {
@@ -105,6 +125,7 @@ private:
     FramePaint *fpaint;
     Arduino arduino;
     LedControl *ledcontrol;
+    MotorThread *motorThread;
 
     QStatusBar *statusBar;
     QLabel *statusbar_fps;
@@ -202,6 +223,15 @@ public slots:
 
     void on_releaseButton_clicked();
     //void on_editScene_clicked();
+
+    // Webcontrol
+    void on_motorMoveLeft_clicked();
+    void on_motorMoveRight_clicked();
+    void on_motorTurnLeft_clicked();
+    void on_motorTurnRight_clicked();
+
+ 	void motorStarted();
+ 	void motorStopped();
 
 
 };
