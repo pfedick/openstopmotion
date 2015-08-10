@@ -46,6 +46,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 	statusBar=NULL;
 	fpaint=NULL;
 	ledcontrol=NULL;
+	motioncontrol=NULL;
 	interpolateSequence=0;
 	ppl7::String Tmp;
 	ui.setupUi(this);
@@ -187,9 +188,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.lightAndDarkButton->setChecked(conf.darkLayout);
 	on_lightAndDarkButton_toggled(conf.darkLayout);
 
-	Tmp.setf("%d",conf.WebControlMoveSteps);
+	Tmp.setf("%d",conf.MotionControlMoveSteps);
 	ui.motorMoveSteps->setText(Tmp);
-	Tmp.setf("%d",conf.WebControlTurnSteps);
+	Tmp.setf("%d",conf.MotionControlTurnSteps);
 	ui.motorTurnSteps->setText(Tmp);
 
 
@@ -209,6 +210,12 @@ StopMoCap::~StopMoCap()
 		delete ledcontrol;
 		ledcontrol=NULL;
 	}
+	if (motioncontrol) {
+		motioncontrol->close();
+		delete motioncontrol;
+		motioncontrol=NULL;
+	}
+
 	if (fpaint) {
 		fpaint->close();
 		delete fpaint;
@@ -237,8 +244,8 @@ StopMoCap::~StopMoCap()
 	conf.saveComposited=ui.saveCompositedImage->isChecked();
 	conf.darkLayout=ui.lightAndDarkButton->isChecked();
 
-	conf.WebControlMoveSteps=ui.motorMoveSteps->text().toInt();
-	conf.WebControlTurnSteps=ui.motorTurnSteps->text().toInt();
+	conf.MotionControlMoveSteps=ui.motorMoveSteps->text().toInt();
+	conf.MotionControlTurnSteps=ui.motorTurnSteps->text().toInt();
 
 	conf.chromaKeyEnabled=ui.chromaKeyingEnabled->isChecked();
 	if (ui.replaceChromaWithColor->isChecked()) conf.chromaReplaceMode=1;
@@ -517,6 +524,11 @@ void StopMoCap::closeEvent(QCloseEvent *event)
     	ledcontrol->close();
     	delete ledcontrol;
     	ledcontrol=NULL;
+    }
+    if (motioncontrol) {
+    	motioncontrol->close();
+    	delete motioncontrol;
+    	motioncontrol=NULL;
     }
 }
 
@@ -1428,11 +1440,13 @@ void StopMoCap::on_lightAndDarkButton_toggled(bool checked)
 		setStyleSheet("background-color: rgb(48, 48, 48);\ncolor: rgb(175, 175, 175);");
 		ui.viewer->setBackground(QColor(0,0,0));
 		if (ledcontrol) ledcontrol->setColorScheme(1);
+		if (motioncontrol) motioncontrol->setColorScheme(1);
 
 	} else {
 		setStyleSheet("");
 		ui.viewer->setBackground(QColor(233,232,230));
 		if (ledcontrol) ledcontrol->setColorScheme(0);
+		if (motioncontrol) motioncontrol->setColorScheme(0);
 	}
 
 
@@ -1474,6 +1488,26 @@ void StopMoCap::on_arduinoButton_clicked()
 	ledcontrol->show();
 }
 
+void StopMoCap::on_motionControlButton_clicked()
+{
+	if (!motioncontrol) {
+		motioncontrol=new MotionControl();
+		motioncontrol->setMainCapture(this);
+		motioncontrol->setWindowFlags(Qt::Window);
+		//motioncontrol->setArduino(arduino);
+		try {
+			motioncontrol->setConfig(conf);
+		} catch (...) {
+
+		}
+
+		if (ui.lightAndDarkButton->isChecked()) motioncontrol->setColorScheme(1);
+		else motioncontrol->setColorScheme(0);
+	}
+	motioncontrol->show();
+}
+
+
 
 void StopMoCap::on_releaseButton_clicked()
 {
@@ -1504,24 +1538,24 @@ void StopMoCap::on_releaseButton_clicked()
 
 void StopMoCap::on_motorMoveLeft_clicked()
 {
-	if(conf.WebControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.WebControlBaseUri+"camera/move/left/";
+	if(conf.MotionControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.MotionControlBaseUri+"camera/move/left/";
 	Uri+=ui.motorMoveSteps->text();
 	motorThread->getUri(Uri);
 }
 
 void StopMoCap::on_motorMoveRight_clicked()
 {
-	if(conf.WebControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.WebControlBaseUri+"camera/move/right/";
+	if(conf.MotionControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.MotionControlBaseUri+"camera/move/right/";
 	Uri+=ui.motorMoveSteps->text();
 	motorThread->getUri(Uri);
 }
 
 void StopMoCap::on_motorTurnLeft_clicked()
 {
-	if(conf.WebControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.WebControlBaseUri+"camera/turn/left/";
+	if(conf.MotionControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.MotionControlBaseUri+"camera/turn/left/";
 	Uri+=ui.motorMoveSteps->text();
 	try {
 		ppl7::Curl::getUri(Uri);
@@ -1532,8 +1566,8 @@ void StopMoCap::on_motorTurnLeft_clicked()
 
 void StopMoCap::on_motorTurnRight_clicked()
 {
-	if(conf.WebControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.WebControlBaseUri+"camera/turn/left/";
+	if(conf.MotionControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.MotionControlBaseUri+"camera/turn/left/";
 	Uri+=ui.motorMoveSteps->text();
 	try {
 		ppl7::Curl::getUri(Uri);

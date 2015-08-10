@@ -28,7 +28,9 @@ HEADERS += include/osm.h \
     include/config.h \
     gui/arduinosketch.h \
     src/bluebox.h \
-    gui/release.h
+    gui/release.h \
+    gui/motioncontrol.h \
+    gui/motioncontrolmotor.h
 SOURCES += src/FrameBuffer.cpp \
 	src/arduino.cpp \
 	gui/ledslider.cpp \
@@ -45,7 +47,10 @@ SOURCES += src/FrameBuffer.cpp \
     src/main.cpp \
     src/config.cpp \
     src/bluebox.cpp \
-    gui/release.cpp
+    gui/release.cpp \
+    gui/motioncontrol.cpp \
+    gui/motioncontrolmotor.cpp
+    
 FORMS += gui/stopmocap.ui \
 	gui/ledslider.ui \
 	gui/ledcontrol.ui \
@@ -53,7 +58,10 @@ FORMS += gui/stopmocap.ui \
     gui/selectscene.ui \
     gui/myslider.ui \
     gui/arduinosketch.ui \
-    gui/release.ui
+    gui/release.ui \
+    gui/motioncontrol.ui \
+    gui/motioncontrolmotor.ui
+    
 RESOURCES += resources.qrc
 RC_FILE = resource.rc
 INCLUDEPATH += gui

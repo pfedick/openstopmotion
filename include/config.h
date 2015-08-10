@@ -47,9 +47,10 @@ class Config
 		ppl7::String	LedControlFile;
 		ppl7::String	ArduinoDevice;
 		int				ArduinoBaudRate;
-		ppl7::String	WebControlBaseUri;
-		int				WebControlMoveSteps;
-		int				WebControlTurnSteps;
+		ppl7::String	MotionControlBaseUri;
+		int				MotionControlMoveSteps;
+		int				MotionControlTurnSteps;
+		ppl7::String	MotionControlFile;
 
 		int mergeFrames;
 		int skipFrames;
