@@ -121,7 +121,7 @@ class StepMove(object):
     def GET(direction, steps):      # pylint: disable=C0103
         global SequencePosition
         setStatus(0,0,1)
-        if direction == "forward":
+        if direction == "right":
             for count in range (0,int(steps)):
                 #print StepSeq[SequencePosition]
                 if have_rpi_gpio:
@@ -130,10 +130,10 @@ class StepMove(object):
                 SequencePosition = SequencePosition + 1
                 if SequencePosition >= StepCount:
                     SequencePosition=0
-                time.sleep(0.010)
+                time.sleep(0.0010)
    
             
-        elif direction == "backward":
+        elif direction == "left":
             SequencePosition -= 1
             if SequencePosition<0:
                 SequencePosition=StepCount
@@ -146,7 +146,7 @@ class StepMove(object):
                 if have_rpi_gpio:
                     for pin in range (0,4):
                         GPIO.output(StepPins[pin],StepSeq[SequencePosition][pin])
-                time.sleep(0.010)
+                time.sleep(0.0010)
         if have_rpi_gpio:
             GPIO.output(StepPins, GPIO.LOW)
         setStatus(0,1,0)
@@ -157,10 +157,10 @@ class StepMove(object):
 if __name__ == "__main__":
     urls = (
             '/', 'ShowHelp',
-            '/step/(.*)/(.*)', 'StepMove',
+            '/camera/move/(.*)/(.*)', 'StepMove',
             '/reset', 'Reset',
             '/form', 'HandleFormular',
-            '/pwm/(.*)/(.*)', 'SetPwm'
+            '/lights/pwm/(.*)/(.*)', 'SetPwm'
             )
     web.config.debug = False
     setStatus(0,1,0)
