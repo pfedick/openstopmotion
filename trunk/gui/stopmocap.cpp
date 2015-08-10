@@ -25,6 +25,7 @@
 
 #define WITH_QT
 #include <ppl7.h>
+#include <ppl7-inet.h>
 #include "osm.h"
 #include "version.h"
 #include "stopmocap.h"
@@ -63,6 +64,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 	inPlayback=false;
 	inPreviewMode=false;
 	playbackFrame=0;
+	motorThread=new MotorThread(this);
+	QObject::connect(motorThread, SIGNAL(motorStarted()), this, SLOT(motorStarted()), Qt::QueuedConnection);
+	QObject::connect(motorThread, SIGNAL(motorStopped()), this, SLOT(motorStopped()), Qt::QueuedConnection);
 
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 	connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
@@ -183,6 +187,12 @@ StopMoCap::StopMoCap(QWidget *parent)
 	ui.lightAndDarkButton->setChecked(conf.darkLayout);
 	on_lightAndDarkButton_toggled(conf.darkLayout);
 
+	Tmp.setf("%d",conf.WebControlMoveSteps);
+	ui.motorMoveSteps->setText(Tmp);
+	Tmp.setf("%d",conf.WebControlTurnSteps);
+	ui.motorTurnSteps->setText(Tmp);
+
+
 	createStatusBar();
 
 	this->restoreGeometry(conf.ScreenGeometry);
@@ -192,6 +202,7 @@ StopMoCap::StopMoCap(QWidget *parent)
 
 StopMoCap::~StopMoCap()
 {
+	delete motorThread;
 	savethread.stop();
 	if (ledcontrol) {
 		ledcontrol->close();
@@ -225,6 +236,9 @@ StopMoCap::~StopMoCap()
 	conf.saveCamShot=ui.saveCamShot->isChecked();
 	conf.saveComposited=ui.saveCompositedImage->isChecked();
 	conf.darkLayout=ui.lightAndDarkButton->isChecked();
+
+	conf.WebControlMoveSteps=ui.motorMoveSteps->text().toInt();
+	conf.WebControlTurnSteps=ui.motorTurnSteps->text().toInt();
 
 	conf.chromaKeyEnabled=ui.chromaKeyingEnabled->isChecked();
 	if (ui.replaceChromaWithColor->isChecked()) conf.chromaReplaceMode=1;
@@ -1486,3 +1500,80 @@ void StopMoCap::on_releaseButton_clicked()
 	release.exportVideo(fBuffer);
 
 }
+
+
+void StopMoCap::on_motorMoveLeft_clicked()
+{
+	if(conf.WebControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.WebControlBaseUri+"camera/move/left/";
+	Uri+=ui.motorMoveSteps->text();
+	motorThread->getUri(Uri);
+}
+
+void StopMoCap::on_motorMoveRight_clicked()
+{
+	if(conf.WebControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.WebControlBaseUri+"camera/move/right/";
+	Uri+=ui.motorMoveSteps->text();
+	motorThread->getUri(Uri);
+}
+
+void StopMoCap::on_motorTurnLeft_clicked()
+{
+	if(conf.WebControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.WebControlBaseUri+"camera/turn/left/";
+	Uri+=ui.motorMoveSteps->text();
+	try {
+		ppl7::Curl::getUri(Uri);
+	} catch (const ppl7::Exception &e) {
+		e.print();
+	}
+}
+
+void StopMoCap::on_motorTurnRight_clicked()
+{
+	if(conf.WebControlBaseUri.isEmpty()) return;
+	ppl7::String Uri=conf.WebControlBaseUri+"camera/turn/left/";
+	Uri+=ui.motorMoveSteps->text();
+	try {
+		ppl7::Curl::getUri(Uri);
+	} catch (const ppl7::Exception &e) {
+		e.print();
+	}
+
+}
+
+void StopMoCap::motorStarted()
+{
+	ui.frameMotors->setEnabled(false);
+}
+
+void StopMoCap::motorStopped()
+{
+	ui.frameMotors->setEnabled(true);
+}
+
+
+
+MotorThread::MotorThread(StopMoCap *gui)
+{
+	this->gui=gui;
+}
+
+void MotorThread::getUri(const ppl7::String &Uri)
+{
+	this->Uri=Uri;
+	this->start();
+}
+
+void MotorThread::run()
+{
+	emit motorStarted();
+	try {
+		ppl7::Curl::getUri(Uri);
+	} catch (const ppl7::Exception &e) {
+		//e.print();
+	}
+	emit motorStopped();
+}
+

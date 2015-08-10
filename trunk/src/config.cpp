@@ -119,6 +119,13 @@ void Config::load()
 	ArduinoBaudRate=settings.value("ArduinoBaudRate",57600).toInt();
 	settings.endGroup();
 
+	settings.beginGroup("webcontrol");
+	WebControlBaseUri=settings.value("WebControlBaseUri").toString();
+	WebControlMoveSteps=settings.value("WebControlMoveSteps",100).toInt();
+	WebControlTurnSteps=settings.value("WebControlTurnSteps",100).toInt();
+	settings.endGroup();
+
+
 
 
 }
@@ -181,4 +188,11 @@ void Config::save()
 	settings.setValue("ArduinoDevice",ArduinoDevice);
 	settings.setValue("ArduinoBaudRate",ArduinoBaudRate);
 	settings.endGroup();
+
+	settings.beginGroup("webcontrol");
+	settings.setValue("WebControlBaseUri",WebControlBaseUri);
+	settings.setValue("WebControlMoveSteps",WebControlMoveSteps);
+	settings.setValue("WebControlTurnSteps",WebControlTurnSteps);
+	settings.endGroup();
+
 }
