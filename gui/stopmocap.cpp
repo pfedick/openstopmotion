@@ -199,6 +199,8 @@ StopMoCap::StopMoCap(QWidget *parent)
 	this->restoreGeometry(conf.ScreenGeometry);
 	fBuffer.loadAsync(conf.CaptureDir+"/"+conf.Scene);
 
+	initializeMotionControl();
+
 }
 
 StopMoCap::~StopMoCap()
@@ -255,6 +257,39 @@ StopMoCap::~StopMoCap()
 	cam.close();
 	delete Timer;
 }
+
+void StopMoCap::initializeMotionControl()
+{
+	if (motioncontrol) {
+		delete motioncontrol;
+		motioncontrol=NULL;
+	}
+	motioncontrol=new MotionControl();
+	motioncontrol->setMainCapture(this);
+	motioncontrol->setWindowFlags(Qt::Window);
+	try {
+		motioncontrol->setConfig(conf);
+	} catch (...) {
+
+	}
+
+	if (ui.lightAndDarkButton->isChecked()) motioncontrol->setColorScheme(1);
+	else motioncontrol->setColorScheme(0);
+
+	if (cam.isOpen()) {
+		std::list<CameraControl> controls;
+		cam.enumerateControls(controls);
+		std::list<CameraControl>::const_iterator it;
+		for (it=controls.begin();it!=controls.end();it++) {
+			if (it->type==CameraControl::Integer) {
+				MotionControl::DeviceCameraControlInteger device(*it);
+				motioncontrol->addDevice(device);
+			}
+		}
+	}
+}
+
+
 
 void StopMoCap::createStatusBar()
 {
@@ -371,10 +406,14 @@ void StopMoCap::on_useDevice_clicked()
 	    delete ui.controlWidget->layout();
 	}
 
+	motioncontrol->removeCameraControls();
 	controlLayout=new QVBoxLayout;
 	controlLayout->setSpacing(0);
 	for (it=controls.begin();it!=controls.end();it++) {
 		if (it->type==CameraControl::Integer) {
+			MotionControl::DeviceCameraControlInteger device(*it);
+			motioncontrol->addDevice(device);
+
 			QLabel *label=new QLabel(it->Name);
 			controlLayout->addWidget(label);
 			MySlider *slider=new MySlider(Qt::Horizontal);
@@ -1490,20 +1529,6 @@ void StopMoCap::on_arduinoButton_clicked()
 
 void StopMoCap::on_motionControlButton_clicked()
 {
-	if (!motioncontrol) {
-		motioncontrol=new MotionControl();
-		motioncontrol->setMainCapture(this);
-		motioncontrol->setWindowFlags(Qt::Window);
-		//motioncontrol->setArduino(arduino);
-		try {
-			motioncontrol->setConfig(conf);
-		} catch (...) {
-
-		}
-
-		if (ui.lightAndDarkButton->isChecked()) motioncontrol->setColorScheme(1);
-		else motioncontrol->setColorScheme(0);
-	}
 	motioncontrol->show();
 }
 

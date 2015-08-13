@@ -145,6 +145,7 @@ private:
     void getSceneList(ppl7::Array &scenes);
     void createStatusBar();
     void updateStatusBar();
+    void initializeMotionControl();
 
 public:
     void stopCapture();

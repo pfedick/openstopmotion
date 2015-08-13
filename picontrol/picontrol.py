@@ -4,6 +4,7 @@ import web
 import sys
 import time
 import signal
+from datetime import datetime
 
 try:
     import RPi.GPIO as GPIO
@@ -15,6 +16,11 @@ except ImportError:
     
     
 StatusRGBPins = [8,10,12]
+
+Motor1_dir = 23
+Motor1_step = 21
+Motor1_sleep = 19
+
 
 StepPins = [16,18,22,24]
 StepSeq = [[1,0,0,0],
@@ -36,8 +42,13 @@ if have_rpi_gpio:
     
     GPIO.setup(StepPins,GPIO.OUT)
     GPIO.output(StepPins, GPIO.LOW)
-    
-    
+
+    GPIO.setup(Motor1_dir,GPIO.OUT)    
+    GPIO.setup(Motor1_step,GPIO.OUT)    
+    GPIO.setup(Motor1_sleep,GPIO.OUT)    
+    GPIO.output(Motor1_dir, GPIO.LOW)
+    GPIO.output(Motor1_step, GPIO.LOW)
+    GPIO.output(Motor1_sleep, GPIO.LOW)
     
     
     
@@ -65,6 +76,32 @@ def showform(steps):
     output +="<input type=submit name=backward>"
     output +="</form>\n"
 
+def exact_sleep(seconds):
+    start = datetime.now()
+    startseconds=start.second + start.microsecond/1000000
+    endsconds=startseconds+seconds
+    print time.time()
+    print time.time()
+    print time.time()
+    print time.time()
+    print time.time()
+    print time.time()
+    time.sleep(seconds)
+    return
+    while True:
+        now = datetime.now()
+        nowseconds=now.second + now.microsecond/1000000
+	print nowseconds, endsconds
+        if nowseconds>=endsconds:
+            print "debug"
+            return
+
+def check_sleep(amount):
+    start = datetime.now()
+    time.sleep(amount)
+    end = datetime.now()
+    delta = end-start
+    return delta.seconds + delta.microseconds/1000000.
 
 
 class ShowHelp(object):
@@ -170,11 +207,34 @@ class StepMove(object):
         return "OK. Steps "+str(direction)+": "+str(steps)
 
 
+class StepMoveBipolar(object):
+    def __init__(self):
+        pass
+    
+    @staticmethod
+    def GET(direction, steps):      # pylint: disable=C0103
+        setStatus(0,0,1)
+        if direction == "right":
+            GPIO.output(Motor1_dir, GPIO.LOW)
+        else:
+            GPIO.output(Motor1_dir, GPIO.HIGH)
+        GPIO.output(Motor1_sleep, GPIO.HIGH)
+        time.sleep(0.002)
+        for count in range (0,int(steps)):
+            GPIO.output(Motor1_step, GPIO.HIGH)
+            #time.sleep(0.001)
+            GPIO.output(Motor1_step, GPIO.LOW)
+            time.sleep(0.001)
+        #GPIO.output(Motor1_sleep, GPIO.LOW)
+        time.sleep(0.002)
+        setStatus(0,1,0)
+        return "OK. Steps "+str(direction)+": "+str(steps)
+
 
 if __name__ == "__main__":
     urls = (
             '/', 'ShowHelp',
-            '/camera/move/(.*)/(.*)', 'StepMove',
+            '/camera/move/(.*)/(.*)', 'StepMoveBipolar',
             '/reset', 'Reset',
             '/form', 'HandleFormular',
             '/lights/pwm/(.*)/(.*)', 'SetPwm',
