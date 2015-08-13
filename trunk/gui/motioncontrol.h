@@ -35,8 +35,9 @@
 #include <ppl7.h>
 #include <ppl7-grafix.h>
 #include "config.h"
-#include "motioncontrolmotor.h"
+#include "device.h"
 #include "ui_motioncontrol.h"
+#include <map>
 
 class StopMoCap;
 
@@ -45,12 +46,59 @@ class MotionControl : public QWidget
     Q_OBJECT
 
 public:
+    enum DeviceType {
+    	DeviceType_PWMLight,
+    	DeviceType_StepMotor,
+    	DeviceType_CameraControlInteger,
+
+    };
+    class Device
+    {
+    	private:
+    		DeviceType Type;
+    		ppl7::String Name;
+    	public:
+    		Device(DeviceType Type, const ppl7::String &Name);
+    		const ppl7::String &name() const;
+    		DeviceType type() const;
+
+    };
+
+    class DevicePWMLight : public Device
+    {
+    	private:
+    		int min, max;
+    	public:
+    		DevicePWMLight(const ppl7::String &Name, int min, int max);
+    };
+
+    class DeviceStepMotor : public Device
+    {
+    	private:
+    	public:
+    		DeviceStepMotor(const ppl7::String &Name);
+
+    };
+
+    class DeviceCameraControlInteger : public Device
+    {
+    	private:
+    		const CameraControl &control;
+    	public:
+    		DeviceCameraControlInteger(const CameraControl &control);
+    };
+
+
     MotionControl(QWidget *parent = 0);
     ~MotionControl();
 
     void setMainCapture(StopMoCap *cap);
     void setConfig (Config &conf);
     void setColorScheme(int scheme);
+
+    void addDevice(const MotionControl::Device &device);
+    void removeDevice(const ppl7::String &Name);
+    void removeCameraControls();
 
 //    void load(const ppl7::String &filename);
 //    void save(const ppl7::String &filename);
@@ -64,6 +112,9 @@ private:
     Ui::MotionControlClass ui;
     StopMoCap *cap;
     Config *conf;
+    std::map<ppl7::String,Device> Devices;
+
+
     ppl7::grafix::Image img;
     int myColorScheme;
     ppl7::String Filename;

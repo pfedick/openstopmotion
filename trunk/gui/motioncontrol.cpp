@@ -23,6 +23,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define WITH_QT
 #include "osm.h"
 #include "motioncontrol.h"
 #include "stopmocap.h"
@@ -30,6 +31,45 @@
 #include <QImage>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <map>
+
+
+MotionControl::Device::Device(DeviceType Type, const ppl7::String &Name)
+{
+	this->Type=Type;
+	this->Name=Name;
+}
+
+const ppl7::String & MotionControl::Device::name() const
+{
+	return Name;
+}
+
+MotionControl::DeviceType MotionControl::Device::type() const
+{
+	return Type;
+}
+
+
+MotionControl::DevicePWMLight::DevicePWMLight(const ppl7::String &Name, int min, int max)
+	: MotionControl::Device(MotionControl::DeviceType_PWMLight, Name)
+{
+	this->min=min;
+	this->max=max;
+}
+
+MotionControl::DeviceStepMotor::DeviceStepMotor(const ppl7::String &Name)
+	: MotionControl::Device(MotionControl::DeviceType_StepMotor, Name)
+{
+
+}
+
+MotionControl::DeviceCameraControlInteger::DeviceCameraControlInteger(const CameraControl &control)
+	: MotionControl::Device(MotionControl::DeviceType_CameraControlInteger, ppl7::String("Cam_")+control.Name),
+	  control(control)
+{
+
+}
 
 
 MotionControl::MotionControl(QWidget *parent)
@@ -61,6 +101,23 @@ MotionControl::MotionControl(QWidget *parent)
 	ui.frameview->installEventFilter(this);
 	//connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
 
+	addDevice(DeviceStepMotor("CameraMovement"));
+	addDevice(DevicePWMLight("LED 1",0,4095));
+	addDevice(DevicePWMLight("LED 2",0,4095));
+	addDevice(DevicePWMLight("LED 3",0,4095));
+	addDevice(DevicePWMLight("LED 4",0,4095));
+	addDevice(DevicePWMLight("LED 5",0,4095));
+	addDevice(DevicePWMLight("LED 6",0,4095));
+	addDevice(DevicePWMLight("LED 7",0,4095));
+	addDevice(DevicePWMLight("LED 8",0,4095));
+	addDevice(DevicePWMLight("LED 9",0,4095));
+	addDevice(DevicePWMLight("LED 10",0,4095));
+	addDevice(DevicePWMLight("LED 11",0,4095));
+	addDevice(DevicePWMLight("LED 12",0,4095));
+	addDevice(DevicePWMLight("LED 13",0,4095));
+	addDevice(DevicePWMLight("LED 14",0,4095));
+	addDevice(DevicePWMLight("LED 15",0,4095));
+	addDevice(DevicePWMLight("LED 16",0,4095));
 
 }
 
@@ -104,8 +161,6 @@ void MotionControl::setConfig (Config &conf)
 	}
 }
 
-
-
 void MotionControl::setColorScheme(int scheme)
 {
 	if (scheme==1) {
@@ -124,3 +179,32 @@ void MotionControl::setMainCapture(StopMoCap *cap)
 	this->cap=cap;
 }
 
+void MotionControl::addDevice(const MotionControl::Device &device)
+{
+	std::map<ppl7::String,Device>::const_iterator it;
+	it=Devices.find(device.name());
+	if (it != Devices.end()) {
+		return;
+	}
+	Devices.insert(std::pair<ppl7::String,Device>(device.name(),device));
+	ui.devicesListWidget->addItem(device.name());
+}
+
+void MotionControl::removeCameraControls()
+{
+	std::map<ppl7::String,Device>::const_iterator it;
+	for (it=Devices.begin(); it!=Devices.end(); ++it) {
+		if (it->second.type()==DeviceType_CameraControlInteger) {
+			QString n=it->second.name();
+			for (int row=0;row<ui.devicesListWidget->count();row++) {
+				QListWidgetItem *item=ui.devicesListWidget->item(row);
+				if (item->text()==n) {
+					item=ui.devicesListWidget->takeItem(row);
+					delete item;
+					row=0;
+				}
+			}
+			Devices.erase(it->first);
+		}
+	}
+}
