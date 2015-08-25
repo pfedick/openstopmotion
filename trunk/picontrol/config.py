@@ -73,6 +73,7 @@ class Config(object):
         motor.step = int(self.__read_param__(config, section,"step",0))
         motor.sleep = int(self.__read_param__(config, section,"sleep",0))
         motor.stopsensor = int(self.__read_param__(config, section,"stopsensor",0))
+        return motor
 
         
     def load(self, filename):
