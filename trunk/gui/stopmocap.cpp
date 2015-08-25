@@ -282,8 +282,7 @@ void StopMoCap::initializeMotionControl()
 		std::list<CameraControl>::const_iterator it;
 		for (it=controls.begin();it!=controls.end();it++) {
 			if (it->type==CameraControl::Integer) {
-				MotionControl::DeviceCameraControlInteger device(*it);
-				motioncontrol->addDevice(device);
+				motioncontrol->addDevice(new MotionControl::DeviceCameraControlInteger(*it));
 			}
 		}
 	}
@@ -411,8 +410,7 @@ void StopMoCap::on_useDevice_clicked()
 	controlLayout->setSpacing(0);
 	for (it=controls.begin();it!=controls.end();it++) {
 		if (it->type==CameraControl::Integer) {
-			MotionControl::DeviceCameraControlInteger device(*it);
-			motioncontrol->addDevice(device);
+			motioncontrol->addDevice(new MotionControl::DeviceCameraControlInteger(*it));
 
 			QLabel *label=new QLabel(it->Name);
 			controlLayout->addWidget(label);
