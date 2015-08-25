@@ -1,0 +1,50 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          picontrol.py
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Should-Start:      $portmap
+# Should-Stop:       $portmap
+# X-Start-Before:    nis
+# X-Stop-After:      nis
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Example initscript
+# Description:       This file should be used to construct scripts to be
+#                    placed in /etc/init.d.
+### END INIT INFO
+
+
+do_stop () 
+{
+
+    PID=`ps auxw|grep "python /home/patrick/osm_picontrol/picontrol.py" | grep -v grep | awk '{print $2}'`
+    if [ $? -eq 0 ] ; then
+        if [ $PID -gt 0 ] ; then
+            kill $PID
+        fi
+    fi
+}
+
+case "$1" in
+  start)
+        cd /home/patrick/osm_picontrol
+        nohup /home/patrick/osm_picontrol/picontrol.py >/dev/null 2>&1 &
+	;;
+  stop)
+        do_stop
+	;;
+
+  restart)
+        do_stop
+        cd /home/patrick/osm_picontrol
+        nohup /home/patrick/osm_picontrol/picontrol.py >/dev/null 2>&1 &
+	;;
+  *)
+	echo "Usage: $N {start|stop}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

@@ -24,15 +24,17 @@ except ImportError:
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 
     def handle(self):
+        osm.add_connection()
         try:
             while True:
                 data = self.request.recv(1024)
-                print "test"
-                cur_thread = threading.current_thread()
-                response = "{}: {}".format(cur_thread.name, data)
-                self.request.sendall(response)
+                if data[0]=='q':
+                    break
+                else:
+                    self.request.sendall(osm.handle_request(data))
         except:
             pass
+        osm.remove_connection()
         print "Connection terminated"
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
@@ -46,6 +48,7 @@ class OpenStopMotionPiControl(object):
         self.pwm = None
         self.server = None
         self.stopflag = False
+        self.connection_count = 0
         
     def parse_args(self, args=None):
         self.parser = ArgumentParser (description = 'TCP-Server '
@@ -98,21 +101,17 @@ class OpenStopMotionPiControl(object):
         """!Start TCP-Server"""
         self.server = ThreadedTCPServer((self.config.hostname, self.config.port),
                                         ThreadedTCPRequestHandler)
-        self.server.allow_reuse_address=1
+        self.server.allow_reuse_address=True
         print "Starting TCP-Server"
         self.stopflag=False
         srvfd = self.server.fileno()
-        phase=0
         try:
             self.set_rgb_status(0,1,0)
             while self.stopflag==False:
-                if phase<10:
-                    self.set_rgb_status(0,1,0)
-                else:
+                if self.connection_count>0:
                     self.set_rgb_status(0,1,1)
-                if phase>20:
-                    phase=0
-                phase=phase+1
+                else:
+                    self.set_rgb_status(0,1,0)
                 ready = select.select([srvfd], [], [], 0.5)
                 if srvfd in ready[0]:
                     self.server.handle_request()
@@ -124,8 +123,17 @@ class OpenStopMotionPiControl(object):
     def stop_server(self):
         self.stopflag=True
         print "Shutdown triggered"
-        
 
+    def add_connection(self):
+        self.connection_count = self.connection_count + 1
+
+    def remove_connection(self):
+        if self.connection_count>0:
+         self.connection_count = self.connection_count - 1
+
+    def handle_request(self,data):
+        print data[0]        
+        return "Ok\n"
 
     
 osm = OpenStopMotionPiControl()
