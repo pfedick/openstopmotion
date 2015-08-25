@@ -34,6 +34,7 @@
 #include <QSizePolicy>
 #include <ppl7.h>
 #include <ppl7-grafix.h>
+#include <ppl7-inet.h>
 #include "config.h"
 #include "device.h"
 #include "ui_motioncontrol.h"
@@ -47,6 +48,7 @@ class MotionControl : public QWidget
 
 public:
     enum DeviceType {
+    	DeviceTyoe_None,
     	DeviceType_PWMLight,
     	DeviceType_StepMotor,
     	DeviceType_CameraControlInteger,
@@ -58,6 +60,7 @@ public:
     		DeviceType Type;
     		ppl7::String Name;
     	public:
+    		Device();
     		Device(DeviceType Type, const ppl7::String &Name);
     		const ppl7::String &name() const;
     		DeviceType type() const;
@@ -68,8 +71,15 @@ public:
     {
     	private:
     		int min, max;
+    		int myId;
+    		int currentValue;
     	public:
-    		DevicePWMLight(const ppl7::String &Name, int min, int max);
+    		DevicePWMLight(const ppl7::String &Name, int id, int min, int max, int value=0);
+    		int minimum() const;
+    		int maximum() const;
+    		int value() const;
+    		int id() const;
+    		void setValue(int value);
     };
 
     class DeviceStepMotor : public Device
@@ -96,7 +106,7 @@ public:
     void setConfig (Config &conf);
     void setColorScheme(int scheme);
 
-    void addDevice(const MotionControl::Device &device);
+    void addDevice(MotionControl::Device *device);
     void removeDevice(const ppl7::String &Name);
     void removeCameraControls();
 
@@ -112,12 +122,15 @@ private:
     Ui::MotionControlClass ui;
     StopMoCap *cap;
     Config *conf;
-    std::map<ppl7::String,Device> Devices;
-
+    std::map<ppl7::String,Device*> Devices;
+    Device *currentDevice;
+    ppl7::Curl curl;
 
     ppl7::grafix::Image img;
     int myColorScheme;
     ppl7::String Filename;
+
+    void selectDevicePWMLight(const ppl7::String &Name);
 
     /*
     void updateFrameView();
@@ -131,6 +144,9 @@ private:
     */
 
 public slots:
+	void on_devicesListWidget_currentItemChanged ( QListWidgetItem * current, QListWidgetItem * previous );
+	void on_controlRangeHorizontalSlider_valueChanged(int value);
+	void on_controlRangeSpinBox_valueChanged(int value);
 	/*
 	void on_connectButton_clicked();
 	void on_slider_valueChanged_fired(int id, int value);
@@ -157,6 +173,7 @@ public slots:
 
 	void on_playbackTimer_fired();
 	*/
+
 
 };
 

@@ -32,7 +32,13 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <map>
+#include <ppl7-inet.h>
 
+
+MotionControl::Device::Device()
+{
+	this->Type=DeviceTyoe_None;
+}
 
 MotionControl::Device::Device(DeviceType Type, const ppl7::String &Name)
 {
@@ -51,11 +57,39 @@ MotionControl::DeviceType MotionControl::Device::type() const
 }
 
 
-MotionControl::DevicePWMLight::DevicePWMLight(const ppl7::String &Name, int min, int max)
+MotionControl::DevicePWMLight::DevicePWMLight(const ppl7::String &Name, int id, int min, int max, int value)
 	: MotionControl::Device(MotionControl::DeviceType_PWMLight, Name)
 {
+	this->myId=id;
 	this->min=min;
 	this->max=max;
+	this->currentValue=value;
+}
+
+int MotionControl::DevicePWMLight::minimum() const
+{
+	return min;
+}
+
+int MotionControl::DevicePWMLight::maximum() const
+{
+	return max;
+}
+
+int MotionControl::DevicePWMLight::value() const
+{
+	return currentValue;
+}
+
+int MotionControl::DevicePWMLight::id() const
+{
+	return myId;
+}
+
+
+void MotionControl::DevicePWMLight::setValue(int value)
+{
+	currentValue=value;
 }
 
 MotionControl::DeviceStepMotor::DeviceStepMotor(const ppl7::String &Name)
@@ -76,6 +110,7 @@ MotionControl::MotionControl(QWidget *parent)
     : QWidget(parent)
 {
 	cap=NULL;
+	currentDevice=NULL;
 	unsaved=false;
 	//PlaybackTimer=new QTimer(this);
 	myColorScheme=0;
@@ -101,23 +136,23 @@ MotionControl::MotionControl(QWidget *parent)
 	ui.frameview->installEventFilter(this);
 	//connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
 
-	addDevice(DeviceStepMotor("CameraMovement"));
-	addDevice(DevicePWMLight("LED 1",0,4095));
-	addDevice(DevicePWMLight("LED 2",0,4095));
-	addDevice(DevicePWMLight("LED 3",0,4095));
-	addDevice(DevicePWMLight("LED 4",0,4095));
-	addDevice(DevicePWMLight("LED 5",0,4095));
-	addDevice(DevicePWMLight("LED 6",0,4095));
-	addDevice(DevicePWMLight("LED 7",0,4095));
-	addDevice(DevicePWMLight("LED 8",0,4095));
-	addDevice(DevicePWMLight("LED 9",0,4095));
-	addDevice(DevicePWMLight("LED 10",0,4095));
-	addDevice(DevicePWMLight("LED 11",0,4095));
-	addDevice(DevicePWMLight("LED 12",0,4095));
-	addDevice(DevicePWMLight("LED 13",0,4095));
-	addDevice(DevicePWMLight("LED 14",0,4095));
-	addDevice(DevicePWMLight("LED 15",0,4095));
-	addDevice(DevicePWMLight("LED 16",0,4095));
+	addDevice(new DeviceStepMotor("CameraMovement"));
+	addDevice(new DevicePWMLight("LED 1",0,0,4095));
+	addDevice(new DevicePWMLight("LED 2",1,0,4095));
+	addDevice(new DevicePWMLight("LED 3",2,0,4095));
+	addDevice(new DevicePWMLight("LED 4",3,0,4095));
+	addDevice(new DevicePWMLight("LED 5",4,0,4095));
+	addDevice(new DevicePWMLight("LED 6",5,0,4095));
+	addDevice(new DevicePWMLight("LED 7",6,0,4095));
+	addDevice(new DevicePWMLight("LED 8",7,0,4095));
+	addDevice(new DevicePWMLight("LED 9",8,0,4095));
+	addDevice(new DevicePWMLight("LED 10",9,0,4095));
+	addDevice(new DevicePWMLight("LED 11",10,0,4095));
+	addDevice(new DevicePWMLight("LED 12",11,0,4095));
+	addDevice(new DevicePWMLight("LED 13",12,0,4095));
+	addDevice(new DevicePWMLight("LED 14",13,0,4095));
+	addDevice(new DevicePWMLight("LED 15",14,0,4095));
+	addDevice(new DevicePWMLight("LED 16",15,0,4095));
 
 }
 
@@ -154,6 +189,7 @@ bool MotionControl::eventFilter(QObject *obj, QEvent *event)
 void MotionControl::setConfig (Config &conf)
 {
 	this->conf=&conf;
+	ui.lineEditControlWebinterface->setText(conf.MotionControlBaseUri);
 	if (conf.MotionControlFile.notEmpty()) {
 		//load (conf.MotionControlFile);
 		Filename=conf.MotionControlFile;
@@ -179,23 +215,23 @@ void MotionControl::setMainCapture(StopMoCap *cap)
 	this->cap=cap;
 }
 
-void MotionControl::addDevice(const MotionControl::Device &device)
+void MotionControl::addDevice(MotionControl::Device *device)
 {
-	std::map<ppl7::String,Device>::const_iterator it;
-	it=Devices.find(device.name());
+	std::map<ppl7::String,Device*>::const_iterator it;
+	it=Devices.find(device->name());
 	if (it != Devices.end()) {
 		return;
 	}
-	Devices.insert(std::pair<ppl7::String,Device>(device.name(),device));
-	ui.devicesListWidget->addItem(device.name());
+	Devices.insert(std::pair<ppl7::String,Device*>(device->name(),device));
+	ui.devicesListWidget->addItem(device->name());
 }
 
 void MotionControl::removeCameraControls()
 {
-	std::map<ppl7::String,Device>::const_iterator it;
+	std::map<ppl7::String,Device*>::const_iterator it;
 	for (it=Devices.begin(); it!=Devices.end(); ++it) {
-		if (it->second.type()==DeviceType_CameraControlInteger) {
-			QString n=it->second.name();
+		if (it->second->type()==DeviceType_CameraControlInteger) {
+			QString n=it->second->name();
 			for (int row=0;row<ui.devicesListWidget->count();row++) {
 				QListWidgetItem *item=ui.devicesListWidget->item(row);
 				if (item->text()==n) {
@@ -207,4 +243,73 @@ void MotionControl::removeCameraControls()
 			Devices.erase(it->first);
 		}
 	}
+}
+
+
+void MotionControl::on_devicesListWidget_currentItemChanged ( QListWidgetItem * current, QListWidgetItem * previous )
+{
+	ppl7::String Name=current->text();
+	try {
+		MotionControl::Device *device=Devices[Name];
+		//Name.printnl();
+		switch (device->type()) {
+			case MotionControl::DeviceType_PWMLight:
+				currentDevice=device;
+				ui.stackedWidget->setCurrentIndex(0);
+				ui.currentDeviceName->setText(tr("Light"));
+				ui.currentDeviceTypeName->setText(device->name());
+				ui.controlRangeHorizontalSlider->setValue(((DevicePWMLight*)device)->value());
+				ui.controlRangeHorizontalSlider->setMinimum(((DevicePWMLight*)device)->minimum());
+				ui.controlRangeHorizontalSlider->setMaximum(((DevicePWMLight*)device)->maximum());
+				ui.controlRangeHorizontalSlider->setValue(((DevicePWMLight*)device)->value());
+				ui.controlRangeSpinBox->setValue(((DevicePWMLight*)device)->value());
+				ui.controlRangeSpinBox->setMinimum(((DevicePWMLight*)device)->minimum());
+				ui.controlRangeSpinBox->setMaximum(((DevicePWMLight*)device)->maximum());
+				ui.controlRangeSpinBox->setValue(((DevicePWMLight*)device)->value());
+				break;
+			case MotionControl::DeviceType_StepMotor:
+				currentDevice=device;
+				ui.stackedWidget->setCurrentIndex(1);
+				ui.currentDeviceName->setText(tr("StepMotor"));
+				ui.currentDeviceTypeName->setText(device->name());
+
+			default:
+				break;
+
+		}
+
+	} catch (...) {
+	}
+}
+
+void selectDevicePWMLight(const ppl7::String &Name)
+{
+
+}
+
+void MotionControl::on_controlRangeHorizontalSlider_valueChanged(int value)
+{
+	ui.controlRangeSpinBox->setValue(value);
+}
+
+void MotionControl::on_controlRangeSpinBox_valueChanged(int value)
+{
+	ui.controlRangeHorizontalSlider->setValue(value);
+	if (!currentDevice) return;
+	if (!currentDevice->type()==MotionControl::DeviceType_PWMLight) return;
+	((DevicePWMLight*)currentDevice)->setValue(value);
+	ppl7::String Uri=ui.lineEditControlWebinterface->text();
+	Uri.trimRight("/");
+	Uri+="/lights/pwm/"+ppl7::ToString("%d/%d",
+			((DevicePWMLight*)currentDevice)->id(),
+			value);
+	Uri.printnl();
+	try {
+		curl.setURL(Uri);
+		curl.get();
+	} catch (const ppl7::Exception &e) {
+		e.print();
+	}
+
+
 }
