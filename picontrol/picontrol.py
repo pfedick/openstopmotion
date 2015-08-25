@@ -129,10 +129,33 @@ class OpenStopMotionPiControl(object):
 
     def remove_connection(self):
         if self.connection_count>0:
-         self.connection_count = self.connection_count - 1
+            self.connection_count = self.connection_count - 1
+         
+    def handle_pwm(self, channel, value):
+        """!Handles a PWM request"""
+        if channel>15 or value>4095:
+            self.set_rgb_status(1,0,0)
+            return "Error: Invalid PWM parameters [channel="+str(channel)+", value="+str(value)+"]\n"
+        if not self.pwm:
+            return "Error: PWM not configured\n"
+        self.set_rgb_status(0,0,1)
+        if have_rpi_gpio:
+            if value==0:
+                self.pwm.setPWM(channel,4096,0)
+            else:
+                self.pwm.setPWM(channel,0,value)
+        return "Ok\n"  
 
     def handle_request(self,data):
-        print data[0]        
+        cmd=data.split(";")
+        if cmd[0]=='pwm':
+            if len(cmd)!=3:
+                return "Error: Invalid command\n"
+            channel=int(cmd[1])
+            value=int(cmd[2])
+            #print "channel: "+str(channel)+", value: "+str(value)
+            return self.handle_pwm(channel,value)
+                   
         return "Ok\n"
 
     
