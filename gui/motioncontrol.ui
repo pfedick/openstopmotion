@@ -19,12 +19,29 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Control-Webinterface:</string>
+        <string>PiControl Hostname:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEditControlWebinterface"/>
+      <widget class="QLineEdit" name="picontrolHostnameLineEdit"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_11">
+       <property name="text">
+        <string>Port:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="picontrolPortLineEdit">
+       <property name="maximumSize">
+        <size>
+         <width>80</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer">

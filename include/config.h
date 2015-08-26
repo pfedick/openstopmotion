@@ -47,7 +47,8 @@ class Config
 		ppl7::String	LedControlFile;
 		ppl7::String	ArduinoDevice;
 		int				ArduinoBaudRate;
-		ppl7::String	MotionControlBaseUri;
+		ppl7::String	MotionControlHostname;
+		int				MotionControlPort;
 		int				MotionControlMoveSteps;
 		int				MotionControlTurnSteps;
 		ppl7::String	MotionControlFile;

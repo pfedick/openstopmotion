@@ -29,7 +29,8 @@ HEADERS += include/osm.h \
     gui/arduinosketch.h \
     src/bluebox.h \
     gui/release.h \
-    gui/motioncontrol.h
+    gui/motioncontrol.h \
+    src/picontrol.h
     
 SOURCES += src/FrameBuffer.cpp \
 	src/arduino.cpp \
@@ -48,7 +49,8 @@ SOURCES += src/FrameBuffer.cpp \
     src/config.cpp \
     src/bluebox.cpp \
     gui/release.cpp \
-    gui/motioncontrol.cpp
+    gui/motioncontrol.cpp \
+    src/picontrol.cpp
     
 FORMS += gui/stopmocap.ui \
 	gui/ledslider.ui \

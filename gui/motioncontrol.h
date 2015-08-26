@@ -37,6 +37,7 @@
 #include <ppl7-inet.h>
 #include "config.h"
 #include "device.h"
+#include "picontrol.h"
 #include "ui_motioncontrol.h"
 #include <map>
 
@@ -124,7 +125,7 @@ private:
     Config *conf;
     std::map<ppl7::String,Device*> Devices;
     Device *currentDevice;
-    ppl7::Curl curl;
+    PiControl pi;
 
     ppl7::grafix::Image img;
     int myColorScheme;

@@ -32,6 +32,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#include <ppl7-inet.h>
 
 #undef CATCH
 
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 #endif
+		ppl7::InitSockets();
 		ppl7::grafix::Grafix gfx;
 		QApplication a(argc, argv);
 	    // Deprecated in Qt5, Qt5 geht davon aus, dass der Sourcecode UTF-8 kodiert ist

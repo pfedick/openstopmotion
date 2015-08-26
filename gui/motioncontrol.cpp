@@ -188,8 +188,11 @@ bool MotionControl::eventFilter(QObject *obj, QEvent *event)
 
 void MotionControl::setConfig (Config &conf)
 {
+	ppl7::String Tmp;
 	this->conf=&conf;
-	ui.lineEditControlWebinterface->setText(conf.MotionControlBaseUri);
+	ui.picontrolHostnameLineEdit->setText(conf.MotionControlHostname);
+	Tmp.setf("%d",conf.MotionControlPort);
+	ui.picontrolPortLineEdit->setText(Tmp);
 	if (conf.MotionControlFile.notEmpty()) {
 		//load (conf.MotionControlFile);
 		Filename=conf.MotionControlFile;
@@ -297,19 +300,19 @@ void MotionControl::on_controlRangeSpinBox_valueChanged(int value)
 	ui.controlRangeHorizontalSlider->setValue(value);
 	if (!currentDevice) return;
 	if (!currentDevice->type()==MotionControl::DeviceType_PWMLight) return;
-	((DevicePWMLight*)currentDevice)->setValue(value);
-	ppl7::String Uri=ui.lineEditControlWebinterface->text();
-	Uri.trimRight("/");
-	Uri+="/lights/pwm/"+ppl7::ToString("%d/%d",
-			((DevicePWMLight*)currentDevice)->id(),
-			value);
-	Uri.printnl();
+	if (!pi.isConnected()) {
+		try {
+			pi.connect(ui.picontrolHostnameLineEdit->text(),
+					ui.picontrolPortLineEdit->text().toInt());
+		} catch (const ppl7::Exception &e) {
+			e.print();
+			return;
+		}
+	}
 	try {
-		curl.setURL(Uri);
-		curl.get();
+		pi.setPWM(((DevicePWMLight*)currentDevice)->id(),value);
 	} catch (const ppl7::Exception &e) {
 		e.print();
 	}
-
-
+	((DevicePWMLight*)currentDevice)->setValue(value);
 }
