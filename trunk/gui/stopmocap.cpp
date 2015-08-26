@@ -1561,22 +1561,27 @@ void StopMoCap::on_releaseButton_clicked()
 
 void StopMoCap::on_motorMoveLeft_clicked()
 {
+	/*
 	if(conf.MotionControlBaseUri.isEmpty()) return;
 	ppl7::String Uri=conf.MotionControlBaseUri+"camera/move/left/";
 	Uri+=ui.motorMoveSteps->text();
 	motorThread->getUri(Uri);
+	*/
 }
 
 void StopMoCap::on_motorMoveRight_clicked()
 {
+	/*
 	if(conf.MotionControlBaseUri.isEmpty()) return;
 	ppl7::String Uri=conf.MotionControlBaseUri+"camera/move/right/";
 	Uri+=ui.motorMoveSteps->text();
 	motorThread->getUri(Uri);
+	*/
 }
 
 void StopMoCap::on_motorTurnLeft_clicked()
 {
+	/*
 	if(conf.MotionControlBaseUri.isEmpty()) return;
 	ppl7::String Uri=conf.MotionControlBaseUri+"camera/turn/left/";
 	Uri+=ui.motorMoveSteps->text();
@@ -1585,10 +1590,12 @@ void StopMoCap::on_motorTurnLeft_clicked()
 	} catch (const ppl7::Exception &e) {
 		e.print();
 	}
+	*/
 }
 
 void StopMoCap::on_motorTurnRight_clicked()
 {
+	/*
 	if(conf.MotionControlBaseUri.isEmpty()) return;
 	ppl7::String Uri=conf.MotionControlBaseUri+"camera/turn/left/";
 	Uri+=ui.motorMoveSteps->text();
@@ -1597,6 +1604,7 @@ void StopMoCap::on_motorTurnRight_clicked()
 	} catch (const ppl7::Exception &e) {
 		e.print();
 	}
+	*/
 
 }
 
@@ -1617,20 +1625,23 @@ MotorThread::MotorThread(StopMoCap *gui)
 	this->gui=gui;
 }
 
+/*
 void MotorThread::getUri(const ppl7::String &Uri)
 {
 	this->Uri=Uri;
 	this->start();
 }
-
+*/
 void MotorThread::run()
 {
 	emit motorStarted();
+	/*
 	try {
 		ppl7::Curl::getUri(Uri);
 	} catch (const ppl7::Exception &e) {
 		//e.print();
 	}
+	*/
 	emit motorStopped();
 }
 

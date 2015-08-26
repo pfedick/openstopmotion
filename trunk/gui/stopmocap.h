@@ -72,7 +72,7 @@ class MotorThread : public QThread
 
 	public:
 		MotorThread(StopMoCap *gui);
-		void getUri(const ppl7::String &Uri);
+		//void getUri(const ppl7::String &Uri);
 		void run();
 
 };

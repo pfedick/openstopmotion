@@ -46,6 +46,7 @@ Config::Config()
 	interpolate=false;
 	overblendFactor=50;
 	darkLayout=false;
+	MotionControlPort=0;
 }
 
 Config::~Config()
@@ -120,15 +121,12 @@ void Config::load()
 	settings.endGroup();
 
 	settings.beginGroup("motioncontrol");
-	MotionControlBaseUri=settings.value("MotionControlBaseUri").toString();
+	MotionControlHostname=settings.value("MotionControlHostname").toString();
+	MotionControlPort=settings.value("MotionControlPort").toInt();
 	MotionControlFile=settings.value("MotionControlFile").toString();
 	MotionControlMoveSteps=settings.value("MotionControlMoveSteps",100).toInt();
 	MotionControlTurnSteps=settings.value("MotionControlTurnSteps",100).toInt();
 	settings.endGroup();
-
-
-
-
 }
 
 void Config::save()
@@ -191,7 +189,8 @@ void Config::save()
 	settings.endGroup();
 
 	settings.beginGroup("motioncontrol");
-	settings.setValue("MotionControlBaseUri",MotionControlBaseUri);
+	settings.setValue("MotionControlHostname",MotionControlHostname);
+	settings.setValue("MotionControlPort",MotionControlPort);
 	settings.setValue("MotionControlFile",MotionControlFile);
 	settings.setValue("MotionControlMoveSteps",MotionControlMoveSteps);
 	settings.setValue("MotionControlTurnSteps",MotionControlTurnSteps);
