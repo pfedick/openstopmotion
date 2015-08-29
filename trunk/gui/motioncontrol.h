@@ -131,7 +131,7 @@ private:
     int myColorScheme;
     ppl7::String Filename;
 
-    void selectDevicePWMLight(const ppl7::String &Name);
+    void selectDevicePWMLight(DevicePWMLight* device);
 
     /*
     void updateFrameView();

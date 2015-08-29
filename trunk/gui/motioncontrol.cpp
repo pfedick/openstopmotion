@@ -257,18 +257,7 @@ void MotionControl::on_devicesListWidget_currentItemChanged ( QListWidgetItem * 
 		//Name.printnl();
 		switch (device->type()) {
 			case MotionControl::DeviceType_PWMLight:
-				currentDevice=device;
-				ui.stackedWidget->setCurrentIndex(0);
-				ui.currentDeviceName->setText(tr("Light"));
-				ui.currentDeviceTypeName->setText(device->name());
-				ui.controlRangeHorizontalSlider->setValue(((DevicePWMLight*)device)->value());
-				ui.controlRangeHorizontalSlider->setMinimum(((DevicePWMLight*)device)->minimum());
-				ui.controlRangeHorizontalSlider->setMaximum(((DevicePWMLight*)device)->maximum());
-				ui.controlRangeHorizontalSlider->setValue(((DevicePWMLight*)device)->value());
-				ui.controlRangeSpinBox->setValue(((DevicePWMLight*)device)->value());
-				ui.controlRangeSpinBox->setMinimum(((DevicePWMLight*)device)->minimum());
-				ui.controlRangeSpinBox->setMaximum(((DevicePWMLight*)device)->maximum());
-				ui.controlRangeSpinBox->setValue(((DevicePWMLight*)device)->value());
+				selectDevicePWMLight((DevicePWMLight*)device);
 				break;
 			case MotionControl::DeviceType_StepMotor:
 				currentDevice=device;
@@ -285,8 +274,20 @@ void MotionControl::on_devicesListWidget_currentItemChanged ( QListWidgetItem * 
 	}
 }
 
-void selectDevicePWMLight(const ppl7::String &Name)
+void MotionControl::selectDevicePWMLight(DevicePWMLight* device)
 {
+	currentDevice=device;
+	ui.stackedWidget->setCurrentIndex(0);
+	ui.currentDeviceName->setText(tr("Light"));
+	ui.currentDeviceTypeName->setText(device->name());
+	ui.controlRangeHorizontalSlider->setValue(((DevicePWMLight*)device)->value());
+	ui.controlRangeHorizontalSlider->setMinimum(((DevicePWMLight*)device)->minimum());
+	ui.controlRangeHorizontalSlider->setMaximum(((DevicePWMLight*)device)->maximum());
+	ui.controlRangeHorizontalSlider->setValue(((DevicePWMLight*)device)->value());
+	ui.controlRangeSpinBox->setValue(((DevicePWMLight*)device)->value());
+	ui.controlRangeSpinBox->setMinimum(((DevicePWMLight*)device)->minimum());
+	ui.controlRangeSpinBox->setMaximum(((DevicePWMLight*)device)->maximum());
+	ui.controlRangeSpinBox->setValue(((DevicePWMLight*)device)->value());
 
 }
 
