@@ -37,12 +37,17 @@ class PiControl
 
 
 	public:
+		enum StepDirection {
+			stepdir_left = 0,
+			stepdir_right =1,
+		};
 		PiControl();
 		~PiControl();
 		void connect(const ppl7::String hostname, int port);
 		void disconnect();
 		bool isConnected() const;
 		void setPWM(int num, int value);
+		void stepMotor(unsigned int id, StepDirection dir, unsigned int steps);
 };
 
 

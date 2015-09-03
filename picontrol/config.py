@@ -15,10 +15,14 @@ class Config(object):
         """!"""
         def __init__(self):
             self.name = ""
+            self.hardware = "motor_ctl"
             self.dir = 0
             self.step = 0
             self.sleep = 0
             self.stopsensor = 0
+            self.m0 = 0
+            self.m1 = 0
+            self.m2 = 0
             
     
     def __init__(self):
@@ -32,6 +36,9 @@ class Config(object):
         self.pwm_frequency = 1000
         # GPIO Pins of RGB-Status-LED
         self.StatusRGBPins = Config.RGBPins(8,10,12)
+        # Motor control over mcp23017
+        self.mcp23017_adr=0
+        self.mcp23017_bus=0
         # GPIO Pins for Motor 1
         self.Motor1 = Config.MotorPins()
         # GPIO Pins for Motor 2
@@ -66,13 +73,22 @@ class Config(object):
         self.StatusRGBPins.green = int(self.__read_param__(config, "statusrgb","green",0))
         self.StatusRGBPins.blue = int(self.__read_param__(config, "statusrgb","blue",0))
 
+    def __read_motor_ctl__(self, config):
+        self.mcp23017_adr = int(self.__read_param__(config, "motor_ctl","mcp23017_adr",0))
+        self.mcp23017_bus = int(self.__read_param__(config, "motor_ctl","mcp23017_bus",0))
+
+
     def __read_motor_param__(self, config, section):
         motor=Config.MotorPins()
         motor.name = self.__read_param__(config, section,"name",section)
+        motor.hardware = self.__read_param__(config, section,"hardware",section)
         motor.dir = int(self.__read_param__(config, section,"dir",0))
         motor.step = int(self.__read_param__(config, section,"step",0))
         motor.sleep = int(self.__read_param__(config, section,"sleep",0))
         motor.stopsensor = int(self.__read_param__(config, section,"stopsensor",0))
+        motor.m0 = int(self.__read_param__(config, section,"m0",0))
+        motor.m1 = int(self.__read_param__(config, section,"m1",0))
+        motor.m2 = int(self.__read_param__(config, section,"m2",0))
         return motor
 
         
@@ -86,6 +102,7 @@ class Config(object):
         self.__read_server_param__(config)
         self.__read_pwm_param__(config)
         self.__read_statusled_param__(config)
+        self.__read_motor_ctl__(config)
         self.Motor1 = self.__read_motor_param__(config,"motor1")
         self.Motor2 = self.__read_motor_param__(config,"motor2")
 

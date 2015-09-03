@@ -59,7 +59,16 @@ bool PiControl::isConnected() const
 
 void PiControl::speak(const ppl7::String &cmd)
 {
-	Socket.write(cmd);
+	//cmd.printnl();
+	try {
+		Socket.write(cmd);
+	} catch (const ppl7::BrokenPipeException &e) {
+		Socket.disconnect();
+
+	} catch (const ppl7::Exception &e) {
+		printf ("PiControl::speak: ");
+		e.print();
+	}
 	ppl7::String answer;
 	Socket.read(answer,1024);
 	//answer.printnl();
@@ -69,5 +78,13 @@ void PiControl::setPWM(int num, int value)
 {
 	ppl7::String Tmp;
 	Tmp.setf("pwm;%d;%d", num, value);
+	speak(Tmp);
+}
+
+
+void PiControl::stepMotor(unsigned int id, StepDirection dir, unsigned int steps)
+{
+	ppl7::String Tmp;
+	Tmp.setf("stepmotor;%u;%d;%u", id, dir, steps);
 	speak(Tmp);
 }

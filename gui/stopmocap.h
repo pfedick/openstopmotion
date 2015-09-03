@@ -67,11 +67,14 @@ class MotorThread : public QThread
 		 	void motorStopped();
 
 	private:
-		StopMoCap *gui;
-		ppl7::String Uri;
+		MotionControl *motioncontrol;
+		unsigned int id;
+		PiControl::StepDirection dir;
+		unsigned int steps;
 
 	public:
-		MotorThread(StopMoCap *gui);
+		MotorThread(MotionControl *motioncontrol);
+		void start(unsigned int id, PiControl::StepDirection dir, unsigned int steps);
 		//void getUri(const ppl7::String &Uri);
 		void run();
 
