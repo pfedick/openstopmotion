@@ -110,6 +110,7 @@ public:
     void addDevice(MotionControl::Device *device);
     void removeDevice(const ppl7::String &Name);
     void removeCameraControls();
+    void connect();
 
 //    void load(const ppl7::String &filename);
 //    void save(const ppl7::String &filename);
@@ -125,7 +126,6 @@ private:
     Config *conf;
     std::map<ppl7::String,Device*> Devices;
     Device *currentDevice;
-    PiControl pi;
 
     ppl7::grafix::Image img;
     int myColorScheme;
@@ -140,9 +140,13 @@ private:
     bool unsaved;
     /*
     int  findNextKeyFrame(int led, int start);
+
     int  findPreviousKeyFrame(int led, int start);
     void remindSave();
     */
+
+public:
+    PiControl pi;
 
 public slots:
 	void on_devicesListWidget_currentItemChanged ( QListWidgetItem * current, QListWidgetItem * previous );

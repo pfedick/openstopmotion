@@ -30,6 +30,7 @@
 #include "version.h"
 #include "stopmocap.h"
 #include "device.h"
+#include "picontrol.h"
 #include <QImage>
 #include <QPixmap>
 #include <QTimer>
@@ -65,10 +66,6 @@ StopMoCap::StopMoCap(QWidget *parent)
 	inPlayback=false;
 	inPreviewMode=false;
 	playbackFrame=0;
-	motorThread=new MotorThread(this);
-	QObject::connect(motorThread, SIGNAL(motorStarted()), this, SLOT(motorStarted()), Qt::QueuedConnection);
-	QObject::connect(motorThread, SIGNAL(motorStopped()), this, SLOT(motorStopped()), Qt::QueuedConnection);
-
 	connect(Timer, SIGNAL(timeout()), this, SLOT(on_timer_fired()));
 	connect(PlaybackTimer, SIGNAL(timeout()), this, SLOT(on_playbackTimer_fired()));
 
@@ -200,6 +197,9 @@ StopMoCap::StopMoCap(QWidget *parent)
 	fBuffer.loadAsync(conf.CaptureDir+"/"+conf.Scene);
 
 	initializeMotionControl();
+	motorThread=new MotorThread(motioncontrol);
+	QObject::connect(motorThread, SIGNAL(motorStarted()), this, SLOT(motorStarted()), Qt::QueuedConnection);
+	QObject::connect(motorThread, SIGNAL(motorStopped()), this, SLOT(motorStopped()), Qt::QueuedConnection);
 
 }
 
@@ -1561,51 +1561,22 @@ void StopMoCap::on_releaseButton_clicked()
 
 void StopMoCap::on_motorMoveLeft_clicked()
 {
-	/*
-	if(conf.MotionControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.MotionControlBaseUri+"camera/move/left/";
-	Uri+=ui.motorMoveSteps->text();
-	motorThread->getUri(Uri);
-	*/
+	motorThread->start(1,PiControl::stepdir_left,ui.motorMoveSteps->text().toInt());
 }
 
 void StopMoCap::on_motorMoveRight_clicked()
 {
-	/*
-	if(conf.MotionControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.MotionControlBaseUri+"camera/move/right/";
-	Uri+=ui.motorMoveSteps->text();
-	motorThread->getUri(Uri);
-	*/
+	motorThread->start(1,PiControl::stepdir_right,ui.motorMoveSteps->text().toInt());
 }
 
 void StopMoCap::on_motorTurnLeft_clicked()
 {
-	/*
-	if(conf.MotionControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.MotionControlBaseUri+"camera/turn/left/";
-	Uri+=ui.motorMoveSteps->text();
-	try {
-		ppl7::Curl::getUri(Uri);
-	} catch (const ppl7::Exception &e) {
-		e.print();
-	}
-	*/
+	motorThread->start(2,PiControl::stepdir_left,ui.motorTurnSteps->text().toInt());
 }
 
 void StopMoCap::on_motorTurnRight_clicked()
 {
-	/*
-	if(conf.MotionControlBaseUri.isEmpty()) return;
-	ppl7::String Uri=conf.MotionControlBaseUri+"camera/turn/left/";
-	Uri+=ui.motorMoveSteps->text();
-	try {
-		ppl7::Curl::getUri(Uri);
-	} catch (const ppl7::Exception &e) {
-		e.print();
-	}
-	*/
-
+	motorThread->start(2,PiControl::stepdir_right,ui.motorTurnSteps->text().toInt());
 }
 
 void StopMoCap::motorStarted()
@@ -1620,9 +1591,17 @@ void StopMoCap::motorStopped()
 
 
 
-MotorThread::MotorThread(StopMoCap *gui)
+MotorThread::MotorThread(MotionControl *motioncontrol)
 {
-	this->gui=gui;
+	this->motioncontrol=motioncontrol;
+}
+
+void MotorThread::start(unsigned int id, PiControl::StepDirection dir, unsigned int steps)
+{
+	this->id=id;
+	this->dir=dir;
+	this->steps=steps;
+	QThread::start();
 }
 
 /*
@@ -1635,13 +1614,12 @@ void MotorThread::getUri(const ppl7::String &Uri)
 void MotorThread::run()
 {
 	emit motorStarted();
-	/*
 	try {
-		ppl7::Curl::getUri(Uri);
-	} catch (const ppl7::Exception &e) {
-		//e.print();
+		motioncontrol->connect();
+		motioncontrol->pi.stepMotor(id,dir,steps);
+	} catch (...) {
+
 	}
-	*/
 	emit motorStopped();
 }
 
