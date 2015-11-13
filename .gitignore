@@ -1,0 +1,14 @@
+/debug/
+/release/
+/Makefile
+/Makefile.Debug
+/Makefile.Release
+/ui_arduinosketch.h
+/ui_framepaint.h
+/ui_ledcontrol.h
+/ui_ledslider.h
+/ui_motioncontrol.h
+/ui_myslider.h
+/ui_release.h
+/ui_selectscene.h
+/ui_stopmocap.h
