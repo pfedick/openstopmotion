@@ -153,26 +153,26 @@ class Device
 
 		void close();
 
-		PPLEXCEPTION(InvalidDevice, Exception);
-		PPLEXCEPTION(InvalidFormat, Exception);
-		PPLEXCEPTION(DeviceNotOpen, Exception);
-		PPLEXCEPTION(SelectError, Exception);
-		PPLEXCEPTION(Timeout, Exception);
-		PPLEXCEPTION(ReadError, Exception);
-		PPLEXCEPTION(StreamingUnsupported, Exception);
-		PPLEXCEPTION(StreamOffFailed, Exception);
-		PPLEXCEPTION(StreamOnFailed, Exception);
-		PPLEXCEPTION(StreamBufferError, Exception);
-		PPLEXCEPTION(DeviceDoesNotSupportCapture, Exception);
-		PPLEXCEPTION(MMapUnsupported, Exception);
-		PPLEXCEPTION(UserpUnsupported, Exception);
-		PPLEXCEPTION(InsufficientBufferMemory, Exception);
-		PPLEXCEPTION(QueryBufFailed, Exception);
-		PPLEXCEPTION(MMapFailed, Exception);
-		PPLEXCEPTION(MUnmapFailed, Exception);
-		PPLEXCEPTION(BufferError, Exception);
-		PPLEXCEPTION(SetControlValueFailed, Exception);
-		PPLEXCEPTION(GetControlValueFailed, Exception);
+		PPL7EXCEPTION(InvalidDevice, Exception);
+		PPL7EXCEPTION(InvalidFormat, Exception);
+		PPL7EXCEPTION(DeviceNotOpen, Exception);
+		PPL7EXCEPTION(SelectError, Exception);
+		PPL7EXCEPTION(Timeout, Exception);
+		PPL7EXCEPTION(ReadError, Exception);
+		PPL7EXCEPTION(StreamingUnsupported, Exception);
+		PPL7EXCEPTION(StreamOffFailed, Exception);
+		PPL7EXCEPTION(StreamOnFailed, Exception);
+		PPL7EXCEPTION(StreamBufferError, Exception);
+		PPL7EXCEPTION(DeviceDoesNotSupportCapture, Exception);
+		PPL7EXCEPTION(MMapUnsupported, Exception);
+		PPL7EXCEPTION(UserpUnsupported, Exception);
+		PPL7EXCEPTION(InsufficientBufferMemory, Exception);
+		PPL7EXCEPTION(QueryBufFailed, Exception);
+		PPL7EXCEPTION(MMapFailed, Exception);
+		PPL7EXCEPTION(MUnmapFailed, Exception);
+		PPL7EXCEPTION(BufferError, Exception);
+		PPL7EXCEPTION(SetControlValueFailed, Exception);
+		PPL7EXCEPTION(GetControlValueFailed, Exception);
 
 };
 
