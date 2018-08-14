@@ -69,6 +69,7 @@ INCLUDEPATH += src
 unix:INCLUDEPATH += ../tmp/include
 unix:INCLUDEPATH += ./include
 unix:INCLUDEPATH += /usr/local/include
+QMAKE_LFLAGS += -no-pie
 win32:INCLUDEPATH += C:/mingw/usr/local/include
 win32:QMAKE_LIBDIR += C:/mingw/usr/local/lib
 win32:QMAKESPEC = C:/Qt/4.7.4/mkspecs/win32-g++
