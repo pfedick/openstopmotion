@@ -38,8 +38,8 @@ USES=			iconv
 
 do-configure:
 	cd ${WRKSRC}; \
-	export CC=clang60
-	export CXX=clang++60
+	export CC=clang60; \
+	export CXX=clang++60; \
 	./configure --prefix=${LOCALBASE} --with-nasm
 
 do-build:
