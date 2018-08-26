@@ -26,7 +26,7 @@ BUILD_DEPENDS=		v4l_compat>=1.0.20120501:${PORTSDIR}/multimedia/v4l_compat \
 			nasm:${PORTSDIR}/devel/nasm \
 			clang60:${PORTSDIR}/devel/llvm60
 
-USE_QT4=		corelib gui opengl qmake
+USE_QT5=		core gui opengl qmake
 
 PLIST_FILES=		bin/${PORTNAME} \
 			share/pixmaps/${PORTNAME}.png \
@@ -43,6 +43,8 @@ do-configure:
 	./configure --prefix=${LOCALBASE} --with-nasm
 
 do-build:
+	export CC=clang60; \
+	export CXX=clang++60; \
 	@(cd ${WRKSRC}; if ! ${SETENV} ${MAKE_ENV} ${MAKE} ${MAKE_FLAGS} ${MAKEFILE} ${_MAKE_JOBS} ${MAKE_ARGS} ; then \
 		if [ x != x${BUILD_FAIL_MESSAGE} ] ; then \
 			${ECHO_MSG} "===> Compilation failed unexpectedly."; \
