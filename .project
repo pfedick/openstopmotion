@@ -3,7 +3,7 @@
 	<name>OpenStopMotion</name>
 	<comment></comment>
 	<projects>
-		<project>PPL7 - SVN</project>
+		<project>PPL7</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

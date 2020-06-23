@@ -608,7 +608,7 @@ void StopMoCap::grabFrame()
 			}
 		}
 		updateStatusBar();
-	} catch (Device::QueryBufFailed) {
+	} catch (const Device::QueryBufFailed &) {
 		cam.close();
 		stopCapture();
 	} catch (const ppl7::Exception &e) {
@@ -625,7 +625,7 @@ void StopMoCap::on_timer_fired()
 	//printf ("Timer fired\n");
 	if (inPlayback) return;
 	fpsCounter++;
-	ppluint64 now=ppl7::GetTime();
+	uint64_t now=ppl7::GetTime();
 	if (now!=fpsTimer) {
 		ppl7::String Tmp;
 		Tmp.setf("%i",fpsCounter);
@@ -1541,7 +1541,7 @@ void StopMoCap::on_releaseButton_clicked()
 		                                tr("No frames captured yet, export not possible"));
 		return;
 	}
-	if (highestSceneFrame()!=fBuffer.size()) {
+	if (highestSceneFrame()!=(int)fBuffer.size()) {
 		 QMessageBox::critical(this, STOPMOCAP_APPNAME,
 		                                tr("Scene is not complete in cache, please wait a few seconds"));
 		return;

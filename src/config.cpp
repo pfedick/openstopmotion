@@ -102,15 +102,15 @@ void Config::load()
 	chromaBGImage=settings.value("chromaBGImage","").toString();
 	chromaToleranceFar=settings.value("chromaToleranceFar",0).toInt();
 	chromaToleranceNear=settings.value("chromaToleranceNear",0).toInt();
-	chromaKey.setColor((ppluint32)settings.value("chromaKconfey",0x00ff0000).toInt());
-	replaceColor.setColor((ppluint32)settings.value("replaceColor",0x00ff0000).toInt());
+	chromaKey.setColor((uint32_t)settings.value("chromaKconfey",0x00ff0000).toInt());
+	replaceColor.setColor((uint32_t)settings.value("replaceColor",0x00ff0000).toInt());
 	chromaReplaceMode=settings.value("chromaReplaceMode",0).toInt();
 
 	foregroundEnabled=settings.value("foregroundEnabled",false).toBool();
 	chromaFGImage=settings.value("chromaFGImage","").toString();
 	chromaToleranceFarFG=settings.value("chromaToleranceFarFG",0).toInt();
 	chromaToleranceNearFG=settings.value("chromaToleranceNearFG",0).toInt();
-	chromaKeyFG.setColor((ppluint32)settings.value("chromaKeyFG",0x00ff0000).toInt());
+	chromaKeyFG.setColor((uint32_t)settings.value("chromaKeyFG",0x00ff0000).toInt());
 
 	settings.endGroup();
 

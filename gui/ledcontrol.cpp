@@ -492,8 +492,8 @@ void LedControl::recalcFrames(int id)
 	int frame=0;
 	//int maxf=ui.maxFrame->text().toInt();
 	int value=0;
-	int nextframe;
-	int nextvalue;
+	int nextframe=0;
+	int nextvalue=0;
 	int steps;
 
 	ppl7::AVLTree<int, int>::Iterator it;

@@ -124,7 +124,7 @@ private:
     ppl7::grafix::Image grabImg;
     int interpolateSequence;
     Device cam;
-    ppluint64 fpsTimer;
+    uint64_t fpsTimer;
     int fpsCounter;
     FramePaint *fpaint;
     Arduino arduino;

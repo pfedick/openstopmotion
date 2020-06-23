@@ -55,7 +55,7 @@ class SaveThread : ppl7::Thread
 		ppl7::Mutex mutex;
 		ppl7::Mutex signal;
 		std::queue<SaveJob*> jobs;
-		ppluint64 timeout;
+		uint64_t timeout;
 		bool running;
 
 
